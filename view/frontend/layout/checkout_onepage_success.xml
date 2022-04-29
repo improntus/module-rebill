@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Improntus_Rebill::css/rebill.css"/>
+    </head>
+    <body>
+        <referenceBlock name="order.success.additional.info">
+            <block class="Improntus\Rebill\Block\Onepage\Success" name="rebill.onepage.success" template="Improntus_Rebill::onepage/success.phtml"/>
+        </referenceBlock>
+    </body>
+</page>
