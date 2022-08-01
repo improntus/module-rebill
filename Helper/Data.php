@@ -2,139 +2,105 @@
 
 namespace Improntus\Rebill\Helper;
 
+use Exception;
+use Improntus\Rebill\Logger\Logger;
+use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ProductFactory;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
+use Magento\Customer\Model\Session;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
-use Magento\Store\Model\ScopeInterface;
-use Magento\Store\Model\StoreManagerInterface;
-use Zend\Log\Logger;
-use Zend\Log\Writer\Stream;
+use Magento\Framework\Registry;
+use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\Item\OptionFactory;
+use Magento\Sales\Model\Order;
+use Magento\SalesRule\Model\Rule;
+use Magento\Framework\Pricing\Helper\Data as CurrencyHelper;
 
-/**
- * Class Data
- *
- * @author Improntus <https://www.improntus.com>
- * @package Improntus\Rebill\Helper
- */
 class Data extends AbstractHelper
 {
     /**
-     * @var StoreManagerInterface
+     * @var Logger
      */
-    protected $_storeManager;
+    protected $logger;
 
     /**
-     * Data constructor.
+     * @var Session
+     */
+    protected $customerSession;
+
+    /**
+     * @var ProductFactory
+     */
+    protected $productFactory;
+    protected $currencyHelper;
+    protected $registry;
+    protected $configurableType;
+
+    /**
      * @param Context $context
-     * @param StoreManagerInterface $storeManager
+     * @param Logger $logger
+     * @param Session $customerSession
+     * @param ProductFactory $productFactory
+     * @param Registry $registry
+     * @param CurrencyHelper $currencyHelper
+     * @param Configurable $configurableType
      */
     public function __construct(
-        Context $context,
-        StoreManagerInterface $storeManager
-    )
-    {
-        $this->_storeManager = $storeManager;
-
+        Context        $context,
+        Logger         $logger,
+        Session        $customerSession,
+        ProductFactory $productFactory,
+        Registry       $registry,
+        CurrencyHelper $currencyHelper,
+        Configurable   $configurableType
+    ) {
+        $this->configurableType = $configurableType;
+        $this->registry = $registry;
+        $this->currencyHelper = $currencyHelper;
+        $this->productFactory = $productFactory;
+        $this->customerSession = $customerSession;
+        $this->logger = $logger;
         parent::__construct($context);
     }
 
     /**
      * @return bool
      */
-    public function getSandboxMode()
+    public function isLoggedIn()
     {
-        return (boolean)$this->scopeConfig->getValue('payment/improntus_rebillsmartfields/sandboxmode', ScopeInterface::SCOPE_STORE);
+        return $this->customerSession->isLoggedIn();
     }
 
     /**
-     * @return bool
+     * @param string $message
      */
-    public function getSmartFieldsEnabled()
+    public function logInfo(string $message)
     {
-        return (boolean)$this->scopeConfig->getValue('payment/improntus_rebillsmartfields/active', ScopeInterface::SCOPE_STORE);
+        $this->logger->addInfo($message);
     }
 
     /**
-     * @return bool
+     * @param string $message
      */
-    public function getTicketEnabled()
+    public function logError(string $message)
     {
-        return (boolean)$this->scopeConfig->getValue('payment/improntus_rebillticket/active', ScopeInterface::SCOPE_STORE);
+        $this->logger->addError($message);
     }
 
-    /**
-     * @return bool
-     */
-    public function getBanktransferEnabled()
+    public function isProductChild(?Product $product)
     {
-        return (boolean)$this->scopeConfig->getValue('payment/improntus_rebillbanktransfer/active', ScopeInterface::SCOPE_STORE);
-    }
-
-    /**
-     * @return string
-     */
-    public function getApiKey()
-    {
-        return $this->scopeConfig->getValue('payment/improntus_rebillsmartfields/api_key', ScopeInterface::SCOPE_STORE);
-    }
-
-    /**
-     * @return string
-     */
-    public function getXLogin()
-    {
-        return $this->scopeConfig->getValue('payment/improntus_rebillsmartfields/x_login', ScopeInterface::SCOPE_STORE);
-    }
-
-    /**
-     * @return string
-     */
-    public function getCountry()
-    {
-        return $this->scopeConfig->getValue('payment/improntus_rebillsmartfields/country', ScopeInterface::SCOPE_STORE);
-    }
-
-    /**
-     * @return bool
-     */
-    public function getDebugMode()
-    {
-        return (boolean)$this->scopeConfig->getValue('payment/improntus_rebillsmartfields/enable_debug', ScopeInterface::SCOPE_STORE);
-    }
-
-    /**
-     * @param $method
-     * @return string
-     */
-    public function getApiUrl(string $method)
-    {
-        return $this->getSandboxMode() ? "https://sandbox.rebill.com/$method" : "https://api.rebill.com/$method";
-    }
-
-    /**
-     * @return string
-     */
-    public function getCurrency()
-    {
-//        $countryData = $this->getCountryData($this->getCountry());
-//
-//        if(is_array($countryData))
-//        {
-//            return $countryData['currency'];
-//        }
-//        else
-//            return 'USD';
-    }
-
-    /**
-     * @param $message String
-     * @param $fileName String
-     */
-    public static function log($message,$fileName)
-    {
-
-        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/'.$fileName);
-        $logger = new \Zend\Log\Logger();
-        $logger->addWriter($writer);
-        $logger->info($message);
+        try {
+            if ($product->getTypeId() == 'configurable') {
+                return false;
+            } elseif ($product->getTypeId() == 'virtual' || $product->getTypeId() == 'simple') {
+                if ($this->configurableType->getParentIdsByChild($product->getId())) {
+                    return true;
+                }
+            }
+        } catch (Exception $exception) {
+            return false;
+        }
+        return false;
     }
 }

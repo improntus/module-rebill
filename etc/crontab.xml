@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="rebill">
+        <job name="rebill_order_update" instance="Improntus\Rebill\Cron\OrderUpdate" method="execute">
+            <schedule>*/20 * * * *</schedule>
+        </job>
+    </group>
+</config>

@@ -9,11 +9,13 @@
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
+
         <div class="payment-method-billing-address rebill">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
+
         <div class="checkout-agreements-block">
             <!-- ko foreach: $parent.getRegion('before-place-order') -->
             <!-- ko template: getTemplate() --><!-- /ko -->
@@ -24,7 +26,7 @@
             <div class="primary">
                 <button data-role="review-save" type="submit" id="send-rebill-payment"
                         data-bind="click: placeOrder, attr: {title: $t('Continue')}" class="button action primary checkout">
-                    <!-- ko i18n: 'Confirmar compra' --><!-- /ko -->
+                    <!-- ko i18n: 'Place Order' --><!-- /ko -->
                 </button>
             </div>
         </div>

@@ -1,0 +1,26 @@
+<?php
+/**
+ * @var $block View
+ */
+
+use Improntus\Rebill\Helper\Config;
+use Magento\Catalog\Block\Product\View;
+use Magento\Framework\Pricing\Helper\Data;
+
+/** @var Config $configHelper */
+$configHelper = $this->helper(Config::class);
+$product = $block->getProduct();
+$details = $configHelper->getProductRebillSubscriptionDetails($product);
+/** @var Data $currencyHelper */
+$currencyHelper = $this->helper(Data::class);
+$onclick = $configHelper->isLoggedIn() ? '' : "onclick=\"window.location.href='{$block->getUrl('customer/account/login')}'\" style=\"cursor:pointer;\"";
+?>
+<?php if ($details['enable_subscription']) : ?>
+    <div class="subscription-text" <?= $onclick ?>>
+        <?php if ($configHelper->isLoggedIn()) : ?>
+            <span class="text"><?= $configHelper->getSubscriptionProductText() ?></span>
+        <?php else : ?>
+            <span class="text guest-text"><?= $configHelper->getGuestCustomerText() ?></span>
+        <?php endif ?>
+    </div>
+<?php endif ?>

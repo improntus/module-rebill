@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <title>Subscriptions</title>
+    </head>
+    <body>
+    <referenceContainer name="content">
+        <block class="Improntus\Rebill\Block\Adminhtml\Subscription\Container" name="rebill.subscription.container">
+            <block class="Magento\Backend\Block\Widget\Grid" name="rebill.subscription.grid" as="grid">
+                <arguments>
+                    <argument name="id" xsi:type="string">id</argument>
+                    <argument name="dataSource" xsi:type="object">Improntus\Rebill\Model\Rebill\Subscription\Collection</argument>
+                    <argument name="default_sort" xsi:type="string">id</argument>
+                    <argument name="default_dir" xsi:type="string">ASC</argument>
+                </arguments>
+                <block class="Magento\Backend\Block\Widget\Grid\ColumnSet" name="rebill.subscription.column.set" as="grid.columnSet">
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="id">
+                        <arguments>
+                            <argument name="header" xsi:type="string" translate="true">ID</argument>
+                            <argument name="index" xsi:type="string">id</argument>
+                            <argument name="type" xsi:type="string">text</argument>
+                        </arguments>
+                    </block>
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="status">
+                        <arguments>
+                            <argument name="header" xsi:type="string" translate="true">Status</argument>
+                            <argument name="index" xsi:type="string">status</argument>
+                            <argument name="type" xsi:type="string">text</argument>
+                        </arguments>
+                    </block>
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="quantity">
+                        <arguments>
+                            <argument name="header" xsi:type="string" translate="true">Quantity</argument>
+                            <argument name="index" xsi:type="string">quantity</argument>
+                            <argument name="type" xsi:type="string">text</argument>
+                        </arguments>
+                    </block>
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="user_email">
+                        <arguments>
+                            <argument name="header" xsi:type="string" translate="true">User Email</argument>
+                            <argument name="index" xsi:type="string">user_email</argument>
+                            <argument name="type" xsi:type="string">text</argument>
+                        </arguments>
+                    </block>
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="title">
+                        <arguments>
+                            <argument name="header" xsi:type="string" translate="true">Title</argument>
+                            <argument name="index" xsi:type="string">title</argument>
+                            <argument name="type" xsi:type="string">text</argument>
+                        </arguments>
+                    </block>
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="last_charge_date">
+                        <arguments>
+                            <argument name="header" xsi:type="string" translate="true">Last Charge Date</argument>
+                            <argument name="index" xsi:type="string">last_charge_date</argument>
+                            <argument name="type" xsi:type="string">text</argument>
+                        </arguments>
+                    </block>
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="next_charge_date">
+                        <arguments>
+                            <argument name="header" xsi:type="string" translate="true">Next Charge Date</argument>
+                            <argument name="index" xsi:type="string">next_charge_date</argument>
+                            <argument name="type" xsi:type="string">text</argument>
+                        </arguments>
+                    </block>
+                </block>
+            </block>
+        </block>
+    </referenceContainer>
+    </body>
+</page>

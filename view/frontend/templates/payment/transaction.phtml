@@ -1,0 +1,98 @@
+<?php
+/**
+ * @var $block Transaction
+ */
+
+use Improntus\Rebill\Block\Payment\Transaction;
+use Improntus\Rebill\Helper\Config;
+
+$order = $block->getOrder();
+$prices = $block->getPrices();
+/** @var Config $configHelper */
+$configHelper = $this->helper(Config::class);
+?>
+<h2 class="rebill.payment.transaction.title"><?= __('Pay with rebill') ?></h2>
+<div id="rebill_elements"></div>
+<div class="rebill-errors"></div>
+
+<script>
+    require(['jquery', 'rebill'], function ($, rebill) {
+        let initialization = {
+            organization_id: '<?= $configHelper->getApiUuid() ?>',
+            api_url: 'https://api.rebill.to/v2',
+        }
+        let checkout = new Rebill.PhantomSDK(initialization);
+
+        checkout.setCustomer({
+            firstName: "<?= $order->getCustomerFirstname() ?>",
+            lastName: "<?= $order->getCustomerLastname() ?>",
+            email: '<?= $order->getCustomerEmail() ?>',
+            phone: {
+                countryCode: "00",
+                areaCode: "00",
+                number: "<?= $order->getBillingAddress()->getTelephone() ?>"
+            },
+            personalId: {
+                type: "<?= $configHelper->getCustomerDocumentType() ?>",
+                value: "<?= $order->getBillingAddress()->getData($configHelper->getCustomerAttributeForDocument()) ?>"
+            },
+            address: {
+                street: "<?= $order->getBillingAddress()->getStreet()[0] ?>",
+                number: "<?= $order->getBillingAddress()->getStreet()[1] ?? 'none' ?>",
+                floor: "<?= $order->getBillingAddress()->getStreet()[2] ?? 'none' ?>",
+                apt: "<?= $order->getBillingAddress()->getStreet()[3] ?? 'none' ?>",
+                city: "<?= $order->getBillingAddress()->getCity() ?>",
+                state: "<?= $order->getBillingAddress()->getRegion() ?>",
+                zipCode: "<?= $order->getBillingAddress()->getPostcode() ?? '' ?>",
+                country: "<?= $order->getBillingAddress()->getCountryId() ?>",
+                description: "Billing Address"
+            }
+        });
+        checkout.setCardHolder({
+            name: '<?= $order->getBillingAddress()->getFirstname() . ' ' . $order->getBillingAddress()->getLastname() ?>',
+            identification: {
+                type: '<?= $configHelper->getCustomerDocumentType() ?>',
+                value: "<?= $order->getBillingAddress()->getData($configHelper->getCustomerAttributeForDocument()) ?>"
+            },
+        })
+        checkout.setTransaction({prices: <?= json_encode($prices) ?>});
+        checkout.setCallbacks({
+            onSuccess: function (response) {
+                $('.rebill-errors').html('');
+                if (response.invoice) {
+                    $.ajax({
+                        url: '<?= $block->getUrl('rebill/payment/success', ['order_id' => $order->getId()]) ?>',
+                        data: response,
+                        type: 'post',
+                        success: function () {
+                            window.location.href = '<?= $block->getUrl('checkout/onepage/success') ?>';
+                        }
+                    });
+                } else {
+                    $('.rebill-errors').append($('<div class="error-message"></div>').text("<?= __('The payment can\'t be processed, try again with another card.') ?>"));
+                }
+            },
+            onError: function (error) {
+                $('.rebill-errors').html('')
+                    .append($('<div class="error-message"></div>').text("<?= __('The payment can\'t be processed, try again with another card.') ?>"));
+            },
+        });
+        checkout.setText({
+            card_number: '<?= __('Card Number') ?>',
+            pay_button: '<?= __('Pay') ?>',
+            error_messages: {
+                emptyCardNumber: '<?= __('Enter a card number') ?>',
+                invalidCardNumber: '<?= __('Card number is invalid') ?>',
+                emptyExpiryDate: '<?= __('Enter an expiry date') ?>',
+                monthOutOfRange: '<?= __('Expiry month must be between 01 and 12') ?>',
+                yearOutOfRange: '<?= __('Expiry year cannot be in the past') ?>',
+                dateOutOfRange: '<?= __('Expiry date cannot be in the past') ?>',
+                invalidExpiryDate: '<?= __('Expiry date is invalid') ?>',
+                emptyCVC: '<?= __('Enter a CVC') ?>',
+                invalidCVC: '<?= __('CVC is invalid') ?>',
+            },
+        });
+
+        checkout.setElements('rebill_elements');
+    });
+</script>

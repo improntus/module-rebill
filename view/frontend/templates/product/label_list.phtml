@@ -1,0 +1,39 @@
+<?php
+/**
+ * @var $block ListProduct
+ */
+
+use Improntus\Rebill\Helper\Config;
+use Magento\Catalog\Block\Product\ListProduct;
+
+/** @var Config $configHelper */
+$configHelper = $this->helper(Config::class);
+?>
+<?php if (($labelType = $configHelper->getProductLabel()) !== 'none') : ?>
+    <script>
+        require(['jquery'], function ($) {
+            $(document).ready(function () {
+                let labelType = '<?= $labelType ?>';
+                let labelRebillLogo = '<?= $block->getViewFileUrl('Improntus_Rebill::images/rebill_logo.png'); ?>';
+                let labelEl = $('<div class="rebill-product-label"></div>');
+                if (labelType === 'text') {
+                    labelEl.append($('<span class="rebill-label-text"></span>').text('<?= $configHelper->getProductLabelCustomText() ?>'));
+                } else {
+                    labelEl.append($('<div class="rebill-label-rebill-logo"></div>')
+                        .append($(`<img src='${labelRebillLogo}' alt='<?= __('Product Subscription with Rebill') ?>'/>`)));
+                }
+                $.ajax({
+                    url: "<?= $block->getUrl('rebill/product/labels') ?>",
+                    type: 'POST',
+                    data: {ids: <?= json_encode($block->getLoadedProductCollection()->getAllIds()) ?>},
+                    dataType: 'json',
+                    success: function (data) {
+                        $.each(data.products, function (id, value) {
+                            $(`#product-item-info_${id} .product-image-photo`).parent().append(labelEl);
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+<?php endif; ?>

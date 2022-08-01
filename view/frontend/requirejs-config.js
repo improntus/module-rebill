@@ -5,5 +5,11 @@ var config = {
                 'Improntus_Rebill/js/model/checkout-data-resolver': true
             }
         }
+    },
+    map: {
+        '*':{
+            jquery_card: 'Improntus_Rebill/js/jquery.card',
+            rebill: 'https://sdk.rebill.to/v2/rebill.min.js',
+        }
     }
 };

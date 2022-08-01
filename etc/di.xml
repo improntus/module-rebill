@@ -1,17 +1,66 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <virtualType name="Improntus\Rebill\Model\Rebill\ConfigProvider">
+    <virtualType name="Improntus\Rebill\Model\Payment\ConfigProvider">
         <arguments>
             <argument name="methodCodes" xsi:type="array">
-                <item name="improntus_rebill" xsi:type="const">Improntus\Rebill\Model\Rebill\Payment::CODE</item>
+                <item name="improntus_rebill" xsi:type="const">Improntus\Rebill\Model\Payment\Rebill::CODE</item>
             </argument>
         </arguments>
     </virtualType>
     <type name="Magento\Checkout\Model\CompositeConfigProvider">
         <arguments>
             <argument name="configProviders" xsi:type="array">
-                <item name="improntus_rebill_config_provider" xsi:type="object">Improntus\Rebill\Model\Rebill\ConfigProvider</item>
+                <item name="improntus_rebill_config_provider" xsi:type="object">Improntus\Rebill\Model\Payment\ConfigProvider</item>
             </argument>
         </arguments>
+    </type>
+
+    <type name="Improntus\Rebill\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="Improntus\Rebill\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">rebillLogger</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="system" xsi:type="object">Improntus\Rebill\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="Improntus\Rebill\Model\ResourceModel\Gateway\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">rebill_gateway</argument>
+            <argument name="resourceModel" xsi:type="string">Improntus\Rebill\Model\ResourceModel\Gateway</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="rebill_gateway_grid_data_source" xsi:type="string">Improntus\Rebill\Model\ResourceModel\Gateway\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="rebill_order_update" xsi:type="object">Improntus\Rebill\Console\OrderUpdate</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Customer\Helper\Address">
+        <plugin name="Improntus_Rebill::isVatAttributeVisible" type="Improntus\Rebill\Plugin\Helper\Address" sortOrder="10"/>
+    </type>
+
+    <type name="Magento\Checkout\Helper\Data">
+        <plugin name="Improntus_Rebill::checkPaymentMethodsAvailability" type="Improntus\Rebill\Plugin\Helper\CheckoutData" sortOrder="10"/>
+    </type>
+
+    <type name="Magento\Catalog\Model\Product">
+        <plugin name="Improntus_Rebill::afterIsSalable" type="Improntus\Rebill\Plugin\Catalog\Product" sortOrder="10"/>
     </type>
 </config>

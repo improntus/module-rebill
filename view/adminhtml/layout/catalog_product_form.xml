@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/layout_generic.xsd">
+    <referenceContainer name="content">
+        <block class="Improntus\Rebill\Block\Adminhtml\ProductForm" name="rebill.product.form.script" template="Improntus_Rebill::product/form/script.phtml" after="-"/>
+    </referenceContainer>
+</layout>

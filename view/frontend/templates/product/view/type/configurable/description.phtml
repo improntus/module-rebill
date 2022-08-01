@@ -1,0 +1,57 @@
+<?php
+/**
+ * @var $block View
+ */
+
+use Improntus\Rebill\Helper\Config;
+use Magento\Catalog\Block\Product\View;
+
+/** @var Config $configHelper */
+$configHelper = $this->helper(Config::class);
+$frequencies = $configHelper->getProductRebillSubscriptionDetails($block->getProduct())['frequency'];
+?>
+<?php if ($count = count($frequencies) && $configHelper->isLoggedIn()) : ?>
+    <div class="rebill-subscription">
+        <div class="check-subscription">
+            <input type="radio" name="use_subscription" value="0" id="one-time-purchase" checked="checked">
+            <label for="one-time-purchase">
+                <?= __('One time purchase') ?>
+            </label>
+        </div>
+        <div class="check-subscription">
+            <input type="radio" name="use_subscription" value="1" id="use-subscription">
+            <label for="use-subscription">
+                <?php if ($count == 1) : ?>
+                    <?= __('Subscribe to this product %1', $configHelper->getFrequencyDescription($block->getProduct(), array_first($frequencies))) ?>
+                <?php else : ?>
+                    <?= __('Subscribe to this product') ?>
+                <?php endif ?>
+            </label>
+        </div>
+        <div class="description" style="display: none">
+            <?php if ($count == 1) : ?>
+                <input type="hidden" name="frequency" value="<?= array_first($frequencies)['id'] ?>">
+            <?php else : ?>
+                <span class="option">
+                    <select name="frequency" id="frequency">
+                        <?php foreach ($frequencies as $frequency) : ?>
+                            <option value="<?= $frequency['id'] ?>"><?= $configHelper->getFrequencyDescription($block->getProduct(), $frequency) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </span>
+            <?php endif ?>
+        </div>
+    </div>
+    <script>
+        require(['jquery'], function ($) {
+            $(document).ready(function () {
+                $("#use-subscription").click(function () {
+                    $(".rebill-subscription .description").show();
+                });
+                $("#one-time-purchase").click(function () {
+                    $(".rebill-subscription .description").hide();
+                });
+            });
+        });
+    </script>
+<?php endif ?>

@@ -1,0 +1,149 @@
+#payment_other_improntus_rebill-head {
+    position: relative;
+    line-height: 28px;
+    font-size: 0;
+    &:after {
+        content: '';
+        display: block;
+        width: 100px;
+        height: 40px;
+        background: url("../Improntus_Rebill/images/rebill_logo.png") center center no-repeat;
+        background-size: contain;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+    }
+}
+
+.admin__menu #menu-improntus-rebill-main > a:before  {
+    opacity: 0.65;
+    content: '';
+    font-size: 2.4rem;
+    display: block;
+    position: relative;
+    top: -0.3rem;
+    width: 35px;
+    height: 32px;
+    background: url('../Improntus_Rebill/images/rebill_logo.svg') center no-repeat;
+    background-size: contain;
+    margin: 0 auto;
+}
+
+.admin__menu #menu-improntus-rebill-main:hover > a:before {
+    opacity: 1;
+}
+
+.fieldset-wrapper[data-index='rebill'] {
+    .admin__field-label {
+        position: relative;
+        .rebill-tooltip {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: -31px;
+            width: 32px;
+            padding: 0 3px;
+            .rebill-tooltip-button {
+                width: 25px;
+                height: 25px;
+                color: #777;
+                border-radius: 100%;
+                line-height: unset !important;
+                text-align: center;
+                padding: 5px;
+                cursor: pointer;
+                &:before {
+                    content: '?';
+                    display: block;
+                    line-height: 1;
+                }
+            }
+            .rebill-tooltip-text {
+                position: absolute;
+                //width: 800px;
+                overflow: hidden;
+                left: 29px;
+                top: -22px;
+                z-index: 100;
+                width: 0;
+                height: 80px;
+                transition: all .5s;
+                text-align: left;
+                &> span {
+                    position: relative;
+                    display: block !important;
+                    border: 1px solid #aaa;
+                    padding: 15px;
+                    background: #fff;
+                    height: 100%;
+                    text-align: justify;
+                    margin-left: 10px;
+                    line-height: unset;
+                    &:before {
+                        position: absolute;
+                        content: '';
+                        display: block;
+                        width: 15px;
+                        height: 15px;
+                        background: #fff;
+                        top: 0;
+                        bottom: 0;
+                        margin: auto;
+                        left: -8px;
+                        transform: rotate(45deg);
+                        border-left: 1px solid #aaa;
+                        border-bottom: 1px solid #aaa;
+                    }
+                    &> span {
+                        width: 760px;
+                        vertical-align: bottom;
+                    }
+                }
+            }
+            &.active {
+                .rebill-tooltip-text {
+                    width: 800px;
+                }
+            }
+        }
+    }
+}
+#rebill-frequency-modal {
+    display: none;
+}
+.modal-content {
+    #rebill-frequency-modal {
+        display: block;
+        table {
+            width: 100%;
+            thead {
+                tr {
+                    th {
+                        background: #ccc;
+                        padding: 15px;
+                    }
+                }
+            }
+            tbody {
+                tr {
+                    border-bottom: 1px solid #ddd;
+                    td {
+                        text-align: center;
+                        padding: 15px;
+                    }
+                }
+            }
+        }
+        input {
+            padding: 5px 5px 5px 18px;
+            max-width: 70px;
+            text-align: center;
+        }
+        select {
+            padding: 5px;
+            max-width: 100px;
+            text-align: center;
+        }
+    }
+}

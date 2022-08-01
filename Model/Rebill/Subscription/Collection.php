@@ -1,0 +1,117 @@
+<?php
+
+namespace Improntus\Rebill\Model\Rebill\Subscription;
+
+use Exception;
+use Improntus\Rebill\Helper\Config;
+use Improntus\Rebill\Model\Price;
+use Improntus\Rebill\Model\Rebill\Item;
+use Improntus\Rebill\Model\Rebill\Subscription;
+use Improntus\Rebill\Model\ResourceModel\Price\CollectionFactory;
+use Magento\Framework\Data\Collection\EntityFactoryInterface;
+
+class Collection extends \Magento\Framework\Data\Collection
+{
+    protected $subscription;
+    protected $modelFactory;
+    protected $collectionFactory;
+    protected $configHelper;
+    protected $rebillItem;
+
+    public function __construct(
+        EntityFactoryInterface $entityFactory,
+        Subscription           $subscription,
+        ModelFactory           $modelFactory,
+        CollectionFactory      $collectionFactory,
+        Config                 $configHelper,
+        Item                   $item
+    ) {
+        $this->rebillItem = $item;
+        $this->configHelper = $configHelper;
+        $this->collectionFactory = $collectionFactory;
+        $this->modelFactory = $modelFactory;
+        $this->subscription = $subscription;
+        $this->setItemObjectClass(Model::class);
+        $this->setItems();
+        parent::__construct($entityFactory);
+    }
+
+    protected function setItems()
+    {
+        $items = [];
+        $pricesIds = [];
+        $x = 0;
+        try {
+            $cycleList = $this->subscription->getList('cycle');
+            $recurrentList = $this->subscription->getList('recurrent');
+            foreach ($cycleList as $item) {
+                $items[$x] = $this->getNewEmptyItem()->setData($this->getItemsData($item));
+                $pricesIds[$item['price']['id']] = $x;
+                $x++;
+            }
+            foreach ($recurrentList as $item) {
+                $items[$x] = $this->getNewEmptyItem()->setData($this->getItemsData($item));
+                $pricesIds[$item['price']['id']] = $x;
+                $x++;
+            }
+            /** @var \Improntus\Rebill\Model\ResourceModel\Price\Collection $prices */
+            $prices = $this->collectionFactory->create();
+            $prices->addFieldToFilter('rebill_price_id', ['in' => array_keys($pricesIds)]);
+            /** @var Price $price */
+            foreach ($prices as $price) {
+                $priceId = $price->getData('rebill_price_id');
+                $index = $pricesIds[$priceId];
+                unset($pricesIds[$priceId]);
+                $items[$index]['title'] = __(
+                    '%1 x %2 - %3',
+                    $items[$index]['quantity'],
+                    $items[$index]['title'],
+                    $this->configHelper->getFrequencyDescription(null, json_decode($price->getData('details'), true), $items[$index]['amount'])
+                );
+            }
+            if (count($pricesIds)) {
+                foreach ($items as &$item) {
+                    if (isset($pricesIds[$item->getData('price')['id']])) {
+                        $price = $item->getData('price');
+                        if ($price) {
+                            $frequency = [
+                                "initialCost"       => 0,
+                                "frequency"         => $price['frequency']['quantity'],
+                                "frequencyType"     => $price['frequency']['quantity'],
+                                "recurringPayments" => $price['repetitions']
+                            ];
+                            $item->setData('title', __(
+                                '%1 x %2 - %3',
+                                $item->getData('quantity'),
+                                $item->getData('title'),
+                                $this->configHelper->getFrequencyDescription(null, $frequency, $price['amount'])
+                            ));
+                        }
+                    }
+                }
+            }
+        } catch (Exception $exception) {
+
+        }
+        $this->_items = $items;
+    }
+
+    protected function getItemsData($item)
+    {
+        return [
+            'id'               => $item['id'],
+            'status'           => $item['status'],
+            'quantity'         => $item['quantity'],
+            'user_email'       => $item['userEmail'],
+            'title'            => $item['title'],
+            'price'            => $item['price'],
+            'last_charge_date' => $item['lastChargeDate'],
+            'next_charge_date' => $item['nextChargeDate'],
+        ];
+    }
+
+    public function getNewEmptyItem()
+    {
+        return $this->modelFactory->create();
+    }
+}

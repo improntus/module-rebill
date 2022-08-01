@@ -1,0 +1,180 @@
+@import "_card.less";
+.checkout-payment-method {
+    #improntus_rebill-form {
+        max-width: 250px;
+        .ccard {
+            .owner {
+                .input-text {
+                    width: 225px;
+                }
+            }
+
+            .date {
+                float: left;
+                margin-right: 20px;
+
+                .month {
+                    .select-month {
+                        width: 80px;
+                    }
+                }
+            }
+        }
+    }
+}
+.rebill-errors {
+    margin-top: 10px;
+    .error-message {
+        color: #ef4f4f;
+    }
+}
+.product-items {
+    .product-image-wrapper, .product-item-photo {
+        position: relative;
+        .rebill-product-label {
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 100;
+            .rebill-label-text {
+                text-transform: uppercase;
+                font-weight: bold;
+                padding: 5px 10px;
+                border: 1px solid #ddd;
+                display: block;
+                color: #000;
+                background: #fff;
+            }
+            .rebill-label-rebill-logo {
+                width: 100px;
+                padding: 5px 5px 0 0;
+            }
+        }
+    }
+}
+.catalog-product-view {
+    .product.media {
+        position: relative;
+        .rebill-product-label {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            .rebill-label-text {
+                text-transform: uppercase;
+                font-weight: bold;
+                padding: 15px;
+                border: 1px solid #ddd;
+            }
+            .rebill-label-rebill-logo {
+                width: 100px;
+                padding: 5px 5px 0 0;
+                border: 1px solid #ddd;
+            }
+        }
+    }
+    .subscription-text {
+        padding: 20px;
+        position: relative;
+        background: #bde4ff;
+        &:before {    display: block;
+            content: '';
+            position: absolute;
+            top: 2px;
+            bottom: 0;
+            left: 15px;
+            width: 50px;
+            height: 50px;
+            background-image: url(../Improntus_Rebill/images/rebill_logo.svg);
+            filter: invert(1);
+            background-size: 32px;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        span.text {
+            text-align: center;
+            display: block;
+            &.guest-text {
+                font-weight: bold;
+            }
+        }
+    }
+    .subscription-info {
+        margin-top: 30px;
+        .title {
+            margin-bottom: 15px;
+            display: block;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .subscription-info-wrapper {
+            padding: 15px 25px;
+            p {
+                strong {
+                    margin-right: 5px;
+                }
+            }
+        }
+    }
+    .box-tocart {
+        .action.tocart {
+            width: 48%;
+        }
+    }
+}
+.rebill-payment-transaction {
+    .main {
+        .rebill-checkout-wrapper {
+            .rebill-checkout-order {
+                width: 70%;
+                float: left;
+                .block-order-details-view {
+                    .box {
+                        display: inline-block;
+                        vertical-align: top;
+                        width: 24%;
+                    }
+                }
+            }
+            .rebill-checkout-payment {
+                float: right;
+                width: 25%;
+            }
+        }
+    }
+}
+@media (max-width: 630px) {
+    .checkout-payment-method {
+        .rebill-card-wrapper {
+            margin-bottom: 20px;
+        }
+        #improntus_rebill-form {
+            margin: auto;
+        }
+    }
+}
+@media (min-width: 630px) and (max-width: 768px) {
+    .checkout-payment-method {
+        .rebill-card-wrapper {
+            width: 350px;
+            float: right;
+        }
+    }
+}
+@media (min-width: 768px) and (max-width: 1024px) {
+    .checkout-payment-method {
+        .rebill-card-wrapper {
+            margin-bottom: 20px;
+        }
+        #improntus_rebill-form {
+            margin: auto;
+        }
+    }
+}
+@media (min-width: 1024px) {
+    .checkout-payment-method {
+        .rebill-card-wrapper {
+            width: 350px;
+            float: right;
+        }
+    }
+}

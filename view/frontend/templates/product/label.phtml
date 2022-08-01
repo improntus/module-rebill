@@ -1,0 +1,23 @@
+<?php
+/**
+ * @var $block View
+ */
+
+use Improntus\Rebill\Helper\Config;
+use Magento\Catalog\Block\Product\View;
+
+/** @var Config $configHelper */
+$configHelper = $this->helper(Config::class);
+$rebillDetails = $configHelper->getProductRebillSubscriptionDetails($block->getProduct());
+?>
+<?php if ($rebillDetails['enable_subscription'] && ($labelType = $configHelper->getProductLabel()) !== 'none') : ?>
+    <div class="rebill-product-label">
+        <?php if ($labelType == 'text') : ?>
+            <span class="rebill-label-text"><?= $configHelper->getProductLabelCustomText() ?></span>
+        <?php else : ?>
+            <div class="rebill-label-rebill-logo">
+                <img src="<?= $block->getViewFileUrl('Improntus_Rebill::images/rebill_logo.png'); ?>" alt="<?= __('Product Subscription with Rebill') ?>">
+            </div>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="checkout_cart_product_add_before">
+        <observer name="set_current_subscription_id" instance="Improntus\Rebill\Observer\CheckoutCartProductAddBefore" />
+    </event>
+    <event name="sales_quote_add_item">
+        <observer name="set_subscription_to_quote_item" instance="Improntus\Rebill\Observer\SalesQuoteAddItem" />
+    </event>
+</config>

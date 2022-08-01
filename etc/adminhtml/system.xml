@@ -1,42 +1,96 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="payment">
-            <group id="improntus_rebill" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="improntus_rebill" translate="label" type="text" sortOrder="100" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <attribute type="displayIn">improntus_methods</attribute>
                 <label>Rebill</label>
-                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="active" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="title" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Title</label>
                 </field>
-                <field id="sandboxmode" translate="label" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Sandbox mode</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                <field id="sort_order" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sort Order</label>
                 </field>
-                <field id="api_key" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Api key SmartFields</label>
-                </field>
-                <field id="x_trans_key" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>X-Trans-Key</label>
-                </field>
-                <field id="x_login" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>X-Login</label>
-                </field>
-                <field id="secret_key" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Secret Key</label>
-                </field>
-                <field id="enable_debug" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enable debug</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-                <field id="country" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Country</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-<!--                    <source_model>Improntus\Rebill\Model\Config\Source\Country</source_model>-->
-                    <can_be_empty>0</can_be_empty>
-                </field>
+                <group id="general" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>General</label>
+                    <attribute type="expanded">1</attribute>
+                    <field id="customer_document_type" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Customer Document Type</label>
+                        <source_model>Improntus\Rebill\Model\Config\Source\CustomerDocumentType</source_model>
+                    </field>
+                    <field id="customer_document_attribute" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Customer Attribute for Document</label>
+                        <source_model>Improntus\Rebill\Model\Config\Source\CustomerDocument</source_model>
+                    </field>
+                    <field id="approved_status" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Status for Approved Orders</label>
+                        <source_model>Improntus\Rebill\Model\Config\Source\ApprovedStatus</source_model>
+                    </field>
+                    <field id="denied_status" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Status for Denied Orders</label>
+                        <source_model>Improntus\Rebill\Model\Config\Source\DeniedStatus</source_model>
+                    </field>
+                    <field id="allow_mixed_cart" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Allow mixed cart</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>This option will allow the customer to pay subscription and not subscription products in the same order</comment>
+                    </field>
+                    <field id="subscription_product_text" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Text for subscription products</label>
+                        <comment>This text will be shown in product page to let customer know that the product is subscription type.</comment>
+                    </field>
+                    <field id="guest_customer_text" translate="label comment" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Text for guest customer in subscription products</label>
+                        <comment>This text will be shown in product page to let guest customer know that they can subscribe to the product only if they have an account.</comment>
+                    </field>
+                    <field id="product_label" translate="label comment" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Label for Subscription Products</label>
+                        <comment>Label in form of a text or image to more easily identify subscription products</comment>
+                        <source_model>Improntus\Rebill\Model\Config\Source\ProductLabel</source_model>
+                    </field>
+                    <field id="product_label_text" translate="label comment" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Text for Label</label>
+                        <depends>
+                            <field id="product_label">text</field>
+                        </depends>
+                    </field>
+                </group>
+                <group id="api_options" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Api Options</label>
+                    <attribute type="expanded">1</attribute>
+                    <field id="user_email" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Api User Email</label>
+                    </field>
+                    <field id="password" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Api Password</label>
+                    </field>
+                    <field id="alias" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Organization Alias</label>
+                    </field>
+                    <field id="uuid" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>UUID</label>
+                        <comment>Unique identifier provided by Rebill</comment>
+                    </field>
+                    <field id="integration_mode" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Integration mode</label>
+                        <source_model>Improntus\Rebill\Model\Config\Source\IntegrationMode</source_model>
+                    </field>
+                    <field id="default_gateway" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Default Gateway</label>
+                        <source_model>Improntus\Rebill\Model\Config\Source\Gateway</source_model>
+                        <comment>This option will allow the customer to pay subscription and not subscription products in the same order</comment>
+                    </field>
+                    <field id="debug_logs" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Enable debug logs</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                </group>
             </group>
         </section>
     </system>

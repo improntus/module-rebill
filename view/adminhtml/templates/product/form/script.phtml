@@ -1,0 +1,39 @@
+<?php
+/**
+ * @var $block ProductForm
+ */
+
+use Improntus\Rebill\Block\Adminhtml\ProductForm;
+use Improntus\Rebill\Helper\Config;
+
+/** @var Config $configHelper */
+$configHelper = $this->helper(Config::class);
+?>
+<div id="rebill-frequency-modal">
+    <table>
+        <thead>
+            <tr>
+                <th><?= __('ID') ?></th>
+                <th><?= __('Frequency') ?></th>
+                <th><?= __('Frequency Type') ?></th>
+                <th><?= __('Max Recurring Payments') ?></th>
+                <th><?= __('Price') ?></th>
+                <th><?= __('SignUp Cost') ?></th>
+                <th><?= __('Actions') ?></th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "rebill_product_form": {
+                "attributes": <?= $block->getRebillAttributesJson() ?>,
+                "product_type": "<?= $block->getProductType() ?>",
+                "is_product_child": <?= (int)$configHelper->isProductChild($block->getProduct()) ?>,
+                "product_price": <?= $block->getProduct()->getPrice() ?>
+            }
+        }
+    }
+</script>

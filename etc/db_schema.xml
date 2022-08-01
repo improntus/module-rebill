@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="rebill_item" resource="default" engine="innodb" comment="Improntus Rebill Item">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="product_sku" length="255" nullable="false" comment="Product SKU"/>
+        <column xsi:type="varchar" name="rebill_item_id" length="255" nullable="false" comment="Rebill Item ID"/>
+        <column xsi:type="text" name="product_description" comment="Product Description"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="UNIQUE_KEY_1">
+            <column name="product_sku"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="UNIQUE_KEY_2">
+            <column name="rebill_item_id"/>
+        </constraint>
+    </table>
+    <table name="rebill_item_price" resource="default" engine="innodb" comment="Improntus Rebill Item Price">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="rebill_item_id" unsigned="true" nullable="false" comment="Rebill Item ID"/>
+        <column xsi:type="varchar" name="rebill_price_id" length="255" nullable="false" comment="Rebill Price ID"/>
+        <column xsi:type="varchar" name="details_hash" length="255" nullable="false" comment="Details"/>
+        <column xsi:type="text" name="details" nullable="false" comment="Details"/>
+        <column xsi:type="int" name="order_id" unsigned="true" nullable="true" comment="Order ID"/>
+        <column xsi:type="int" name="order_item_id" unsigned="true" nullable="true" comment="Order Item ID"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="UNIQUE_KEY_1">
+            <column name="rebill_price_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="UNIQUE_KEY_2">
+            <column name="details_hash"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="REBILL_ITEM_PRICE_ID">
+            <column name="rebill_item_id"/>
+            <column name="rebill_price_id"/>
+            <column name="order_id"/>
+            <column name="order_item_id"/>
+        </constraint>
+    </table>
+    <table name="rebill_subscription" resource="default" engine="innodb" comment="Improntus Rebill Item Price">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="subscription_id" length="255" nullable="false" comment="Details"/>
+        <column xsi:type="varchar" name="price_id" length="255" nullable="false" comment="Rebill Price ID"/>
+        <column xsi:type="varchar" name="status" length="255" nullable="false" comment="Rebill Price ID"/>
+        <column xsi:type="int" name="quantity" unsigned="true" nullable="true" comment="Order ID"/>
+        <column xsi:type="int" name="order_id" unsigned="true" nullable="true" comment="Order ID"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="REBILL_SUBSCRIPTION">
+            <column name="subscription_id"/>
+        </constraint>
+    </table>
+    <table name="salesrule">
+        <column xsi:type="int" name="rebill_apply_to_subscriptions" unsigned="true" nullable="true" comment="Rebill Apply To Subscriptions"/>
+        <column xsi:type="int" name="rebill_no_apply_expired_coupon" unsigned="true" nullable="true" comment="Rebill No Apply Expired Coupon"/>
+        <column xsi:type="int" name="rebill_qty_payment_per_subscriptions" unsigned="true" nullable="true" comment="Rebill Qty of Payments to Apply per Subscription"/>
+    </table>
+    <table name="quote_address">
+        <column xsi:type="decimal" name="rebill_initial_cost_amount" scale="4" precision="20" nullable="true" comment="Rebill Initial Cost Amount"/>
+        <column xsi:type="decimal" name="base_rebill_initial_cost_amount" scale="4" precision="20" nullable="true" comment="Rebill Initial Cost Amount"/>
+    </table>
+    <table name="sales_order">
+        <column xsi:type="decimal" name="rebill_initial_cost_amount" scale="4" precision="20" nullable="true" comment="Rebill Initial Cost Amount"/>
+        <column xsi:type="decimal" name="base_rebill_initial_cost_amount" scale="4" precision="20" nullable="true" comment="Rebill Initial Cost Amount"/>
+    </table>
+    <table name="sales_invoice">
+        <column xsi:type="decimal" name="rebill_initial_cost_amount" scale="4" precision="20" nullable="true" comment="Rebill Initial Cost Amount"/>
+        <column xsi:type="decimal" name="base_rebill_initial_cost_amount" scale="4" precision="20" nullable="true" comment="Rebill Initial Cost Amount"/>
+    </table>
+    <table name="sales_creditmemo">
+        <column xsi:type="decimal" name="rebill_initial_cost_amount" scale="4" precision="20" nullable="true" comment="Rebill Initial Cost Amount"/>
+        <column xsi:type="decimal" name="base_rebill_initial_cost_amount" scale="4" precision="20" nullable="true" comment="Rebill Initial Cost Amount"/>
+    </table>
+</schema>

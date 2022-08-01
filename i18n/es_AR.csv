@@ -1,0 +1,55 @@
+"Can't find any order to pay with rebill.","No pudimos encontrar ningún pedido para pagar con Rebill"
+"None selected","Sin selección"
+Sandbox,Sandbox
+Production,Production
+"Unable to create items on Rebill.","No fue posible crear items en rebill"
+"Unable to create prices on Rebill.","No fue posible crear precios en rebill"
+Days,Días
+Months,Meses
+Years,Años
+status_detail,Detalle de status
+"Card Holder Name","Nombre en la tarjeta"
+"Last 4 four digits","Últimos 4 digitos"
+"Print Payment","Imprimir Pago"
+"Pay with rebill","Pagar con Rebill"
+"Card Number","Número de tarjeta"
+Pay,Pagar
+"Enter a card number","Ingrese un número de tarjeta"
+"Card number is invalid","Número de tarjeta inválido"
+"Enter an expiry date","Ingrese una fecha de expiración"
+"Expiry month must be between 01 and 12","El mes de expiración debe ser entre 01 y 12"
+"Expiry year cannot be in the past","El año de expiración no puede estar en el pasado"
+"Expiry date cannot be in the past","La fecha de expiración no puede estar en el pasado"
+"Expiry date is invalid","Fecha de expiración inválida"
+"Enter a CVC","Ingrese un código CVC"
+"CVC is invalid","Código CVC inválido"
+"Place Order","Ir a pagar"
+Continue,Continuar
+Rebill,Rebill
+Enabled,Habilitado
+Title,Título
+"Sort Order","Posición"
+General,General
+"Customer Document Type","Tipo de documento de cliente"
+"Customer Attribute for Document","Atributo de cliente para Documento"
+"Status for Approved Orders","Estado para pedidos aprobados"
+"Status for Denied Orders","Estado para pedidos denegados"
+"Allow mixed cart","Permitir carrito mixto"
+"This option will allow the customer to pay subscription and not subscription products in the same order","Esta opción permitirá al cliente comprar productos de suscripción y normales en el mismo pedido"
+"Text for subscription products","Texto para productos de suscripción"
+"This text will be shown in product page to let customer know that the product is subscription type.","Este texto se mostrara en la pagina de producto para hacerle saber al cliente que el producto es del tipo 'suscripción'."
+"Text for guest customer in subscription products","Texto para productos de suscripción para clientes invitados"
+"This text will be shown in product page to let guest customer know that they can subscribe to the product only if they have an account.","Este texto se mostrará en la pagina de producto para hacerle saber al cliente que el producto del tipo 'suscripción' solo se puede comprar si esta registrado."
+"Api Options","Opciones de API"
+"Api User Email","API User Email"
+"Api Password","API Contraseña"
+"Organization Alias","Alias de Organización"
+UUID,UUID
+"Unique identifier provided by Rebill","Identificador único provisto por Rebill"
+"Integration mode","Modo Integracion"
+"Default Gateway","Gateway por defecto"
+"Enable debug logs","Habilitar logs de debug"
+"Apply to Subscriptions","Aplica a suscripciones"
+"Don't keep applying to subscriptions if the coupon/rule is expired or disabled","No seguir aplicando a las suscripciones si la regla/cupón expiró o esta deshabilitada"
+"Quantity of payments in a subscription that the coupon/rule will be applied to","Cantidad de pagos a los que una regla/cupón aplicará a una suscripción"
+"Rebill Payment","Pagar con Rebill"

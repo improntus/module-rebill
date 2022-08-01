@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="product.info.main">
+            <block class="Magento\Catalog\Block\Product\View" name="rebill.subscription.text" template="Improntus_Rebill::product/subscription_text.phtml" />
+        </referenceContainer>
+        <referenceContainer name="product.info.media">
+            <block class="Magento\Catalog\Block\Product\View" name="rebill.subscription.label" template="Improntus_Rebill::product/label.phtml" />
+        </referenceContainer>
+<!--        <referenceContainer name="product.info.addtocart">-->
+<!--            <block class="Magento\Catalog\Block\Product\View" name="rebill.subscription.button" template="Improntus_Rebill::product/view/addtocart.phtml" before="-"/>-->
+<!--        </referenceContainer>-->
+    </body>
+</page>

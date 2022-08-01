@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+<!--        <script src="https://sdk.rebill.to/v2/rebill.min.js" src_type="url"/>-->
+        <css src="https://sdk.rebill.to/v2/rebill.min.css" src_type="url"/>
+    </head>
+    <body>
+        <referenceBlock name="page.main.title">
+            <action method="setPageTitle">
+                <argument translate="true" name="title" xsi:type="string">Rebill Payment</argument>
+            </action>
+        </referenceBlock>
+        <referenceContainer name="content">
+            <container name="rebill.checkout.wrapper" htmlTag="div" htmlClass="rebill-checkout-wrapper">
+                <container name="rebill.checkout.order" htmlTag="div" htmlClass="rebill-checkout-order">
+                    <block class="Magento\Sales\Block\Order\Info" as="info" name="sales.order.info"/>
+                    <block class="Magento\Sales\Block\Order\View" name="sales.order.view" cacheable="false">
+                        <block class="Magento\Sales\Block\Order\Items" name="order_items" template="Magento_Sales::order/items.phtml">
+                            <block class="Magento\Framework\View\Element\RendererList" name="sales.order.items.renderers" as="renderer.list">
+                                <block class="Magento\Sales\Block\Order\Item\Renderer\DefaultRenderer" name="sales.order.items.renderers.default" as="default" template="Magento_Sales::order/items/renderer/default.phtml"/>
+                            </block>
+                            <block class="Magento\Theme\Block\Html\Pager" name="sales_order_item_pager"/>
+                        </block>
+                    </block>
+                </container>
+                <container name="rebill.checkout.payment" htmlTag="div" htmlClass="rebill-checkout-payment">
+                    <container name="rebill.totals" htmlTag="div" htmlClass="order-details-items ordered">
+                        <container name="rebill.totals.table.wrapper" htmlTag="div" htmlClass="table-wrapper order-items">
+                            <container name="rebill.totals.table" htmlTag="table" htmlClass="data table table-order-items">
+                                <container name="rebill.totals.tfoot" htmlTag="tfoot">
+                                    <block class="Magento\Sales\Block\Order\Totals" name="order_totals" template="Magento_Sales::order/totals.phtml">
+                                        <arguments>
+                                            <argument name="label_properties" xsi:type="string">colspan="4" class="mark"</argument>
+                                            <argument name="value_properties" xsi:type="string">class="amount"</argument>
+                                        </arguments>
+                                        <block class="Magento\Tax\Block\Sales\Order\Tax" name="tax" template="Magento_Tax::order/tax.phtml"/>
+                                        <block class="Improntus\Rebill\Block\Sales\Order\Totals\InitialCost" name="initial_cost"/>
+                                    </block>
+                                </container>
+                            </container>
+                        </container>
+                    </container>
+                    <block class="Improntus\Rebill\Block\Payment\Transaction" name="rebill_payment_transaction" template="Improntus_Rebill::payment/transaction.phtml" cacheable="false"/>
+                </container>
+            </container>
+        </referenceContainer>
+        <block class="Magento\Sales\Block\Order\Item\Renderer\DefaultRenderer" name="item_unit_price" template="Magento_Sales::items/price/unit.phtml"/>
+        <block class="Magento\Sales\Block\Order\Item\Renderer\DefaultRenderer" name="item_row_total" template="Magento_Sales::items/price/row.phtml"/>
+        <block class="Magento\Sales\Block\Order\Item\Renderer\DefaultRenderer" name="item_row_total_after_discount" template="Magento_Sales::items/price/total_after_discount.phtml"/>
+    </body>
+</page>

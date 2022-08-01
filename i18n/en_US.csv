@@ -1,0 +1,57 @@
+"Can't find any order to pay with rebill.","Can't find any order to pay with rebill."
+"None selected","None selected"
+Sandbox,Sandbox
+Production,Production
+"Unable to create items on Rebill.","Unable to create items on Rebill."
+"Unable to create prices on Rebill.","Unable to create prices on Rebill."
+Days,Days
+Months,Months
+Years,Years
+status_detail,status_detail
+"Card Holder Name","Card Holder Name"
+"Last 4 four digits","Last 4 four digits"
+"Print Payment","Print Payment"
+"Pay with rebill","Pay with rebill"
+"Card Number","Card Number"
+Pay,Pay
+"Enter a card number","Enter a card number"
+"Card number is invalid","Card number is invalid"
+"Enter an expiry date","Enter an expiry date"
+"Expiry month must be between 01 and 12","Expiry month must be between 01 and 12"
+"Expiry year cannot be in the past","Expiry year cannot be in the past"
+"Expiry date cannot be in the past","Expiry date cannot be in the past"
+"Expiry date is invalid","Expiry date is invalid"
+"Enter a CVC","Enter a CVC"
+"CVC is invalid","CVC is invalid"
+"Place Order","Place Order"
+Continue,Continue
+Rebill,Rebill
+"Rebill Menu","Rebill Menu"
+"Rebill Gateways","Rebill Gateways"
+Enabled,Enabled
+Title,Title
+"Sort Order","Sort Order"
+General,General
+"Customer Document Type","Customer Document Type"
+"Customer Attribute for Document","Customer Attribute for Document"
+"Status for Approved Orders","Status for Approved Orders"
+"Status for Denied Orders","Status for Denied Orders"
+"Allow mixed cart","Allow mixed cart"
+"This option will allow the customer to pay subscription and not subscription products in the same order","This option will allow the customer to pay subscription and not subscription products in the same order"
+"Text for subscription products","Text for subscription products"
+"This text will be shown in product page to let customer know that the product is subscription type.","This text will be shown in product page to let customer know that the product is subscription type."
+"Text for guest customer in subscription products","Text for guest customer in subscription products"
+"This text will be shown in product page to let guest customer know that they can subscribe to the product only if they have an account.","This text will be shown in product page to let guest customer know that they can subscribe to the product only if they have an account."
+"Api Options","Api Options"
+"Api User Email","Api User Email"
+"Api Password","Api Password"
+"Organization Alias","Organization Alias"
+UUID,UUID
+"Unique identifier provided by Rebill","Unique identifier provided by Rebill"
+"Integration mode","Integration mode"
+"Default Gateway","Default Gateway"
+"Enable debug logs","Enable debug logs"
+"Apply to Subscriptions","Apply to Subscriptions"
+"Don't keep applying to subscriptions if the coupon/rule is expired or disabled","Don't keep applying to subscriptions if the coupon/rule is expired or disabled"
+"Quantity of payments in a subscription that the coupon/rule will be applied to","Quantity of payments in a subscription that the coupon/rule will be applied to"
+"Rebill Payment","Rebill Payment"

@@ -1,0 +1,49 @@
+<?php
+/**
+ * @var $block Subscriptions
+ */
+
+use Improntus\Rebill\Block\Customer\Subscriptions;
+use Magento\Framework\Pricing\Helper\Data;
+
+/** @var Data $currencyHelper */
+$currencyHelper = $this->helper(Data::class);
+$subscriptions = $block->getSubscriptions() ?? [];
+?>
+<?php if ($subscriptions) : ?>
+    <div class="subscription-grid-wrapper table-wrapper">
+        <table class="data table">
+            <thead>
+            <tr>
+                <th><?= __('Subscription') ?></th>
+                <th><?= __('Quantity') ?></th>
+                <th><?= __('Status') ?></th>
+                <th><?= __('Total') ?></th>
+                <th><?= __('Payment Method') ?></th>
+                <th><?= __('Created at') ?></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($subscriptions as $subscription) : ?>
+                <tr>
+                    <td><?= $subscription['title'] ?></td>
+                    <td><?= $subscription['quantity'] ?></td>
+                    <td><?= $subscription['status'] ?></td>
+                    <td><?= $currencyHelper->currencyByStore((float)$subscription['price']['amount']) ?></td>
+                    <td><?= $block->getPaymentMethod($subscription) ?></td>
+                    <td><?= date('Y-m-d', strtotime($subscription['createdAt'])) ?></td>
+                    <td class="col actions">
+                        <a class="action delete"
+                           href="<?= $block->getUrl('rebill/customer/cancel', ['id' => $subscription['id']]) ?>"><?= __('Cancel') ?></a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+<?php else : ?>
+<div class="subscription-grid-wrapper table-wrapper">
+    <span class="no-subscriptions"><?= __('You have no active subscriptions') ?></span>
+</div>
+<?php endif; ?>
