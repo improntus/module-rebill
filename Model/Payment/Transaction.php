@@ -278,7 +278,8 @@ class Transaction
         }
         $price = $rowTotal / $itemQty;
         $rebillDetails = $this->configHelper->getProductRebillSubscriptionDetails($item->getProduct());
-        $cost = $rebillDetails['initial_subscription_cost'];
+        $frequency = $item->getProductOptionByCode('rebill_subscription');
+        $cost = $frequency['initialCost'];
         /**
          * @TODO in future implementation it will be needed the gateway in $rebillDetails
          */
@@ -298,14 +299,14 @@ class Transaction
             ];
             if ($rebillDetails['enable_subscription']) {
                 $rebillPriceData['frequency'] = [
-                    'type'     => $rebillDetails['frequency_type'] ?? 'months',
-                    'quantity' => (int)$rebillDetails['frequency'] ?? 1,
+                    'type'     => $frequency['frequencyType'] ?? 'months',
+                    'quantity' => (int)$frequency['frequency'] ?? 1,
                 ];
                 $rebillPriceData['free_trial'] = [
                     'type'     => 'days',
                     'quantity' => $rebillDetails['free_trial_time_lapse'],
                 ];
-                $rebillPriceData['repetitions'] = null;
+                $rebillPriceData['repetitions'] = $frequency['recurringPayments'];
             }
             $rebillPriceId = $this->item->createPriceForItem($rebillItemId, $rebillPriceData);
             if ($rebillPriceId === null) {
