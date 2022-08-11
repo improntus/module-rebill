@@ -5,6 +5,7 @@ namespace Improntus\Rebill\Helper;
 use Exception;
 use Improntus\Rebill\Logger\Logger;
 use Magento\Catalog\Model\Product;
+use Magento\Quote\Model\QuoteRepository;
 use Magento\Catalog\Model\ProductFactory;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Customer\Model\Session;
@@ -33,9 +34,26 @@ class Data extends AbstractHelper
      * @var ProductFactory
      */
     protected $productFactory;
+
+    /**
+     * @var CurrencyHelper
+     */
     protected $currencyHelper;
+
+    /**
+     * @var Registry
+     */
     protected $registry;
+
+    /**
+     * @var Configurable
+     */
     protected $configurableType;
+
+    /**
+     * @var QuoteRepository
+     */
+    protected $quoteRepository;
 
     /**
      * @param Context $context
@@ -45,16 +63,19 @@ class Data extends AbstractHelper
      * @param Registry $registry
      * @param CurrencyHelper $currencyHelper
      * @param Configurable $configurableType
+     * @param QuoteRepository $quoteRepository
      */
     public function __construct(
-        Context        $context,
-        Logger         $logger,
-        Session        $customerSession,
-        ProductFactory $productFactory,
-        Registry       $registry,
-        CurrencyHelper $currencyHelper,
-        Configurable   $configurableType
+        Context         $context,
+        Logger          $logger,
+        Session         $customerSession,
+        ProductFactory  $productFactory,
+        Registry        $registry,
+        CurrencyHelper  $currencyHelper,
+        Configurable    $configurableType,
+        QuoteRepository $quoteRepository
     ) {
+        $this->quoteRepository = $quoteRepository;
         $this->configurableType = $configurableType;
         $this->registry = $registry;
         $this->currencyHelper = $currencyHelper;

@@ -7,6 +7,7 @@ use Magento\Catalog\Model\Product;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Model\Order;
 use Magento\SalesRule\Model\Rule;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 class Subscription extends Data
 {
@@ -53,11 +54,8 @@ class Subscription extends Data
         $hasSubscriptionProducts = false;
         /** @var Quote\Item $item */
         foreach ($quote->getAllItems() as $item) {
-            $product = $this->productFactory->create()->load($item->getProduct()->getId());
-            $productData = $this->getProductRebillSubscriptionDetails($product);
-            if ($productData['enable_subscription']) {
+            if ($item->getOptionByCode('rebill_subscription') && !$item->getParentItemId()) {
                 $hasSubscriptionProducts = true;
-                break;
             }
         }
         return $hasSubscriptionProducts;
@@ -73,11 +71,8 @@ class Subscription extends Data
         $hasNoSubscriptionProducts = false;
         /** @var Quote\Item $item */
         foreach ($quote->getAllItems() as $item) {
-            $product = $this->productFactory->create()->load($item->getProduct()->getId());
-            $productData = $this->getProductRebillSubscriptionDetails($product);
-            if (!$productData['enable_subscription']) {
+            if (!$item->getOptionByCode('rebill_subscription') && !$item->getParentItemId()) {
                 $hasNoSubscriptionProducts = true;
-                break;
             }
         }
         return $hasNoSubscriptionProducts;
@@ -106,17 +101,19 @@ class Subscription extends Data
     /**
      * @param Order $order
      * @return array
-     * @description return subscription details from order items
+     * @throws NoSuchEntityException
      */
     public function getOrderSubscriptionInformation(Order $order)
     {
+        $quote = $this->quoteRepository->get($order->getQuoteId());
         $subscriptionProducts = [];
         /** @var Order\Item $item */
-        foreach ($order->getAllItems() as $item) {
-            $product = $this->productFactory->create()->load($item->getProduct()->getId());
-            $productData = $this->getProductRebillSubscriptionDetails($product);
-            $productData['initial_subscription_cost'] *= $item->getQtyOrdered();
-            $subscriptionProducts[] = $productData;
+        foreach ($order->getAllVisibleItems() as $item) {
+            $quoteItem = $quote->getItemById($item->getQuoteItemId());
+            $frequency = $quoteItem->getOptionByCode('rebill_subscription');
+            $frequency = $frequency ? json_decode($frequency->getValue(), true) : [];
+            $frequency['initialCost'] *= $item->getQtyOrdered();
+            $subscriptionProducts[] = $frequency;
         }
         return $subscriptionProducts;
     }

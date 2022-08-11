@@ -10,7 +10,7 @@ use Magento\Catalog\Block\Product\View;
 $configHelper = $this->helper(Config::class);
 $frequencies = $configHelper->getProductRebillSubscriptionDetails($block->getProduct())['frequency'];
 ?>
-<?php if ($count = count($frequencies) && $configHelper->isLoggedIn()) : ?>
+<?php if ($count = count($frequencies)) : ?>
     <div class="rebill-subscription">
         <div class="check-subscription">
             <input type="radio" name="use_subscription" value="0" id="one-time-purchase" checked="checked">

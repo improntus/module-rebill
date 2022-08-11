@@ -3,6 +3,7 @@
 namespace Improntus\Rebill\Model\Payment;
 
 use Exception;
+use Magento\Quote\Model\Quote;
 use Improntus\Rebill\Helper\Config;
 use Improntus\Rebill\Model\ItemFactory;
 use Improntus\Rebill\Model\Price;
@@ -12,6 +13,7 @@ use Improntus\Rebill\Model\Rebill;
 use Magento\Framework\Registry;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Item;
+use Magento\Quote\Model\QuoteRepository;
 
 class Transaction
 {
@@ -46,21 +48,29 @@ class Transaction
     protected $registry;
 
     /**
+     * @var QuoteRepository
+     */
+    protected $quoteRepository;
+
+    /**
      * @param Config $configHelper
      * @param Session $session
      * @param Rebill\Item $item
      * @param ItemFactory $itemFactory
      * @param PriceFactory $priceFactory
      * @param Registry $registry
+     * @param QuoteRepository $quoteRepository
      */
     public function __construct(
-        Config       $configHelper,
-        Session      $session,
-        Rebill\Item  $item,
-        ItemFactory  $itemFactory,
-        PriceFactory $priceFactory,
-        Registry     $registry
+        Config          $configHelper,
+        Session         $session,
+        Rebill\Item     $item,
+        ItemFactory     $itemFactory,
+        PriceFactory    $priceFactory,
+        Registry        $registry,
+        QuoteRepository $quoteRepository
     ) {
+        $this->quoteRepository = $quoteRepository;
         $this->registry = $registry;
         $this->configHelper = $configHelper;
         $this->session = $session;
@@ -81,33 +91,32 @@ class Transaction
                 $order = $this->session->getLastRealOrder();
             }
             if (!$order->getId() || $order->getPayment()->getMethod() !== \Improntus\Rebill\Model\Payment\Rebill::CODE) {
+                $this->session->restoreQuote();
                 return false;
             }
             $this->registry->register('prepared_order', $order);
             $this->registry->register('current_order', $order);
-            $items = $order->getAllItems();
+            $quote = $this->quoteRepository->get($order->getQuoteId());
+            $items = $order->getAllVisibleItems();
             $prices = [];
             /** @var Item $item */
             foreach ($items as $item) {
-                if (!$item->getParentItemId()) {
-                    continue;
-                }
-                $rebillPriceId = $this->getRebillPriceIdForItem($item);
+                $rebillPriceId = $this->getRebillPriceIdForItem($item, $quote);
                 $prices[] = [
                     'id'       => $rebillPriceId,
-                    'quantity' => (int)$item->getQtyOrdered()
+                    'quantity' => (int)$item->getQtyOrdered(),
                 ];
             }
             if ($id = $this->getRebillPriceIdForShipping($order)) {
                 $prices[] = [
                     'id'       => $id,
-                    'quantity' => 1
+                    'quantity' => 1,
                 ];
             }
-            if ($id = $this->getRebillPriceIdForAdditionalCosts($order)) {
+            if ($id = $this->getRebillPriceIdForAdditionalCosts($order, $quote)) {
                 $prices[] = [
                     'id'       => $id,
-                    'quantity' => 1
+                    'quantity' => 1,
                 ];
             }
             $this->registry->register('rebill_prices', $prices);
@@ -118,7 +127,7 @@ class Transaction
         return true;
     }
 
-    protected function getRebillPriceIdForAdditionalCosts(Order $order)
+    protected function getRebillPriceIdForAdditionalCosts(Order $order, Quote $quote)
     {
         $total = $order->getGrandTotal()
             - $order->getShippingAmount()
@@ -126,8 +135,10 @@ class Transaction
         /** @var Item $item */
         foreach ($order->getAllVisibleItems() as $item) {
             $total -= $item->getRowTotal();
-            $rebillSubscription = json_decode($item->getProductOptionByCode('rebill_subscription'), true);
-            $total += $rebillSubscription['initialCost'] * $item->getQtyOrdered();
+            $quoteItem = $quote->getItemById($item->getQuoteItemId());
+            $rebillSubscription = $quoteItem->getOptionByCode('rebill_subscription');
+            $rebillSubscription = $rebillSubscription ? json_decode($rebillSubscription->getValue(), true) : [];
+            $total += ($rebillSubscription['initialCost'] ?? 0) * $item->getQtyOrdered();
         }
         $total += $order->getTaxAmount();
         if (!$total) {
@@ -135,16 +146,17 @@ class Transaction
         }
         /** @var \Improntus\Rebill\Model\Item $rebillItem */
         $rebillItem = $this->itemFactory->create();
-        $rebillItem->load("Pedido #{$order->getIncrementId()}", 'product_sku');
+        $rebillItem->load("Order #{$order->getIncrementId()} Additionals", 'product_sku');
         if (!$rebillItem->getId()) {
             $rebillItem->setData('product_sku', $order->getShippingDescription());
             $rebillItemId = $this->item->createItem([
-                'name'        => "Pedido #{$order->getIncrementId()}",
-                'description' => "Pedido #{$order->getIncrementId()}"
+                'name'        => "Order #{$order->getIncrementId()} Additionals",
+                'description' => "Order #{$order->getIncrementId()} Additionals",
             ]);
             if ($rebillItemId === null) {
                 throw new Exception(__('Unable to create items on Rebill.'));
             }
+            $rebillItem->setData('product_sku', "Order #{$order->getIncrementId()} Additionals");
             $rebillItem->setData('rebill_item_id', $rebillItemId);
             $rebillItem->setData('product_description', $order->getShippingDescription());
             $rebillItem->save();
@@ -163,7 +175,7 @@ class Transaction
                 'repetitions' => 1,
                 'currency'    => $this->configHelper->getCurrency(),
                 'gatewayId'   => $gateway,
-                'enabled'     => true
+                'enabled'     => true,
             ];
             $rebillPriceId = $this->item->createPriceForItem($rebillItemId, $rebillPriceData);
             if ($rebillPriceId === null) {
@@ -175,7 +187,7 @@ class Transaction
                 'details'         => json_encode([]),
                 'details_hash'    => $hash,
                 'order_id'        => $order->getId(),
-                'order_item_id'   => null
+                'order_item_id'   => null,
             ]);
             $rebillPrice->save();
         }
@@ -184,7 +196,7 @@ class Transaction
 
     protected function getRebillPriceIdForShipping(Order $order)
     {
-        if (!$order->getShippingAmount()) {
+        if (!$order->getShippingAmount() == 0) {
             return null;
         }
         /** @var \Improntus\Rebill\Model\Item $rebillItem */
@@ -194,7 +206,7 @@ class Transaction
             $rebillItem->setData('product_sku', $order->getShippingDescription());
             $rebillItemId = $this->item->createItem([
                 'name'        => $order->getShippingDescription(),
-                'description' => $order->getShippingDescription()
+                'description' => $order->getShippingDescription(),
             ]);
             if ($rebillItemId === null) {
                 throw new Exception(__('Unable to create items on Rebill.'));
@@ -223,7 +235,7 @@ class Transaction
                 'repetitions' => 1,
                 'currency'    => $this->configHelper->getCurrency(),
                 'gatewayId'   => $gateway,
-                'enabled'     => true
+                'enabled'     => true,
             ];
             $rebillPriceId = $this->item->createPriceForItem($rebillItemId, $rebillPriceData);
             if ($rebillPriceId === null) {
@@ -235,14 +247,14 @@ class Transaction
                 'details'         => json_encode([]),
                 'details_hash'    => $hash,
                 'order_id'        => $order->getId(),
-                'order_item_id'   => null
+                'order_item_id'   => null,
             ]);
             $rebillPrice->save();
         }
         return $rebillPrice->getData('rebill_price_id');
     }
 
-    protected function getRebillPriceIdForItem(Item $item)
+    protected function getRebillPriceIdForItem(Item $item, Quote $quote)
     {
         $order = $item->getOrder();
         /** @var \Improntus\Rebill\Model\Item $rebillItem */
@@ -252,7 +264,7 @@ class Transaction
             $rebillItem->setData('product_sku', $item->getProduct()->getSku());
             $rebillItemId = $this->item->createItem([
                 'name'        => $item->getProduct()->getName(),
-                'description' => (string)$item->getProduct()->getData('short_description')
+                'description' => (string)$item->getProduct()->getData('short_description'),
             ]);
             if ($rebillItemId === null) {
                 throw new Exception(__('Unable to create items on Rebill.'));
@@ -278,8 +290,10 @@ class Transaction
         }
         $price = $rowTotal / $itemQty;
         $rebillDetails = $this->configHelper->getProductRebillSubscriptionDetails($item->getProduct());
-        $frequency = $item->getProductOptionByCode('rebill_subscription');
-        $cost = $frequency['initialCost'];
+        $quoteItem = $quote->getItemById($item->getQuoteItemId());
+        $frequency = $quoteItem->getOptionByCode('rebill_subscription');
+        $frequency = $frequency ? json_decode($frequency->getValue(), true) : [];
+        $cost = $frequency['initialCost'] ?? 0;
         /**
          * @TODO in future implementation it will be needed the gateway in $rebillDetails
          */
@@ -295,9 +309,9 @@ class Transaction
                 'repetitions' => 1,
                 'currency'    => $this->configHelper->getCurrency(),
                 'gatewayId'   => $gateway,
-                'enabled'     => true
+                'enabled'     => true,
             ];
-            if ($rebillDetails['enable_subscription']) {
+            if ($rebillDetails['enable_subscription'] && $frequency) {
                 $rebillPriceData['frequency'] = [
                     'type'     => $frequency['frequencyType'] ?? 'months',
                     'quantity' => (int)$frequency['frequency'] ?? 1,
@@ -318,7 +332,7 @@ class Transaction
                 'details'         => json_encode($rebillDetails),
                 'details_hash'    => $hash,
                 'order_id'        => $order->getId(),
-                'order_item_id'   => $item->getId()
+                'order_item_id'   => $item->getId(),
             ]);
             $rebillPrice->save();
         }

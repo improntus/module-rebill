@@ -80,7 +80,7 @@ $configHelper = $this->helper(Config::class);
         checkout.setText({
             card_number: '<?= __('Card Number') ?>',
             pay_button: '<?= __('Pay') ?>',
-            error_messages: {
+            /*error_messages: {
                 emptyCardNumber: '<?= __('Enter a card number') ?>',
                 invalidCardNumber: '<?= __('Card number is invalid') ?>',
                 emptyExpiryDate: '<?= __('Enter an expiry date') ?>',
@@ -90,7 +90,7 @@ $configHelper = $this->helper(Config::class);
                 invalidExpiryDate: '<?= __('Expiry date is invalid') ?>',
                 emptyCVC: '<?= __('Enter a CVC') ?>',
                 invalidCVC: '<?= __('CVC is invalid') ?>',
-            },
+            },*/
         });
 
         checkout.setElements('rebill_elements');

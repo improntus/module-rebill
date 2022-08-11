@@ -7,6 +7,7 @@ use Magento\Checkout\Helper\Data;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Store\Model\ScopeInterface;
 
 class CheckoutData
 {

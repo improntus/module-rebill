@@ -16,11 +16,9 @@ $currencyHelper = $this->helper(Data::class);
 $onclick = $configHelper->isLoggedIn() ? '' : "onclick=\"window.location.href='{$block->getUrl('customer/account/login')}'\" style=\"cursor:pointer;\"";
 ?>
 <?php if ($details['enable_subscription']) : ?>
-    <div class="subscription-text" <?= $onclick ?>>
-        <?php if ($configHelper->isLoggedIn()) : ?>
-            <span class="text"><?= $configHelper->getSubscriptionProductText() ?></span>
-        <?php else : ?>
+        <?php if (!$configHelper->isLoggedIn()) : ?>
+        <div class="subscription-text" <?= $onclick ?>>
             <span class="text guest-text"><?= $configHelper->getGuestCustomerText() ?></span>
+        </div>
         <?php endif ?>
-    </div>
 <?php endif ?>
