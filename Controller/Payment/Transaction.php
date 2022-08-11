@@ -32,9 +32,10 @@ class Transaction extends Action
      */
     public function execute()
     {
-        $result = $this->transaction->prepareTransaction();
-        if (!$result) {
-            $this->messageManager->addErrorMessage(__('Can\'t find any order to pay with rebill.'));
+        try {
+            $this->transaction->prepareTransaction();
+        } catch (Exception $exception) {
+            $this->messageManager->addErrorMessage($exception->getMessage());
             $this->_redirect('checkout/cart/index');
             return;
         }

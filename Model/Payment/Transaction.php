@@ -92,7 +92,7 @@ class Transaction
             }
             if (!$order->getId() || $order->getPayment()->getMethod() !== \Improntus\Rebill\Model\Payment\Rebill::CODE) {
                 $this->session->restoreQuote();
-                return false;
+                throw new Exception(__('Can\'t find any order to pay with rebill.'));
             }
             $this->registry->register('prepared_order', $order);
             $this->registry->register('current_order', $order);
@@ -122,7 +122,8 @@ class Transaction
             $this->registry->register('rebill_prices', $prices);
         } catch (Exception $exception) {
             $this->session->restoreQuote();
-            throw $exception;
+            $this->configHelper->logError($exception->getMessage());
+            throw new \Exception('There was an error creating the payment, please try againt.');
         }
         return true;
     }
@@ -148,7 +149,6 @@ class Transaction
         $rebillItem = $this->itemFactory->create();
         $rebillItem->load("Order #{$order->getIncrementId()} Additionals", 'product_sku');
         if (!$rebillItem->getId()) {
-            $rebillItem->setData('product_sku', $order->getShippingDescription());
             $rebillItemId = $this->item->createItem([
                 'name'        => "Order #{$order->getIncrementId()} Additionals",
                 'description' => "Order #{$order->getIncrementId()} Additionals",
@@ -203,7 +203,6 @@ class Transaction
         $rebillItem = $this->itemFactory->create();
         $rebillItem->load($order->getShippingDescription(), 'product_sku');
         if (!$rebillItem->getId()) {
-            $rebillItem->setData('product_sku', $order->getShippingDescription());
             $rebillItemId = $this->item->createItem([
                 'name'        => $order->getShippingDescription(),
                 'description' => $order->getShippingDescription(),
@@ -211,6 +210,7 @@ class Transaction
             if ($rebillItemId === null) {
                 throw new Exception(__('Unable to create items on Rebill.'));
             }
+            $rebillItem->setData('product_sku', $order->getShippingDescription());
             $rebillItem->setData('rebill_item_id', $rebillItemId);
             $rebillItem->setData('product_description', $order->getShippingDescription());
             $rebillItem->save();
@@ -314,13 +314,13 @@ class Transaction
             if ($rebillDetails['enable_subscription'] && $frequency) {
                 $rebillPriceData['frequency'] = [
                     'type'     => $frequency['frequencyType'] ?? 'months',
-                    'quantity' => (int)$frequency['frequency'] ?? 1,
+                    'quantity' => (int)($frequency['frequency'] ?: 1),
                 ];
                 $rebillPriceData['free_trial'] = [
                     'type'     => 'days',
-                    'quantity' => $rebillDetails['free_trial_time_lapse'],
+                    'quantity' => $rebillDetails['free_trial_time_lapse'] ?? 0,
                 ];
-                $rebillPriceData['repetitions'] = $frequency['recurringPayments'];
+                $rebillPriceData['repetitions'] = $frequency['recurringPayments'] ?: 0;
             }
             $rebillPriceId = $this->item->createPriceForItem($rebillItemId, $rebillPriceData);
             if ($rebillPriceId === null) {
