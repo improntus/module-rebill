@@ -63,6 +63,24 @@
                             <argument name="type" xsi:type="string">text</argument>
                         </arguments>
                     </block>
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="cancel">
+                        <arguments>
+                            <argument name="header" xsi:type="string" translate="true">Cancel</argument>
+                            <argument name="index" xsi:type="string">id</argument>
+                            <argument name="type" xsi:type="string">action</argument>
+                            <argument name="filter" xsi:type="string" />
+                            <argument name="actions" xsi:type="array">
+                                <item xsi:type="array" name="cancel">
+                                    <item name="url" xsi:type="array">
+                                        <item name="base" xsi:type="string">*/*/cancel</item>
+                                    </item>
+                                    <item name="field" xsi:type="string">id</item>
+                                    <item name="confirm" xsi:type="string" translate="true">Are you sure you want to cancel this subscription?</item>
+                                    <item name="caption" xsi:type="string">Cancel</item>
+                                </item>
+                            </argument>
+                        </arguments>
+                    </block>
                 </block>
             </block>
         </block>

@@ -10,7 +10,7 @@ use Magento\Catalog\Block\Product\View;
 $configHelper = $this->helper(Config::class);
 $frequencies = $configHelper->getProductRebillSubscriptionDetails($block->getProduct())['frequency'];
 ?>
-<?php if ($count = count($frequencies) && $configHelper->isLoggedIn()) : ?>
+<?php if (($count = count($frequencies)) && $configHelper->isLoggedIn()) : ?>
     <div class="rebill-subscription">
         <div class="check-subscription">
             <input type="radio" name="use_subscription" value="0" id="one-time-purchase" checked="checked">
@@ -21,7 +21,7 @@ $frequencies = $configHelper->getProductRebillSubscriptionDetails($block->getPro
         <div class="check-subscription">
             <input type="radio" name="use_subscription" value="1" id="use-subscription">
             <label for="use-subscription">
-                <?php if ($count == 1) : ?>
+                <?php if ($count === 1) : ?>
                     <?= __('Subscribe to this product %1', $configHelper->getFrequencyDescription($block->getProduct(), array_first($frequencies))) ?>
                 <?php else : ?>
                     <?= __('Subscribe to this product') ?>
@@ -29,7 +29,7 @@ $frequencies = $configHelper->getProductRebillSubscriptionDetails($block->getPro
             </label>
         </div>
         <div class="description" style="display: none">
-            <?php if ($count == 1) : ?>
+            <?php if ($count === 1) : ?>
                 <input type="hidden" name="frequency" value="<?= array_first($frequencies)['id'] ?>">
             <?php else : ?>
                 <span class="option">
