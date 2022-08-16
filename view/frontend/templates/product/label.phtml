@@ -1,6 +1,7 @@
 <?php
 /**
  * @var $block View
+ * @var $escaper \Magento\Framework\Escaper
  */
 
 use Improntus\Rebill\Helper\Config;
@@ -13,10 +14,10 @@ $rebillDetails = $configHelper->getProductRebillSubscriptionDetails($block->getP
 <?php if ($rebillDetails['enable_subscription'] && ($labelType = $configHelper->getProductLabel()) !== 'none') : ?>
     <div class="rebill-product-label">
         <?php if ($labelType == 'text') : ?>
-            <span class="rebill-label-text"><?= $configHelper->getProductLabelCustomText() ?></span>
+            <span class="rebill-label-text"><?= $escaper->escapeHtml($configHelper->getProductLabelCustomText()) ?></span>
         <?php else : ?>
             <div class="rebill-label-rebill-logo">
-                <img src="<?= $block->getViewFileUrl('Improntus_Rebill::images/rebill_logo.png'); ?>" alt="<?= __('Product Subscription with Rebill') ?>">
+                <img src="<?= /** @noEscape */ $block->getViewFileUrl('Improntus_Rebill::images/rebill_logo.png'); ?>" alt="<?= /** @noEscape */ __('Product Subscription with Rebill') ?>">
             </div>
         <?php endif; ?>
     </div>

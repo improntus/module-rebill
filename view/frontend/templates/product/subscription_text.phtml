@@ -1,6 +1,7 @@
 <?php
 /**
  * @var $block View
+ * @var $escaper \Magento\Framework\Escaper
  */
 
 use Improntus\Rebill\Helper\Config;
@@ -17,8 +18,8 @@ $onclick = $configHelper->isLoggedIn() ? '' : "onclick=\"window.location.href='{
 ?>
 <?php if ($details['enable_subscription']) : ?>
     <?php if (!$configHelper->isLoggedIn()) : ?>
-        <div class="subscription-text" <?= $onclick ?>>
-            <span class="text guest-text"><?= $configHelper->getGuestCustomerText() ?></span>
+        <div class="subscription-text" <?= /** @noEscape */$onclick ?>>
+            <span class="text guest-text"><?= $escaper->escapeHtml($configHelper->getGuestCustomerText()) ?></span>
         </div>
     <?php endif ?>
 <?php endif ?>

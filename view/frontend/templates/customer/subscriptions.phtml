@@ -1,6 +1,7 @@
 <?php
 /**
  * @var $block Subscriptions
+ * @var $escaper \Magento\Framework\Escaper
  */
 
 use Improntus\Rebill\Block\Customer\Subscriptions;
@@ -15,27 +16,27 @@ $subscriptions = $block->getSubscriptions() ?? [];
         <table class="data table">
             <thead>
             <tr>
-                <th><?= __('Subscription') ?></th>
-                <th><?= __('Quantity') ?></th>
-                <th><?= __('Status') ?></th>
-                <th><?= __('Total') ?></th>
-                <th><?= __('Payment Method') ?></th>
-                <th><?= __('Created at') ?></th>
+                <th><?= /** @noEscape */__('Subscription') ?></th>
+                <th><?= /** @noEscape */__('Quantity') ?></th>
+                <th><?= /** @noEscape */__('Status') ?></th>
+                <th><?= /** @noEscape */__('Total') ?></th>
+                <th><?= /** @noEscape */__('Payment Method') ?></th>
+                <th><?= /** @noEscape */__('Created at') ?></th>
                 <th></th>
             </tr>
             </thead>
             <tbody>
             <?php foreach ($subscriptions as $subscription) : ?>
                 <tr>
-                    <td><?= $subscription['title'] ?></td>
-                    <td><?= $subscription['quantity'] ?></td>
-                    <td><?= $subscription['status'] ?></td>
-                    <td><?= $currencyHelper->currencyByStore((float)$subscription['price']['amount']) ?></td>
-                    <td><?= $block->getPaymentMethod($subscription) ?></td>
-                    <td><?= date('Y-m-d', strtotime($subscription['createdAt'])) ?></td>
+                    <td><?= $escaper->escapeHtml($subscription['title']) ?></td>
+                    <td><?= $escaper->escapeHtml($subscription['quantity']) ?></td>
+                    <td><?= $escaper->escapeHtml($subscription['status']) ?></td>
+                    <td><?= $escaper->escapeHtml($currencyHelper->currencyByStore((float)$subscription['price']['amount'])) ?></td>
+                    <td><?= $escaper->escapeHtml($block->getPaymentMethod($subscription)) ?></td>
+                    <td><?= $escaper->escapeHtml(date('Y-m-d', strtotime($subscription['createdAt']))) ?></td>
                     <td class="col actions">
                         <a class="action delete"
-                           href="<?= $block->getUrl('rebill/customer/cancel', ['id' => $subscription['id']]) ?>"><?= __('Cancel') ?></a>
+                           href="<?= /** @noEscape */$block->getUrl('rebill/customer/cancel', ['id' => $subscription['id']]) ?>"><?= /** @noEscape */__('Cancel') ?></a>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -44,6 +45,6 @@ $subscriptions = $block->getSubscriptions() ?? [];
     </div>
 <?php else : ?>
 <div class="subscription-grid-wrapper table-wrapper">
-    <span class="no-subscriptions"><?= __('You have no active subscriptions') ?></span>
+    <span class="no-subscriptions"><?= /** @noEscape */__('You have no active subscriptions') ?></span>
 </div>
 <?php endif; ?>

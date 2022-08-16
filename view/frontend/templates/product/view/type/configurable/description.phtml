@@ -1,6 +1,7 @@
 <?php
 /**
  * @var $block View
+ * @var $escaper \Magento\Framework\Escaper
  */
 
 use Improntus\Rebill\Helper\Config;
@@ -15,27 +16,27 @@ $frequencies = $configHelper->getProductRebillSubscriptionDetails($block->getPro
         <div class="check-subscription">
             <input type="radio" name="use_subscription" value="0" id="one-time-purchase" checked="checked">
             <label for="one-time-purchase">
-                <?= __('One time purchase') ?>
+                <?= /** @noEscape */__('One time purchase') ?>
             </label>
         </div>
         <div class="check-subscription">
             <input type="radio" name="use_subscription" value="1" id="use-subscription">
             <label for="use-subscription">
                 <?php if ($count === 1) : ?>
-                    <?= __('Subscribe to this product %1', $configHelper->getFrequencyDescription($block->getProduct(), array_first($frequencies))) ?>
+                    <?= /** @noEscape */ __('Subscribe to this product %1', $configHelper->getFrequencyDescription($block->getProduct(), array_first($frequencies))) ?>
                 <?php else : ?>
-                    <?= __('Subscribe to this product') ?>
+                    <?= /** @noEscape */ __('Subscribe to this product') ?>
                 <?php endif ?>
             </label>
         </div>
         <div class="description" style="display: none">
             <?php if ($count === 1) : ?>
-                <input type="hidden" name="frequency" value="<?= array_first($frequencies)['id'] ?>">
+                <input type="hidden" name="frequency" value="<?= /** @noEscape */array_first($frequencies)['id'] ?>">
             <?php else : ?>
                 <span class="option">
                     <select name="frequency" id="frequency">
                         <?php foreach ($frequencies as $frequency) : ?>
-                            <option value="<?= $frequency['id'] ?>"><?= $configHelper->getFrequencyDescription($block->getProduct(), $frequency) ?></option>
+                            <option value="<?= /** @noEscape */ $frequency['id'] ?>"><?= /** @noEscape */ $configHelper->getFrequencyDescription($block->getProduct(), $frequency) ?></option>
                         <?php endforeach; ?>
                     </select>
                 </span>

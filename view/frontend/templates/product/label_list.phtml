@@ -1,6 +1,7 @@
 <?php
 /**
  * @var $block ListProduct
+ * @var $escaper \Magento\Framework\Escaper
  */
 
 use Improntus\Rebill\Helper\Config;
@@ -13,19 +14,19 @@ $configHelper = $this->helper(Config::class);
     <script>
         require(['jquery'], function ($) {
             $(document).ready(function () {
-                let labelType = '<?= $labelType ?>';
-                let labelRebillLogo = '<?= $block->getViewFileUrl('Improntus_Rebill::images/rebill_logo.png'); ?>';
+                let labelType = '<?= $escaper->escapeHtml($labelType) ?>';
+                let labelRebillLogo = '<?= /** @noEscape  */ $block->getViewFileUrl('Improntus_Rebill::images/rebill_logo.png'); ?>';
                 let labelEl = $('<div class="rebill-product-label"></div>');
                 if (labelType === 'text') {
-                    labelEl.append($('<span class="rebill-label-text"></span>').text('<?= $configHelper->getProductLabelCustomText() ?>'));
+                    labelEl.append($('<span class="rebill-label-text"></span>').text('<?= $escaper->escapeHtml($configHelper->getProductLabelCustomText()) ?>'));
                 } else {
                     labelEl.append($('<div class="rebill-label-rebill-logo"></div>')
-                        .append($(`<img src='${labelRebillLogo}' alt='<?= __('Product Subscription with Rebill') ?>'/>`)));
+                        .append($(`<img src='${labelRebillLogo}' alt='<?= /** @noEscape  */ __('Product Subscription with Rebill') ?>'/>`)));
                 }
                 $.ajax({
-                    url: "<?= $block->getUrl('rebill/product/labels') ?>",
+                    url: "<?= /** @noEscape  */ $block->getUrl('rebill/product/labels') ?>",
                     type: 'POST',
-                    data: {ids: <?= json_encode($block->getLoadedProductCollection()->getAllIds()) ?>},
+                    data: {ids: <?= /** @noEscape  */ json_encode($block->getLoadedProductCollection()->getAllIds()) ?>},
                     dataType: 'json',
                     success: function (data) {
                         $.each(data.products, function (id, value) {

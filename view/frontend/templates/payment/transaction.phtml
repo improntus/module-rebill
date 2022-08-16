@@ -1,6 +1,7 @@
 <?php
 /**
  * @var $block Transaction
+ * @var $escaper \Magento\Framework\Escaper
  */
 
 use Improntus\Rebill\Block\Payment\Transaction;
@@ -11,85 +12,85 @@ $prices = $block->getPrices();
 /** @var Config $configHelper */
 $configHelper = $this->helper(Config::class);
 ?>
-<h2 class="rebill.payment.transaction.title"><?= __('Pay with rebill') ?></h2>
+<h2 class="rebill.payment.transaction.title"><?= /** @noEscape  */__('Pay with rebill') ?></h2>
 <div id="rebill_elements"></div>
 <div class="rebill-errors"></div>
 
 <script>
     require(['jquery', 'rebill'], function ($, rebill) {
         let initialization = {
-            organization_id: '<?= $configHelper->getApiUuid() ?>',
+            organization_id: '<?= $escaper->escapeHtml($configHelper->getApiUuid()) ?>',
             api_url: 'https://api.rebill.to/v2',
         }
         let checkout = new Rebill.PhantomSDK(initialization);
 
         checkout.setCustomer({
-            firstName: "<?= $order->getCustomerFirstname() ?>",
-            lastName: "<?= $order->getCustomerLastname() ?>",
-            email: '<?= $order->getCustomerEmail() ?>',
+            firstName: "<?= $escaper->escapeHtml($order->getCustomerFirstname()) ?>",
+            lastName: "<?= $escaper->escapeHtml($order->getCustomerLastname()) ?>",
+            email: '<?= $escaper->escapeHtml($order->getCustomerEmail()) ?>',
             phone: {
                 countryCode: "00",
                 areaCode: "00",
-                number: "<?= $order->getBillingAddress()->getTelephone() ?>"
+                number: "<?= $escaper->escapeHtml($order->getBillingAddress()->getTelephone()) ?>"
             },
             personalId: {
-                type: "<?= $configHelper->getCustomerDocumentType() ?>",
-                value: "<?= $order->getBillingAddress()->getData($configHelper->getCustomerAttributeForDocument()) ?>"
+                type: "<?= $escaper->escapeHtml($configHelper->getCustomerDocumentType()) ?>",
+                value: "<?= $escaper->escapeHtml($order->getBillingAddress()->getData($configHelper->getCustomerAttributeForDocument())) ?>"
             },
             address: {
-                street: "<?= $order->getBillingAddress()->getStreet()[0] ?>",
-                number: "<?= $order->getBillingAddress()->getStreet()[1] ?? 'none' ?>",
-                floor: "<?= $order->getBillingAddress()->getStreet()[2] ?? 'none' ?>",
-                apt: "<?= $order->getBillingAddress()->getStreet()[3] ?? 'none' ?>",
-                city: "<?= $order->getBillingAddress()->getCity() ?>",
-                state: "<?= $order->getBillingAddress()->getRegion() ?>",
-                zipCode: "<?= $order->getBillingAddress()->getPostcode() ?? '' ?>",
-                country: "<?= $order->getBillingAddress()->getCountryId() ?>",
+                street: "<?= $escaper->escapeHtml($order->getBillingAddress()->getStreet()[0]) ?>",
+                number: "<?= $escaper->escapeHtml($order->getBillingAddress()->getStreet()[1]) ?? 'none' ?>",
+                floor: "<?= $escaper->escapeHtml($order->getBillingAddress()->getStreet()[2]) ?? 'none' ?>",
+                apt: "<?= $escaper->escapeHtml($order->getBillingAddress()->getStreet()[3]) ?? 'none' ?>",
+                city: "<?= $escaper->escapeHtml($order->getBillingAddress()->getCity()) ?>",
+                state: "<?= $escaper->escapeHtml($order->getBillingAddress()->getRegion()) ?>",
+                zipCode: "<?= $escaper->escapeHtml($order->getBillingAddress()->getPostcode()) ?? '' ?>",
+                country: "<?= $escaper->escapeHtml($order->getBillingAddress()->getCountryId()) ?>",
                 description: "Billing Address"
             }
         });
         checkout.setCardHolder({
-            name: '<?= $order->getBillingAddress()->getFirstname() . ' ' . $order->getBillingAddress()->getLastname() ?>',
+            name: '<?= $escaper->escapeHtml($order->getBillingAddress()->getFirstname() . ' ' . $order->getBillingAddress()->getLastname()) ?>',
             identification: {
-                type: '<?= $configHelper->getCustomerDocumentType() ?>',
-                value: "<?= $order->getBillingAddress()->getData($configHelper->getCustomerAttributeForDocument()) ?>"
+                type: '<?= $escaper->escapeHtml($configHelper->getCustomerDocumentType()) ?>',
+                value: "<?= $escaper->escapeHtml($order->getBillingAddress()->getData($configHelper->getCustomerAttributeForDocument())) ?>"
             },
         })
-        checkout.setTransaction({prices: <?= json_encode($prices) ?>});
+        checkout.setTransaction({prices: <?= /** @noEscape */json_encode($prices) ?>});
         checkout.setCallbacks({
             onSuccess: function (response) {
                 $('.rebill-errors').html('');
                 if (response.invoice) {
                     $.ajax({
-                        url: '<?= $block->getUrl('rebill/payment/success', ['order_id' => $order->getId()]) ?>',
+                        url: '<?= /** @noEscape  */ $block->getUrl('rebill/payment/success', ['order_id' => $order->getId()]) ?>',
                         data: response,
                         type: 'post',
                         success: function () {
-                            window.location.href = '<?= $block->getUrl('checkout/onepage/success') ?>';
+                            window.location.href = '<?= /** @noEscape  */ $block->getUrl('checkout/onepage/success') ?>';
                         }
                     });
                 } else {
-                    $('.rebill-errors').append($('<div class="error-message"></div>').text("<?= __('The payment can\'t be processed, try again with another card.') ?>"));
+                    $('.rebill-errors').append($('<div class="error-message"></div>').text("<?= /** @noEscape  */ __('The payment can\'t be processed, try again with another card.') ?>"));
                 }
             },
             onError: function (error) {
                 $('.rebill-errors').html('')
-                    .append($('<div class="error-message"></div>').text("<?= __('The payment can\'t be processed, try again with another card.') ?>"));
+                    .append($('<div class="error-message"></div>').text("<?= /** @noEscape  */ __('The payment can\'t be processed, try again with another card.') ?>"));
             },
         });
         checkout.setText({
-            card_number: '<?= __('Card Number') ?>',
-            pay_button: '<?= __('Pay') ?>',
+            card_number: '<?= /** @noEscape  */ __('Card Number') ?>',
+            pay_button: '<?= /** @noEscape  */ __('Pay') ?>',
             /*error_messages: {
-                emptyCardNumber: '<?= __('Enter a card number') ?>',
-                invalidCardNumber: '<?= __('Card number is invalid') ?>',
-                emptyExpiryDate: '<?= __('Enter an expiry date') ?>',
-                monthOutOfRange: '<?= __('Expiry month must be between 01 and 12') ?>',
-                yearOutOfRange: '<?= __('Expiry year cannot be in the past') ?>',
-                dateOutOfRange: '<?= __('Expiry date cannot be in the past') ?>',
-                invalidExpiryDate: '<?= __('Expiry date is invalid') ?>',
-                emptyCVC: '<?= __('Enter a CVC') ?>',
-                invalidCVC: '<?= __('CVC is invalid') ?>',
+                emptyCardNumber: '<?= /** @noEscape  */ __('Enter a card number') ?>',
+                invalidCardNumber: '<?= /** @noEscape  */ __('Card number is invalid') ?>',
+                emptyExpiryDate: '<?= /** @noEscape  */ __('Enter an expiry date') ?>',
+                monthOutOfRange: '<?= /** @noEscape  */ __('Expiry month must be between 01 and 12') ?>',
+                yearOutOfRange: '<?= /** @noEscape  */ __('Expiry year cannot be in the past') ?>',
+                dateOutOfRange: '<?= /** @noEscape  */ __('Expiry date cannot be in the past') ?>',
+                invalidExpiryDate: '<?= /** @noEscape  */ __('Expiry date is invalid') ?>',
+                emptyCVC: '<?= /** @noEscape  */ __('Enter a CVC') ?>',
+                invalidCVC: '<?= /** @noEscape  */ __('CVC is invalid') ?>',
             },*/
         });
 

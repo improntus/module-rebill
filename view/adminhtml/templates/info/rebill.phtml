@@ -1,16 +1,19 @@
 <?php
-/** @var \Improntus\Rebill\Block\Sales\Order\Rebill $block */
+/**
+ * @var \Improntus\Rebill\Block\Sales\Order\Rebill $block
+ * @var $escaper \Magento\Framework\Escaper
+ */
 $order = $block->getInfo()->getOrder();
 $payment = $order->getPayment();
 $additionalInformation = $payment->getAdditionalInformation();
 ?>
-<p><?= $additionalInformation['method_title'] ?></p>
+<p><?= $escaper->escapeHtml($additionalInformation['method_title']) ?></p>
 <ul class="status-payment-rebill" style="list-style: none;padding: 0;">
     <?php if (isset($additionalInformation['status_detail'])): ?>
-        <li><?= __($additionalInformation['status_detail']) ?></li>
+        <li><?= /** @noEscape */__($additionalInformation['status_detail']) ?></li>
     <?php endif ?>
     <?php if (isset($additionalInformation['card'])): ?>
-        <li><strong><?= __('Card Holder Name') ?>: </strong> <?= $additionalInformation['card']['holder_name']?></li>
-        <li><strong><?= __('Last 4 four digits') ?>: </strong><?= $additionalInformation['card']['last4']?></li>
+        <li><strong><?= /** @noEscape */ __('Card Holder Name') ?>: </strong> <?= $escaper->escapeHtml($additionalInformation['card']['holder_name']) ?></li>
+        <li><strong><?= /** @noEscape */ __('Last 4 four digits') ?>: </strong><?= $escaper->escapeHtml($additionalInformation['card']['last4']) ?></li>
     <?php endif ?>
 </ul>

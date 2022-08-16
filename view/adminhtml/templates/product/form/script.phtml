@@ -1,6 +1,7 @@
 <?php
 /**
  * @var $block ProductForm
+ * @var $escaper \Magento\Framework\Escaper
  */
 
 use Improntus\Rebill\Block\Adminhtml\ProductForm;
@@ -13,13 +14,13 @@ $configHelper = $this->helper(Config::class);
     <table>
         <thead>
             <tr>
-                <th><?= __('ID') ?></th>
-                <th><?= __('Frequency') ?></th>
-                <th><?= __('Frequency Type') ?></th>
-                <th><?= __('Max Recurring Payments') ?></th>
-                <th><?= __('Price') ?></th>
-                <th><?= __('SignUp Cost') ?></th>
-                <th><?= __('Actions') ?></th>
+                <th><?= /** @noEscape */__('ID') ?></th>
+                <th><?= /** @noEscape */__('Frequency') ?></th>
+                <th><?= /** @noEscape */__('Frequency Type') ?></th>
+                <th><?= /** @noEscape */__('Max Recurring Payments') ?></th>
+                <th><?= /** @noEscape */__('Price') ?></th>
+                <th><?= /** @noEscape */__('SignUp Cost') ?></th>
+                <th><?= /** @noEscape */__('Actions') ?></th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -29,10 +30,10 @@ $configHelper = $this->helper(Config::class);
     {
         "*": {
             "rebill_product_form": {
-                "attributes": <?= $block->getRebillAttributesJson() ?>,
-                "product_type": "<?= $block->getProductType() ?>",
-                "is_product_child": <?= (int)$configHelper->isProductChild($block->getProduct()) ?>,
-                "product_price": <?= $block->getProduct()->getPrice() ?>
+                "attributes": <?= /** @noEscape */ $block->getRebillAttributesJson() ?>,
+                "product_type": "<?= /** @noEscape */ $block->getProductType() ?>",
+                "is_product_child": <?= /** @noEscape */ (int)$configHelper->isProductChild($block->getProduct()) ?>,
+                "product_price": <?= /** @noEscape */ $block->getProduct()->getPrice() ?>
             }
         }
     }
