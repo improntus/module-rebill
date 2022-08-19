@@ -128,8 +128,6 @@ class Subscription extends Data
         return [
             'enable_subscription'           => (bool)$product->getData('rebill_subscription_type'),
             'subscription_type'             => $product->getData('rebill_subscription_type'),
-            'inherit_from_parent'           => (int)$product->getData('rebill_inherit_from_parent'),
-            'individual_settings_in_simple' => (int)$product->getData('rebill_individual_settings_in_simple'),
             'free_trial_time_lapse'         => $product->getData('rebill_free_trial_time_lapse'),
             'frequency'                     => json_decode($product->getData('rebill_frequency') ?? '[]', true),
             'gateway_id'                    => $product->getData('rebill_gateway_id'),

@@ -51,4 +51,29 @@ class Subscription extends Rebill
         }
     }
 
+    /**
+     * @param $subscriptionId
+     * @param $priceId
+     * @return mixed|null
+     * @throws Exception
+     */
+    public function changePrice($subscriptionId, $priceId)
+    {
+        try {
+            return $this->request('subscription_change_price', 'POST', [$subscriptionId], ['price_id' => $priceId]);
+        } catch (Exception $exception) {
+            $this->configHelper->logError($exception->getMessage());
+            throw $exception;
+        }
+    }
+
+    public function getInvoice($id)
+    {
+        try {
+            return $this->request('invoice', 'GET', [$id]);
+        } catch (Exception $exception) {
+            $this->configHelper->logError($exception->getMessage());
+            throw $exception;
+        }
+    }
 }

@@ -254,9 +254,9 @@ class Transaction
         return $rebillPrice->getData('rebill_price_id');
     }
 
-    protected function getRebillPriceIdForItem(Item $item, Quote $quote)
+    public function getRebillPriceIdForItem(Item $item, Quote $quote)
     {
-        $order = $item->getOrder();
+//        $order = $item->getOrder();
         /** @var \Improntus\Rebill\Model\Item $rebillItem */
         $rebillItem = $this->itemFactory->create();
         $rebillItem->load($item->getProduct()->getSku(), 'product_sku');
@@ -298,7 +298,7 @@ class Transaction
          * @TODO in future implementation it will be needed the gateway in $rebillDetails
          */
         $gateway = $this->configHelper->getGatewayId();
-        $hash = hash('md5', json_encode($rebillDetails) . $price . $cost . $item->getProduct()->getSku() . $gateway);
+        $hash = hash('md5', json_encode($frequency) . $price . $cost . $item->getProduct()->getSku() . $gateway);
         /** @var Price $rebillPrice */
         $rebillPrice = $this->priceFactory->create();
         $rebillPrice->load($hash, 'details_hash');
@@ -331,8 +331,6 @@ class Transaction
                 'rebill_price_id' => $rebillPriceId,
                 'details'         => json_encode($rebillDetails),
                 'details_hash'    => $hash,
-                'order_id'        => $order->getId(),
-                'order_item_id'   => $item->getId(),
             ]);
             $rebillPrice->save();
         }

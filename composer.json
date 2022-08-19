@@ -1,21 +1,18 @@
 {
-  "name": "improntus/rebill",
-  "version": "1.0.2",
-  "description": "N/A",
-  "type": "magento2-module",
-  "require": {
-    "magento/framework": "*",
-    "magento/module-checkout": "100.4.*"
-  },
-  "license": [
-    "Open Software License (OSL)"
-  ],
-  "autoload": {
-    "files": [
-      "registration.php"
-    ],
-    "psr-4": {
-      "Improntus\\Rebill\\": ""
+    "name": "improntus/module-rebill",
+    "version": "1.0.3",
+    "description": "N/A",
+    "type": "magento2-module",
+    "require": {
+        "magento/framework": "*",
+        "magento/module-checkout": "100.4.*"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Improntus\\Rebill\\": ""
+        }
     }
-  }
 }

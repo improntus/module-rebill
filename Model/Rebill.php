@@ -33,21 +33,23 @@ class Rebill
      * @var string[]
      */
     protected $endpoints = [
-        'auth'                   => '/v2/auth/login/%s',
-        'create_item'            => '/v2/item',
-        'update_item'            => '/v2/item/%s',
-        'create_price'           => '/v2/item/%s/price',
-        'update_price'           => '/v2/item/price/%s',
-        'checkout'               => '/v2/checkout',
-        'customer_subscriptions' => '/v2/subscriptions/customer/%s',
-        'identification'         => '/v2/data/identification/%s/%s',
-        'organization_info'      => '/v2/organization',
-        'payment'                => '/v2/payments/%s',
-        'payment_list'           => '/v2/payments',
-        'card'                   => '/v2/clients/cards/%s',
-        'subscription'           => '/v2/subscriptions/customer/%s',
-        'cancel_subscription'    => '/v2/clients/subscriptions/%s',
-        'subscription_list'      => '/v2/subscriptions/%s/all'
+        'auth'                      => '/v2/auth/login/%s',
+        'create_item'               => '/v2/item',
+        'update_item'               => '/v2/item/%s',
+        'create_price'              => '/v2/item/%s/price',
+        'update_price'              => '/v2/item/price/%s',
+        'checkout'                  => '/v2/checkout',
+        'customer_subscriptions'    => '/v2/subscriptions/customer/%s',
+        'identification'            => '/v2/data/identification/%s/%s',
+        'organization_info'         => '/v2/organization',
+        'payment'                   => '/v2/payments/%s',
+        'payment_list'              => '/v2/payments',
+        'card'                      => '/v2/clients/cards/%s',
+        'subscription'              => '/v2/subscriptions/customer/%s',
+        'cancel_subscription'       => '/v2/clients/subscriptions/%s',
+        'subscription_list'         => '/v2/subscriptions/%s/all',
+        'subscription_change_price' => '/v2/subscriptions/%s/change-plan',
+        'invoice'                   => '/v2/receipts/%s',
     ];
 
     /**
