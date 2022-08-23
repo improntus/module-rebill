@@ -50,7 +50,7 @@ class InitialCost extends AbstractTotal
             $rebillInfo = $this->configHelper->getOrderSubscriptionInformation($order);
             $cost = 0;
             foreach ($rebillInfo as $info) {
-                $cost += $info['initialCost'];
+                $cost += $info['initialCost'] ?? 0;
             }
             $invoice->setData('rebill_initial_cost_amount', $cost);
             $invoice->setData('base_rebill_initial_cost_amount', $cost);

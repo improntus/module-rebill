@@ -68,7 +68,7 @@ class InitialCost extends AbstractTotal
         $cost = 0;
 
         foreach ($subscriptionInformation as $info) {
-            $cost += (float)$info['initialCost'];
+            $cost += (float)($info['initialCost'] ?? 0);
         }
 
         $address->setData('rebill_initial_cost_amount', $cost);
