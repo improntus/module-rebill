@@ -117,7 +117,9 @@ class Subscription extends Data
             $quoteItem = $quote->getItemById($item->getQuoteItemId());
             $frequency = $quoteItem->getOptionByCode('rebill_subscription');
             $frequency = $frequency ? json_decode($frequency->getValue(), true) : [];
-            $frequency['initialCost'] *= $item->getQtyOrdered();
+            if ($frequency) {
+                $frequency['initialCost'] *= $item->getQtyOrdered();
+            }
             $subscriptionProducts[] = $frequency;
         }
         return $subscriptionProducts;
