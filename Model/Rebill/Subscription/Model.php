@@ -1,18 +1,36 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Model\Rebill\Subscription;
 
+use Exception;
 use Improntus\Rebill\Model\Rebill\Subscription;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\DataObject;
 
 class Model extends DataObject
 {
+    /**
+     * @var Subscription
+     */
     protected $subscription;
+
+    /**
+     * @var ScopeConfigInterface
+     */
     protected $scopeConfig;
 
+    /**
+     * @param Subscription $subscription
+     * @param ScopeConfigInterface $scopeConfig
+     * @param array $data
+     */
     public function __construct(
-        Subscription              $subscription,
+        Subscription         $subscription,
         ScopeConfigInterface $scopeConfig,
         array                $data = []
     ) {
@@ -21,6 +39,10 @@ class Model extends DataObject
         parent::__construct($data);
     }
 
+    /**
+     * @param $email
+     * @return void
+     */
     public function load($email)
     {
         try {
@@ -34,8 +56,6 @@ class Model extends DataObject
                 'last_charge_date' => $item['lastChargeDate'],
                 'next_charge_date' => $item['nextChargeDate'],
             ]);
-        } catch (\Exception $exception) {
-
-        }
+        } catch (Exception $exception) {}
     }
 }

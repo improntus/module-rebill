@@ -1,8 +1,14 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Model\Rebill\Subscription;
 
 use Exception;
+use Magento\Framework\DataObject;
 use Improntus\Rebill\Helper\Config;
 use Improntus\Rebill\Model\Price;
 use Improntus\Rebill\Model\Rebill\Item;
@@ -12,12 +18,39 @@ use Magento\Framework\Data\Collection\EntityFactoryInterface;
 
 class Collection extends \Magento\Framework\Data\Collection
 {
+    /**
+     * @var Subscription
+     */
     protected $subscription;
+
+    /**
+     * @var ModelFactory
+     */
     protected $modelFactory;
+
+    /**
+     * @var CollectionFactory
+     */
     protected $collectionFactory;
+
+    /**
+     * @var Config
+     */
     protected $configHelper;
+
+    /**
+     * @var Item
+     */
     protected $rebillItem;
 
+    /**
+     * @param EntityFactoryInterface $entityFactory
+     * @param Subscription $subscription
+     * @param ModelFactory $modelFactory
+     * @param CollectionFactory $collectionFactory
+     * @param Config $configHelper
+     * @param Item $item
+     */
     public function __construct(
         EntityFactoryInterface $entityFactory,
         Subscription           $subscription,
@@ -36,6 +69,9 @@ class Collection extends \Magento\Framework\Data\Collection
         parent::__construct($entityFactory);
     }
 
+    /**
+     * @return void
+     */
     protected function setItems()
     {
         $items = [];
@@ -66,7 +102,11 @@ class Collection extends \Magento\Framework\Data\Collection
                     '%1 x %2 - %3',
                     $items[$index]['quantity'],
                     $items[$index]['title'],
-                    $this->configHelper->getFrequencyDescription(null, json_decode($price->getData('details'), true), $items[$index]['amount'])
+                    $this->configHelper->getFrequencyDescription(
+                        null,
+                        json_decode($price->getData('details'), true),
+                        $items[$index]['amount']
+                    )
                 );
             }
             if (count($pricesIds)) {
@@ -78,7 +118,7 @@ class Collection extends \Magento\Framework\Data\Collection
                                 "initialCost"       => 0,
                                 "frequency"         => $price['frequency']['quantity'],
                                 "frequencyType"     => $price['frequency']['quantity'],
-                                "recurringPayments" => $price['repetitions']
+                                "recurringPayments" => $price['repetitions'],
                             ];
                             $item->setData('title', __(
                                 '%1 x %2 - %3',
@@ -91,11 +131,15 @@ class Collection extends \Magento\Framework\Data\Collection
                 }
             }
         } catch (Exception $exception) {
-
+            $items = [];
         }
         $this->_items = $items;
     }
 
+    /**
+     * @param $item
+     * @return array
+     */
     protected function getItemsData($item)
     {
         return [
@@ -110,6 +154,9 @@ class Collection extends \Magento\Framework\Data\Collection
         ];
     }
 
+    /**
+     * @return Model|DataObject
+     */
     public function getNewEmptyItem()
     {
         return $this->modelFactory->create();

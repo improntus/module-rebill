@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Controller\Payment;
 
@@ -6,25 +11,57 @@ use Magento\Sales\Model\Order;
 use Improntus\Rebill\Helper\Config;
 use Magento\Sales\Model\OrderRepository;
 use Improntus\Rebill\Model\Sales\Invoice;
+use Magento\Framework\App\ResponseInterface;
 use Improntus\Rebill\Model\Rebill\Subscription;
 use Improntus\Rebill\Model\SubscriptionFactory;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 class Success extends Action
 {
+    /**
+     * @var Session
+     */
     protected $session;
+
+    /**
+     * @var Subscription
+     */
     protected $subscription;
+
+    /**
+     * @var SubscriptionFactory
+     */
     protected $subscriptionFactory;
 
     /**
      * @var OrderRepository
      */
     protected $orderRepository;
+
+    /**
+     * @var Invoice
+     */
     protected $invoice;
+
+    /**
+     * @var Config
+     */
     protected $configHelper;
 
+    /**
+     * @param Context $context
+     * @param Session $session
+     * @param Subscription $subscription
+     * @param SubscriptionFactory $subscriptionFactory
+     * @param OrderRepository $orderRepository
+     * @param Invoice $invoice
+     * @param Config $configHelper
+     */
     public function __construct(
         Context             $context,
         Session             $session,
@@ -43,6 +80,11 @@ class Success extends Action
         parent::__construct($context);
     }
 
+    /**
+     * @return ResponseInterface|ResultInterface|void
+     * @throws InputException
+     * @throws NoSuchEntityException
+     */
     public function execute()
     {
         $invoice = $this->getRequest()->getParam('invoice');
@@ -52,7 +94,7 @@ class Success extends Action
                 $orderId = $this->getRequest()->getParam('order_id');
                 /** @var Order $order */
                 $order = $this->orderRepository->get($orderId);
-                $magentoInvoice = $this->invoice->execute($order);
+                $this->invoice->execute($order);
                 $order->setStatus($this->configHelper->getApprovedStatus())->save();
                 $subscriptions = $this->subscription->getSubscriptionFromClient($this->session->getCustomer()->getEmail());
                 $_subscriptions = [];

@@ -1,9 +1,17 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Controller\Product;
 
 use Improntus\Rebill\Helper\Config;
 use Magento\Catalog\Model\Product;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\Result\Json;
+use Magento\Framework\Controller\ResultInterface;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Framework\App\Action\Action;
@@ -13,15 +21,32 @@ use Magento\Framework\Controller\Result\JsonFactory;
 
 class Labels extends Action implements HttpPostActionInterface
 {
+    /**
+     * @var CollectionFactory
+     */
     protected $collectionFactory;
+
+    /**
+     * @var Config
+     */
     protected $configHelper;
+
+    /**
+     * @var JsonFactory
+     */
     protected $jsonFactory;
 
+    /**
+     * @param Context $context
+     * @param Config $configHelper
+     * @param CollectionFactory $collectionFactory
+     * @param JsonFactory $jsonFactory
+     */
     public function __construct(
-        Context $context,
-        Config $configHelper,
+        Context           $context,
+        Config            $configHelper,
         CollectionFactory $collectionFactory,
-        JsonFactory $jsonFactory
+        JsonFactory       $jsonFactory
     ) {
         $this->jsonFactory = $jsonFactory;
         $this->configHelper = $configHelper;
@@ -29,6 +54,9 @@ class Labels extends Action implements HttpPostActionInterface
         parent::__construct($context);
     }
 
+    /**
+     * @return ResponseInterface|Json|ResultInterface
+     */
     public function execute()
     {
         $ids = $this->getRequest()->getParam('ids');

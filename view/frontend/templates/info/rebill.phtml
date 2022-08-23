@@ -1,8 +1,18 @@
 <?php
 /**
- * @var \Improntus\Rebill\Block\Sales\Order\Rebill $block
- * @var $escaper \Magento\Framework\Escaper
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
  */
+
+/**
+ * @var Rebill $block
+ * @var $escaper Escaper
+ */
+
+use Magento\Framework\Escaper;
+use Improntus\Rebill\Block\Sales\Order\Rebill;
+
 $order = $block->getInfo()->getOrder();
 $payment = $order->getPayment();
 $additionalInformation = $payment->getAdditionalInformation();

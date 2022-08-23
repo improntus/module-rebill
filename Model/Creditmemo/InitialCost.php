@@ -1,4 +1,10 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
+
 namespace Improntus\Rebill\Model\Creditmemo;
 
 use Improntus\Rebill\Helper\Config;
@@ -6,11 +12,6 @@ use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\Total\AbstractTotal;
 use Magento\Framework\Exception\NoSuchEntityException;
 
-/**
- * Class FinanceCost
- *
- * @package Improntus\MercadoPago\Model\Creditmemo
- */
 class InitialCost extends AbstractTotal
 {
     /**

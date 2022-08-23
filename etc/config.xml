@@ -1,4 +1,11 @@
 <?xml version="1.0"?>
+<!--
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
+-->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <payment>
@@ -7,14 +14,13 @@
                 <active>0</active>
                 <title>Pay with Rebill</title>
                 <sort_order>0</sort_order>
-<!--                <payment_action>order</payment_action>-->
                 <general>
                     <customer_document_type>DNI</customer_document_type>
                     <customer_document_attribute>vat_id</customer_document_attribute>
                     <approved_status>processing</approved_status>
                     <denied_status>cancelled</denied_status>
                     <allow_mixed_cart>0</allow_mixed_cart>
-                    <subscription_product_text>Subscribe to this product</subscription_product_text>
+                    <subscription_product_text>Subscribe</subscription_product_text>
                     <guest_customer_text>Log in to subscribe to this product</guest_customer_text>
                     <product_label>none</product_label>
                     <product_label_text>Subscription</product_label_text>

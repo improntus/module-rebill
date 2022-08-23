@@ -1,8 +1,14 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Helper;
 
 use Exception;
+use Magento\Framework\Phrase;
 use Magento\Catalog\Model\Product;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Model\Order;
@@ -11,7 +17,6 @@ use Magento\Framework\Exception\NoSuchEntityException;
 
 class Subscription extends Data
 {
-
     /**
      * @param Rule $rule
      * @return bool
@@ -126,29 +131,47 @@ class Subscription extends Data
     public function getProductRebillSubscriptionDetails(Product $product)
     {
         return [
-            'enable_subscription'           => (bool)$product->getData('rebill_subscription_type'),
-            'subscription_type'             => $product->getData('rebill_subscription_type'),
-            'free_trial_time_lapse'         => $product->getData('rebill_free_trial_time_lapse'),
-            'frequency'                     => json_decode($product->getData('rebill_frequency') ?? '[]', true),
-            'gateway_id'                    => $product->getData('rebill_gateway_id'),
+            'enable_subscription'   => (bool)$product->getData('rebill_subscription_type'),
+            'subscription_type'     => $product->getData('rebill_subscription_type'),
+            'free_trial_time_lapse' => $product->getData('rebill_free_trial_time_lapse'),
+            'frequency'             => json_decode($product->getData('rebill_frequency') ?? '[]', true),
+            'gateway_id'            => $product->getData('rebill_gateway_id'),
         ];
     }
 
+    /**
+     * @param Product $product
+     * @return bool
+     */
     public function isSubscriptionEnabled(Product $product)
     {
         return (bool)$product->getData('rebill_subscription_type');
     }
 
+    /**
+     * @param $id
+     * @return void
+     */
     public function setCurrentSubscription($id)
     {
+        if ($this->getCurrentSubscription()) {
+            $this->registry->unregister('current_subscription_id');
+        }
         $this->registry->register('current_subscription_id', $id);
     }
 
+    /**
+     * @return mixed|null
+     */
     public function getCurrentSubscription()
     {
         return $this->registry->registry('current_subscription_id');
     }
 
+    /**
+     * @param Product $product
+     * @return bool|int
+     */
     public function isProductSubscriptionType(Product $product)
     {
         if ($product->getTypeId() == 'configurable') {
@@ -169,6 +192,12 @@ class Subscription extends Data
         return 0;
     }
 
+    /**
+     * @param Product|null $product
+     * @param array $frequencyArray
+     * @param $price
+     * @return Phrase|string
+     */
     public function getFrequencyDescription(?Product $product = null, array $frequencyArray = [], $price = null)
     {
         try {

@@ -1,9 +1,15 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Model\Payment;
 
 use Improntus\Rebill\Helper\Config;
 use Magento\Framework\Api\AttributeValueFactory;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\DataObject;
@@ -25,9 +31,6 @@ class Rebill extends Cc implements GatewayInterface
 {
     const CODE = 'improntus_rebill';
 
-    /**
-     * define URL to go when an order is placed
-     */
     const ACTION_URL = 'rebill/payment/transaction';
 
     /**
@@ -64,9 +67,22 @@ class Rebill extends Cc implements GatewayInterface
         'COP',
         'PEN',
         'VEB',
-        'VEF'
+        'VEF',
     ];
 
+    /**
+     * @param Context $context
+     * @param Registry $registry
+     * @param ExtensionAttributesFactory $extensionFactory
+     * @param AttributeValueFactory $customAttributeFactory
+     * @param Data $paymentData
+     * @param ScopeConfigInterface $scopeConfig
+     * @param Logger $logger
+     * @param ModuleListInterface $moduleList
+     * @param TimezoneInterface $localeDate
+     * @param Config $configHelper
+     * @param array $data
+     */
     public function __construct(
         Context                    $context,
         Registry                   $registry,
@@ -78,7 +94,7 @@ class Rebill extends Cc implements GatewayInterface
         ModuleListInterface        $moduleList,
         TimezoneInterface          $localeDate,
         Config                     $configHelper,
-        array                      $data = array()
+        array                      $data = []
     ) {
         $this->configHelper = $configHelper;
         parent::__construct(
@@ -97,6 +113,10 @@ class Rebill extends Cc implements GatewayInterface
         );
     }
 
+    /**
+     * @param $currencyCode
+     * @return bool
+     */
     public function canUseForCurrency($currencyCode)
     {
         if (!in_array($currencyCode, $this->_supportedCurrencyCodes)) {
@@ -105,6 +125,10 @@ class Rebill extends Cc implements GatewayInterface
         return true;
     }
 
+    /**
+     * @param CartInterface|null $quote
+     * @return bool
+     */
     public function isAvailable(CartInterface $quote = null)
     {
         if ($this->configHelper->isEnabled() && $quote && $quote->getBaseGrandTotal() < $this->_minOrderTotal) {
@@ -113,6 +137,11 @@ class Rebill extends Cc implements GatewayInterface
         return true;
     }
 
+    /**
+     * @param DataObject $request
+     * @param ConfigInterface $config
+     * @return DataObject|void
+     */
     public function postRequest(DataObject $request, ConfigInterface $config)
     {
         $this->configHelper->logInfo('postRequest');
@@ -120,6 +149,10 @@ class Rebill extends Cc implements GatewayInterface
         // TODO: Implement postRequest() method.
     }
 
+    /**
+     * @return $this|Rebill
+     * @throws LocalizedException
+     */
     public function validate()
     {
         $info = $this->getInfoInstance();

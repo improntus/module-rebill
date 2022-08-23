@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Block\Sales\Order\Totals;
 
@@ -6,15 +11,20 @@ use Improntus\Rebill\Helper\Config;
 use Magento\Framework\DataObject;
 use Magento\Framework\View\Element\Template;
 use Magento\Sales\Model\Order\Payment;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 class InitialCost extends Template
 {
     /**
-     * @var
+     * @var Config
      */
-    protected $_source;
     protected $configHelper;
 
+    /**
+     * @param Template\Context $context
+     * @param Config $configHelper
+     * @param array $data
+     */
     public function __construct(
         Template\Context $context,
         Config           $configHelper,
@@ -34,6 +44,8 @@ class InitialCost extends Template
 
     /**
      * @return $this
+     * @throws NoSuchEntityException
+     * @description add rebill costs to total orders and calculate them if they don't exist
      */
     public function initTotals()
     {

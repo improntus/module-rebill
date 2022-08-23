@@ -1,3 +1,8 @@
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $t, modal) {
     'use strict';
     $.widget('mage.rebill_product_form', {
@@ -5,8 +10,8 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
             attributes: [],
             product_type: 'simple',
             enabler_attribute_code: 'rebill_enable_subscription',
-            is_product_child: false,
-            product_price: 0
+            product_price: 0,
+            is_product_child: false
         },
         _create: function () {
             console.log(this.options);
@@ -16,14 +21,7 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
                     let interval = setInterval(function () {
                         let el = self.getAttributeElement(attribute['code']);
                         if (el.length) {
-                            /**
-                             * @todo mvp doesn't need this attributes, maybe be implemented in next releases
-                             */
-                            if (attribute['code'] === 'rebill_inherit_from_parent' || attribute['code'] === 'rebill_individual_settings_in_simple') {
-                                self.hideAttribute(attribute['code']);
-                            } else {
-                                self.initAttribute(attribute);
-                            }
+                            self.initAttribute(attribute);
                             clearInterval(interval);
                         }
                     }, 100);
@@ -32,34 +30,6 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
         },
         initAttribute: function (attribute) {
             let self = this;
-            let attributeToCheck = '';
-            let attributeNotApply = '';
-            if (self.options.product_type !== 'configurable') {
-                attributeToCheck = 'rebill_inherit_from_parent';
-                attributeNotApply = 'rebill_individual_settings_in_simple';
-            } else {
-                attributeToCheck = 'rebill_individual_settings_in_simple';
-                attributeNotApply = 'rebill_inherit_from_parent';
-            }
-            if (!self.options.is_product_child || attribute['code'] !== attributeToCheck) {
-                if (attribute['code'] === attributeNotApply) {
-                    self.hideAttribute(attribute['code']);
-                } else {
-                    if (attribute['code'] !== attributeToCheck && attribute['code'] !== self.options.enabler_attribute_code) {
-                        setInterval(function () {
-                            if (self.getAttributeValue(attributeToCheck) === 1) {
-                                self.hideAttribute(attribute['code']);
-                            } else {
-                                self.showAttribute(attribute['code']);
-                            }
-                        }, 100);
-                    }
-                }
-            } else {
-                if (attribute['code'] === attributeToCheck) {
-                    self.hideAttribute(attribute['code']);
-                }
-            }
             if (attribute['code'] === 'rebill_frequency') {
                 self.initFrequencyForm(attribute);
             }
@@ -180,17 +150,8 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
             return $(`[name='product[${code}]']`);
         },
         getAttributeValue: function (code) {
-            if (code === 'rebill_inherit_from_parent' || code === 'rebill_individual_settings_in_simple') {
-                return 0;
-            }
             return parseInt(this.getAttributeElement(code).val());
         },
-        hideAttribute: function (code) {
-            this.getAttributeElement(code).parents('.admin__field').slideUp(300);
-        },
-        showAttribute: function (code) {
-            this.getAttributeElement(code).parents('.admin__field').slideDown(300);
-        }
     });
 
     return $.mage.rebill_product_form;

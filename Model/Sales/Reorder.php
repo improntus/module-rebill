@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Model\Sales;
 
@@ -31,6 +36,11 @@ class Reorder
      */
     protected $cartManagement;
 
+    /**
+     * @param MagentoReorder $reorder
+     * @param QuoteRepository $quoteRepository
+     * @param CartManagementInterface $cartManagement
+     */
     public function __construct(
         MagentoReorder          $reorder,
         QuoteRepository         $quoteRepository,

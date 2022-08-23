@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Block\Adminhtml;
 
@@ -15,16 +20,34 @@ use Magento\Catalog\Model\ResourceModel\Product\Attribute\Collection as Attribut
 
 class ProductForm extends Template
 {
+    /**
+     * @var AttributeCollectionFactory
+     */
     protected $attributeCollectionFactory;
+
+    /**
+     * @var JsonHelper
+     */
     protected $jsonHelper;
+
+    /**
+     * @var Registry
+     */
     protected $registry;
 
-
+    /**
+     * @param Template\Context $context
+     * @param ProductMetadataInterface $productMetadata
+     * @param Registry $registry
+     * @param AttributeCollectionFactory $attributeCollectionFactory
+     * @param JsonHelper $jsonHelper
+     * @param array $data
+     * @param DirectoryHelper|null $directoryHelper
+     */
     public function __construct(
         Template\Context           $context,
         ProductMetadataInterface   $productMetadata,
         Registry                   $registry,
-        Config                     $configHelper,
         AttributeCollectionFactory $attributeCollectionFactory,
         JsonHelper                 $jsonHelper,
         array                      $data = [],
@@ -40,6 +63,10 @@ class ProductForm extends Template
         }
     }
 
+    /**
+     * @return mixed|null
+     * @description Return product type to show frequency options
+     */
     public function getProductType()
     {
         /** @var Product|null $product */
@@ -50,24 +77,28 @@ class ProductForm extends Template
         }
     }
 
+    /**
+     * @return mixed|null
+     * @description returns current product in product admin form
+     */
     public function getProduct()
     {
         /** @var Product|null $product */
         return $this->registry->registry('current_product');
     }
 
+    /**
+     * @param string|null $code
+     * @return int[]|mixed|string[]
+     * @description return attributes with its tooltips
+     */
     protected function getRebillAttributes(?string $code = null)
     {
         $attributes = [
-            'rebill_enable_subscription'           => __('Add the option to subscribe to this product'),
-            'rebill_inherit_from_parent'           => __('Inherit all the rebill settings from configurable product'),
-            'rebill_individual_settings_in_simple' => __('Invalidate the settings in the configurable product allowing you to elaborate subscription combinations through configurable attributes and simple products'),
-            'rebill_initial_subscription_cost'     => __('Cost for subscribe to this product. It will be billed only once'),
-            'rebill_free_trial_time_lapse'         => __('Time lapse of free trial expressed in days. Once it\'s finished, it will be billed for the first time'),
-            'rebill_frequency'                     => __('Frequency in which the subscription will be billed, expressed in months or years'),
-//            'rebill_frequency_type'                => __('Expression of time for the frequency in which the product will be billed: months or years'),
-//            'rebill_max_number_recurrent_payments' => __('Maximum number of payments per subscription. Example: if the frequency is 1 month and this value is 12, then the subscription will only be billed 12 times, each time after a month since the last payment, for a total subscription of a year'),
-            'rebill_gateway_id'                    => __('Payment gateway through which the product will be charged'),
+            'rebill_enable_subscription'       => __('Add the option to subscribe to this product'),
+            'rebill_free_trial_time_lapse'     => __('Time lapse of free trial expressed in days. Once it\'s finished, it will be billed for the first time'),
+            'rebill_frequency'                 => __('Frequency in which the subscription will be billed, expressed in months or years'),
+            'rebill_gateway_id'                => __('Payment gateway through which the product will be charged'),
         ];
         if ($code) {
             $result = $attributes[$code];
@@ -77,6 +108,10 @@ class ProductForm extends Template
         return $result;
     }
 
+    /**
+     * @return string
+     * @description return attributes in a json array to process the data in the js
+     */
     public function getRebillAttributesJson()
     {
         /** @var AttributeCollection $collection */

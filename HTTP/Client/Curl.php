@@ -1,4 +1,10 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
+
 namespace Improntus\Rebill\HTTP\Client;
 
 use Exception;
@@ -11,17 +17,31 @@ class Curl extends \Magento\Framework\HTTP\Client\Curl
      */
     private $sslVersion;
 
+    /**
+     * @param $sslVersion
+     */
     public function __construct($sslVersion = null)
     {
         parent::__construct($sslVersion);
         $this->sslVersion = $sslVersion;
     }
 
+    /**
+     * @param $uri
+     * @param $params
+     * @return void
+     * @throws Exception
+     */
     public function put($uri, $params)
     {
         $this->makeRequest("PUT", $uri, $params);
     }
 
+    /**
+     * @param $uri
+     * @return void
+     * @throws Exception
+     */
     public function delete($uri)
     {
         $this->makeRequest("DELETE", $uri);

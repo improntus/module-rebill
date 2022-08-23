@@ -1,9 +1,16 @@
 <?php
 /**
- * @var $block View
- * @var $escaper \Magento\Framework\Escaper
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
  */
 
+/**
+ * @var $block View
+ * @var $escaper Escaper
+ */
+
+use Magento\Framework\Escaper;
 use Improntus\Rebill\Helper\Config;
 use Magento\Catalog\Block\Product\View;
 
@@ -46,11 +53,15 @@ $frequencies = $configHelper->getProductRebillSubscriptionDetails($block->getPro
     <script>
         require(['jquery'], function ($) {
             $(document).ready(function () {
+                let cartButton = $("#product-addtocart-button");
+                let cartText = cartButton.text();
                 $("#use-subscription").click(function () {
                     $(".rebill-subscription .description").show();
+                    cartButton.text("<?= $escaper->escapeJs($configHelper->getSubscriptionProductText()) ?>");
                 });
                 $("#one-time-purchase").click(function () {
                     $(".rebill-subscription .description").hide();
+                    cartButton.text(cartText);
                 });
             });
         });

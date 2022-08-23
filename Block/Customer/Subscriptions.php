@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Block\Customer;
 
@@ -10,10 +15,28 @@ use Magento\Framework\View\Element\Template;
 
 class Subscriptions extends Template
 {
+    /**
+     * @var Session
+     */
     protected $session;
+
+    /**
+     * @var Subscription
+     */
     protected $subscription;
+
+    /**
+     * @var Config
+     */
     protected $configHelper;
 
+    /**
+     * @param Template\Context $context
+     * @param Session $session
+     * @param Subscription $subscription
+     * @param Config $configHelper
+     * @param array $data
+     */
     public function __construct(
         Template\Context $context,
         Session          $session,
@@ -27,6 +50,10 @@ class Subscriptions extends Template
         parent::__construct($context, $data);
     }
 
+    /**
+     * @return array|mixed|null
+     * @description return array of active subscriptions
+     */
     public function getSubscriptions()
     {
         try {
@@ -44,12 +71,22 @@ class Subscriptions extends Template
         }
     }
 
+    /**
+     * @param $subscription
+     * @return string
+     * @description return the credit card information
+     */
     public function getPaymentMethod($subscription)
     {
         $card = $subscription['invoices'][0]['buyer']['card'];
-        return $card['last4'] . ' ' . $this->getCardDate($card);
+        return "XXXX XXXX XXXX " . $card['last4'] . ' ' . $this->getCardDate($card);
     }
 
+    /**
+     * @param $card
+     * @return string
+     * @description return the credit card expiration date
+     */
     protected function getCardDate($card)
     {
         $month = $card['expiration']['month'];

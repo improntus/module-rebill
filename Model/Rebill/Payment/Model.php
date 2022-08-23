@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Model\Rebill\Payment;
 
@@ -9,9 +14,21 @@ use Magento\Framework\DataObject;
 
 class Model extends DataObject
 {
+    /**
+     * @var Payment
+     */
     protected $payment;
+
+    /**
+     * @var ScopeConfigInterface
+     */
     protected $scopeConfig;
 
+    /**
+     * @param Payment $payment
+     * @param ScopeConfigInterface $scopeConfig
+     * @param array $data
+     */
     public function __construct(
         Payment              $payment,
         ScopeConfigInterface $scopeConfig,
@@ -22,6 +39,10 @@ class Model extends DataObject
         parent::__construct($data);
     }
 
+    /**
+     * @param $id
+     * @return void
+     */
     public function load($id)
     {
         try {
@@ -41,8 +62,6 @@ class Model extends DataObject
                 'gateway_type'        => $item['gateway']['type'],
                 'gateway_description' => $item['gateway']['description'],
             ]);
-        } catch (Exception $exception) {
-
-        }
+        } catch (Exception $exception) {}
     }
 }

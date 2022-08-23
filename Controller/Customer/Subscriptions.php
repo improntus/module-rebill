@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Controller\Customer;
 
@@ -9,11 +14,18 @@ use Magento\Framework\App\ResponseInterface;
 
 class Subscriptions extends Action
 {
+    /**
+     * @var Config
+     */
     protected $configHelper;
 
+    /**
+     * @param Context $context
+     * @param Config $configHelper
+     */
     public function __construct(
         Context $context,
-        Config $configHelper
+        Config  $configHelper
     ) {
         $this->configHelper = $configHelper;
         parent::__construct($context);

@@ -1,13 +1,24 @@
 <?php
 /**
- * @var \Improntus\Rebill\Block\Onepage\Success $block
- * @var $escaper \Magento\Framework\Escaper
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
  */
+
+/**
+ * @var Success $block
+ * @var $escaper Escaper
+ */
+
+use Magento\Framework\Escaper;
+use Improntus\Rebill\Model\Payment\Rebill;
+use Improntus\Rebill\Block\Onepage\Success;
+
 $order = $block->getOrder();
 $payment = $order->getPayment();
 $additionalInformation = $payment->getAdditionalInformation();
 ?>
-<?php if($payment->getMethod()  == \Improntus\Rebill\Model\Payment\Rebill::CODE):?>
+<?php if($payment->getMethod()  == Rebill::CODE):?>
     <img style="width: 100px;margin-bottom: 20px;" src="" alt="">
     <p><a onclick="this.target='_blank'" href=""><?= /** @noEscape */__('Print Payment')?></a></p>
 <?php endif; ?>

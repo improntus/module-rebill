@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Block\Payment;
 
@@ -8,8 +13,16 @@ use Magento\Sales\Model\Order;
 
 class Transaction extends Template
 {
+    /**
+     * @var Registry
+     */
     protected $registry;
 
+    /**
+     * @param Template\Context $context
+     * @param Registry $registry
+     * @param array $data
+     */
     public function __construct(
         Template\Context $context,
         Registry         $registry,
@@ -20,7 +33,7 @@ class Transaction extends Template
     }
 
     /**
-     * @return Order
+     * @return mixed|null
      */
     public function getOrder()
     {
@@ -28,7 +41,7 @@ class Transaction extends Template
     }
 
     /**
-     * @return array
+     * @return mixed|null
      */
     public function getPrices()
     {

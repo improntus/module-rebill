@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Model;
 
@@ -64,7 +69,7 @@ class Rebill
         $this->configHelper = $configHelper;
 
         if ($configHelper->getIntegrationMode() == 'sandbox') {
-            $this->baseUrl = 'https://sandbox.rebill.to';
+            $this->baseUrl = 'https://api.rebill.dev';
         } else {
             $this->baseUrl = 'https://api.rebill.to';
         }

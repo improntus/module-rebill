@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Model\Invoice;
 
@@ -7,11 +12,6 @@ use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\Total\AbstractTotal;
 use Magento\Framework\Exception\NoSuchEntityException;
 
-/**
- * Class FinanceCost
- *
- * @package Improntus\MercadoPago\Model\Invoice
- */
 class InitialCost extends AbstractTotal
 {
     /**

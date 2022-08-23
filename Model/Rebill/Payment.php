@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Model\Rebill;
 
@@ -21,6 +26,11 @@ class Payment extends Rebill
         }
     }
 
+    /**
+     * @param $id
+     * @return mixed|null
+     * @throws Exception
+     */
     public function getPaymentById($id)
     {
         try {

@@ -1,5 +1,11 @@
 <?php
 /**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
+
+/**
  * @var $block ProductForm
  * @var $escaper \Magento\Framework\Escaper
  */
@@ -33,7 +39,6 @@ $configHelper = $this->helper(Config::class);
                 "attributes": <?= /** @noEscape */ $block->getRebillAttributesJson() ?>,
                 "product_type": "<?= /** @noEscape */ $block->getProductType() ?>",
                 "is_product_child": <?= /** @noEscape */ (int)$configHelper->isProductChild($block->getProduct()) ?>,
-                "product_price": <?= /** @noEscape */ $block->getProduct()->getPrice() ?>
             }
         }
     }

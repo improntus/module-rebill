@@ -1,3 +1,8 @@
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 var config = {
     config: {
         mixins: {
@@ -8,7 +13,6 @@ var config = {
     },
     map: {
         '*':{
-            jquery_card: 'Improntus_Rebill/js/jquery.card',
             rebill: 'https://sdk.rebill.to/v2/rebill.min.js',
         }
     }

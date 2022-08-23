@@ -1,15 +1,35 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Model\Rebill\Payment;
 
+use Exception;
+use Magento\Framework\DataObject;
 use Improntus\Rebill\Model\Rebill\Payment;
 use Magento\Framework\Data\Collection\EntityFactoryInterface;
 
 class Collection extends \Magento\Framework\Data\Collection
 {
+    /**
+     * @var Payment
+     */
     protected $payment;
+
+    /**
+     * @var ModelFactory
+     */
     protected $modelFactory;
 
+    /**
+     * @param EntityFactoryInterface $entityFactory
+     * @param Payment $payment
+     * @param ModelFactory $modelFactory
+     * @throws Exception
+     */
     public function __construct(
         EntityFactoryInterface $entityFactory,
         Payment                $payment,
@@ -22,11 +42,18 @@ class Collection extends \Magento\Framework\Data\Collection
         parent::__construct($entityFactory);
     }
 
+    /**
+     * @return Model|DataObject
+     */
     public function getNewEmptyItem()
     {
         return $this->modelFactory->create();
     }
 
+    /**
+     * @return void
+     * @throws Exception
+     */
     protected function setItems()
     {
         $paymentList = $this->payment->getList();
@@ -48,9 +75,7 @@ class Collection extends \Magento\Framework\Data\Collection
                     'gateway_type'        => $item['gateway']['type'],
                     'gateway_description' => $item['gateway']['description'],
                 ]);
-            } catch (\Exception $exception) {
-
-            }
+            } catch (Exception $exception) {}
         }
         $this->_items = $items;
     }

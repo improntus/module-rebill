@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Model\Payment;
 
@@ -128,6 +133,12 @@ class Transaction
         return true;
     }
 
+    /**
+     * @param Order $order
+     * @param Quote $quote
+     * @return array|mixed|null
+     * @throws Exception
+     */
     protected function getRebillPriceIdForAdditionalCosts(Order $order, Quote $quote)
     {
         $total = $order->getGrandTotal()
@@ -142,152 +153,69 @@ class Transaction
             $total += ($rebillSubscription['initialCost'] ?? 0) * $item->getQtyOrdered();
         }
         $total += $order->getTaxAmount();
-        if (!$total) {
+        if ($total <= 0) {
             return null;
         }
-        /** @var \Improntus\Rebill\Model\Item $rebillItem */
-        $rebillItem = $this->itemFactory->create();
-        $rebillItem->load("Order #{$order->getIncrementId()} Additionals", 'product_sku');
-        if (!$rebillItem->getId()) {
-            $rebillItemId = $this->item->createItem([
-                'name'        => "Order #{$order->getIncrementId()} Additionals",
-                'description' => "Order #{$order->getIncrementId()} Additionals",
-            ]);
-            if ($rebillItemId === null) {
-                throw new Exception(__('Unable to create items on Rebill.'));
-            }
-            $rebillItem->setData('product_sku', "Order #{$order->getIncrementId()} Additionals");
-            $rebillItem->setData('rebill_item_id', $rebillItemId);
-            $rebillItem->setData('product_description', $order->getShippingDescription());
-            $rebillItem->save();
-        }
-        $rebillItemId = $rebillItem->getData('rebill_item_id');
-        //@TODO in future implementation it will be needed the gateway in $rebillDetails
+        $rebillItem = $this->getRebillItem(
+            "order_{$order->getIncrementId()}_additional",
+            "Order #{$order->getIncrementId()} Additional",
+            "Order #{$order->getIncrementId()} Additional"
+        );
         $gateway = $this->configHelper->getGatewayId();
         $hash = hash('md5', $total . $order->getShippingDescription() . $gateway);
-        /** @var Price $rebillPrice */
-        $rebillPrice = $this->priceFactory->create();
-        $rebillPrice->load($hash, 'details_hash');
-        if (!$rebillPrice->getId()) {
-            $rebillPriceData = [
-                'amount'      => (string)$total,
-                'type'        => 'fixed',
-                'repetitions' => 1,
-                'currency'    => $this->configHelper->getCurrency(),
-                'gatewayId'   => $gateway,
-                'enabled'     => true,
-            ];
-            $rebillPriceId = $this->item->createPriceForItem($rebillItemId, $rebillPriceData);
-            if ($rebillPriceId === null) {
-                throw new Exception(__('Unable to create prices on Rebill.'));
-            }
-            $rebillPrice->setData([
-                'rebill_item_id'  => $rebillItem->getId(),
-                'rebill_price_id' => $rebillPriceId,
-                'details'         => json_encode([]),
-                'details_hash'    => $hash,
-                'order_id'        => $order->getId(),
-                'order_item_id'   => null,
-            ]);
-            $rebillPrice->save();
-        }
+        $rebillPrice = $this->getRebillPrice($rebillItem, $hash, $gateway, $total);
         return $rebillPrice->getData('rebill_price_id');
     }
 
+    /**
+     * @param Order $order
+     * @return array|mixed|null
+     * @throws Exception
+     */
     protected function getRebillPriceIdForShipping(Order $order)
     {
         if (!$order->getShippingAmount() == 0) {
             return null;
         }
-        /** @var \Improntus\Rebill\Model\Item $rebillItem */
-        $rebillItem = $this->itemFactory->create();
-        $rebillItem->load($order->getShippingDescription(), 'product_sku');
-        if (!$rebillItem->getId()) {
-            $rebillItemId = $this->item->createItem([
-                'name'        => $order->getShippingDescription(),
-                'description' => $order->getShippingDescription(),
-            ]);
-            if ($rebillItemId === null) {
-                throw new Exception(__('Unable to create items on Rebill.'));
-            }
-            $rebillItem->setData('product_sku', $order->getShippingDescription());
-            $rebillItem->setData('rebill_item_id', $rebillItemId);
-            $rebillItem->setData('product_description', $order->getShippingDescription());
-            $rebillItem->save();
-        }
-        $rebillItemId = $rebillItem->getData('rebill_item_id');
+        $rebillItem = $this->getRebillItem(
+            $order->getShippingMethod(),
+            $order->getShippingDescription(),
+            $order->getShippingDescription()
+        );
         $rowTotal = $order->getShippingAmount()
             - $order->getShippingDiscountAmount()
             + $order->getShippingTaxAmount()
             + $order->getShippingDiscountTaxCompensationAmount();
         $itemQty = 1;
         $price = $rowTotal / $itemQty;
-        //@TODO in future implementation it will be needed the gateway in $rebillDetails
         $gateway = $this->configHelper->getGatewayId();
         $hash = hash('md5', $price . $order->getShippingDescription() . $gateway);
-        /** @var Price $rebillPrice */
-        $rebillPrice = $this->priceFactory->create();
-        $rebillPrice->load($hash, 'details_hash');
-        if (!$rebillPrice->getId()) {
-            $rebillPriceData = [
-                'amount'      => (string)$price,
-                'type'        => 'fixed',
-                'repetitions' => 1,
-                'currency'    => $this->configHelper->getCurrency(),
-                'gatewayId'   => $gateway,
-                'enabled'     => true,
-            ];
-            $rebillPriceId = $this->item->createPriceForItem($rebillItemId, $rebillPriceData);
-            if ($rebillPriceId === null) {
-                throw new Exception(__('Unable to create prices on Rebill.'));
-            }
-            $rebillPrice->setData([
-                'rebill_item_id'  => $rebillItem->getId(),
-                'rebill_price_id' => $rebillPriceId,
-                'details'         => json_encode([]),
-                'details_hash'    => $hash,
-                'order_id'        => $order->getId(),
-                'order_item_id'   => null,
-            ]);
-            $rebillPrice->save();
-        }
+        $rebillPrice = $this->getRebillPrice($rebillItem, $hash, $gateway, $price);
         return $rebillPrice->getData('rebill_price_id');
     }
 
+    /**
+     * @param Item $item
+     * @param Quote $quote
+     * @return array|mixed|null
+     * @throws Exception
+     */
     public function getRebillPriceIdForItem(Item $item, Quote $quote)
     {
-//        $order = $item->getOrder();
-        /** @var \Improntus\Rebill\Model\Item $rebillItem */
-        $rebillItem = $this->itemFactory->create();
-        $rebillItem->load($item->getProduct()->getSku(), 'product_sku');
-        if (!$rebillItem->getId()) {
-            $rebillItem->setData('product_sku', $item->getProduct()->getSku());
-            $rebillItemId = $this->item->createItem([
-                'name'        => $item->getProduct()->getName(),
-                'description' => (string)$item->getProduct()->getData('short_description'),
-            ]);
-            if ($rebillItemId === null) {
-                throw new Exception(__('Unable to create items on Rebill.'));
-            }
-            $rebillItem->setData('rebill_item_id', $rebillItemId);
-            $rebillItem->setData('product_description', $item->getProduct()->getSku() . ' - ' . $item->getProduct()->getName());
-            $rebillItem->save();
-        }
-        $rebillItemId = $rebillItem->getData('rebill_item_id');
+        $rebillItem = $this->getRebillItem(
+            $item->getProduct()->getSku(),
+            $item->getProduct()->getName(),
+            $item->getProduct()->getData('short_description')
+        );
+        $_item = $item;
         if ($item->getParentItemId()) {
-            $parentItem = $item->getParentItem();
-            $rowTotal = $parentItem->getRowTotal()
-                - $parentItem->getDiscountAmount()
-                + $parentItem->getTaxAmount()
-                + $parentItem->getDiscountTaxCompensationAmount();
-            $itemQty = $parentItem->getQtyOrdered();
-        } else {
-            $rowTotal = $item->getRowTotal()
-                - $item->getDiscountAmount()
-                + $item->getTaxAmount()
-                + $item->getDiscountTaxCompensationAmount();
-            $itemQty = $item->getQtyOrdered();
+            $_item = $item->getParentItem();
         }
+        $rowTotal = $_item->getRowTotal()
+            - $_item->getDiscountAmount()
+            + $_item->getTaxAmount()
+            + $_item->getDiscountTaxCompensationAmount();
+        $itemQty = $_item->getQtyOrdered();
         $price = $rowTotal / $itemQty;
         $rebillDetails = $this->configHelper->getProductRebillSubscriptionDetails($item->getProduct());
         $quoteItem = $quote->getItemById($item->getQuoteItemId());
@@ -299,12 +227,34 @@ class Transaction
          */
         $gateway = $this->configHelper->getGatewayId();
         $hash = hash('md5', json_encode($frequency) . $price . $cost . $item->getProduct()->getSku() . $gateway);
-        /** @var Price $rebillPrice */
+        $rebillPrice = $this->getRebillPrice($rebillItem, $hash, $gateway, $price + $cost, $rebillDetails, $frequency);
+        return $rebillPrice->getData('rebill_price_id');
+    }
+
+    /**
+     * @param \Improntus\Rebill\Model\Item $item
+     * @param string $hash
+     * @param string $gateway
+     * @param float $price
+     * @param float $cost
+     * @param array $rebillDetails
+     * @param array $frequency
+     * @return Price
+     * @throws Exception
+     */
+    protected function getRebillPrice(
+        \Improntus\Rebill\Model\Item $item,
+        string $hash,
+        string $gateway,
+        float $price,
+        array $rebillDetails = [],
+        array $frequency = []
+    ) {
         $rebillPrice = $this->priceFactory->create();
         $rebillPrice->load($hash, 'details_hash');
         if (!$rebillPrice->getId()) {
             $rebillPriceData = [
-                'amount'      => (string)($price + $cost),
+                'amount'      => (string)$price,
                 'type'        => 'fixed',
                 'repetitions' => 1,
                 'currency'    => $this->configHelper->getCurrency(),
@@ -322,18 +272,72 @@ class Transaction
                 ];
                 $rebillPriceData['repetitions'] = $frequency['recurringPayments'] ?: 0;
             }
-            $rebillPriceId = $this->item->createPriceForItem($rebillItemId, $rebillPriceData);
+            $rebillPriceId = $this->item->createPriceForItem($item->getData('rebill_item_id'), $rebillPriceData);
             if ($rebillPriceId === null) {
                 throw new Exception(__('Unable to create prices on Rebill.'));
             }
-            $rebillPrice->setData([
-                'rebill_item_id'  => $rebillItem->getId(),
-                'rebill_price_id' => $rebillPriceId,
-                'details'         => json_encode($rebillDetails),
-                'details_hash'    => $hash,
-            ]);
+            $rebillPrice->setData($this->formatPriceData($item->getId(), $rebillPriceId, $rebillDetails, $hash));
             $rebillPrice->save();
         }
-        return $rebillPrice->getData('rebill_price_id');
+        return $rebillPrice;
+    }
+
+    /**
+     * @param string $itemId
+     * @param string $priceId
+     * @param array $details
+     * @param string $hash
+     * @return array
+     */
+    protected function formatPriceData(string $itemId, string $priceId, array $details, string $hash)
+    {
+        return [
+            'rebill_item_id'  => $itemId,
+            'rebill_price_id' => $priceId,
+            'details'         => json_encode($details),
+            'details_hash'    => $hash,
+        ];
+    }
+
+    /**
+     * @param string $sku
+     * @param string $name
+     * @param string $description
+     * @return \Improntus\Rebill\Model\Item
+     * @throws Exception
+     */
+    protected function getRebillItem(string $sku, string $name, string $description = '')
+    {
+        $rebillItem = $this->itemFactory->create();
+        $rebillItem->load($sku, 'product_sku');
+        if (!$rebillItem->getId()) {
+            $rebillItem->setData('product_sku', $sku);
+            $rebillItemId = $this->item->createItem(
+                $this->formatItemData(
+                    $name,
+                    $description
+                )
+            );
+            if ($rebillItemId === null) {
+                throw new Exception(__('Unable to create items on Rebill.'));
+            }
+            $rebillItem->setData('rebill_item_id', $rebillItemId);
+            $rebillItem->setData('product_description', "$sku - $name");
+            $rebillItem->save();
+        }
+        return $rebillItem;
+    }
+
+    /**
+     * @param string $name
+     * @param string $description
+     * @return string[]
+     */
+    protected function formatItemData(string $name, string $description)
+    {
+        return [
+            'name'        => $name,
+            'description' => $description,
+        ];
     }
 }

@@ -1,4 +1,10 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
+
 namespace Improntus\Rebill\Model\Config\Source;
 
 use Improntus\Rebill\Model\Rebill;
@@ -6,6 +12,9 @@ use Magento\Framework\Option\ArrayInterface;
 
 class Gateway implements ArrayInterface
 {
+    /**
+     * @var array
+     */
     protected $_options = [];
 
     /**
@@ -23,7 +32,7 @@ class Gateway implements ArrayInterface
     }
 
     /**
-     * @return array|null
+     * @return array
      */
     public function toOptionArray()
     {
@@ -32,7 +41,7 @@ class Gateway implements ArrayInterface
             $this->_options = [];
             $this->_options[] = [
                 'value' => null,
-                'label' => __('None selected')
+                'label' => __('None selected'),
             ];
             foreach ($gateways as $item) {
                 if ($item['status'] != 'ACCEPTED') {
@@ -40,10 +49,10 @@ class Gateway implements ArrayInterface
                 }
                 $this->_options[] = [
                     'value' => $item['id'],
-                    'label' => "{$item['type']} - {$item['country']} - {$item['description']}"
+                    'label' => "{$item['type']} - {$item['country']} - {$item['description']}",
                 ];
             }
         }
-        return $this->_options;
+        return $this->_options ?? [];
     }
 }

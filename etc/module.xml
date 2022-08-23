@@ -1,7 +1,14 @@
 <?xml version="1.0"?>
+<!--
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
+-->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-    <module name="Improntus_Rebill" setup_version="1.0.0">
+    <module name="Improntus_Rebill">
         <sequence>
             <module name="Magento_Payment" />
             <module name="Magento_Checkout"/>

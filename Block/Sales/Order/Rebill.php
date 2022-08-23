@@ -1,4 +1,10 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
+
 namespace Improntus\Rebill\Block\Sales\Order;
 
 use Magento\Framework\Registry;
@@ -6,12 +12,6 @@ use Magento\Framework\View\Element\Template\Context;
 use Magento\Payment\Block\Info;
 use Magento\Sales\Api\Data\OrderInterface;
 
-/**
- * Class Rebill
- *
- * @author Improntus <https://www.improntus.com>
- * @package Improntus\Rebill\Block\Sales\Order
- */
 class Rebill extends Info
 {
     /**
@@ -25,19 +25,16 @@ class Rebill extends Info
     protected $_coreRegistry;
 
     /**
-     * OfflinePayment constructor.
      * @param Context $context
-     * @param array $data
      * @param Registry $registry
+     * @param array $data
      */
     public function __construct(
-        Context $context,
+        Context  $context,
         Registry $registry,
-        array $data = []
-    )
-    {
+        array    $data = []
+    ) {
         $this->_coreRegistry = $registry;
-
         parent::__construct($context, $data);
     }
 
@@ -46,6 +43,6 @@ class Rebill extends Info
      */
     public function getCurrentOrder()
     {
-        return  $this->_coreRegistry->registry('current_order');
+        return $this->_coreRegistry->registry('current_order');
     }
 }

@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Helper;
 
@@ -109,6 +114,10 @@ class Data extends AbstractHelper
         $this->logger->addError($message);
     }
 
+    /**
+     * @param Product|null $product
+     * @return bool
+     */
     public function isProductChild(?Product $product)
     {
         try {

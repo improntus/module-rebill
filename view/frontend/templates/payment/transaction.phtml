@@ -1,81 +1,92 @@
 <?php
 /**
- * @var $block Transaction
- * @var $escaper \Magento\Framework\Escaper
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
  */
 
+/**
+ * @var $block Transaction
+ * @var $escaper Escaper
+ */
+
+use Magento\Framework\Escaper;
 use Improntus\Rebill\Block\Payment\Transaction;
 use Improntus\Rebill\Helper\Config;
 
+$e = $escaper;
 $order = $block->getOrder();
 $prices = $block->getPrices();
 /** @var Config $configHelper */
 $configHelper = $this->helper(Config::class);
 ?>
-<h2 class="rebill.payment.transaction.title"><?= /** @noEscape  */__('Pay with rebill') ?></h2>
+<h2 class="rebill.payment.transaction.title"><?= $e->escapeHtml(__('Pay with rebill')) ?></h2>
 <div id="rebill_elements"></div>
 <div class="rebill-errors"></div>
 
 <script>
-    require(['jquery', 'rebill'], function ($, rebill) {
+    require(['jquery', 'rebill'], function ($) {
         let initialization = {
-            organization_id: '<?= $escaper->escapeHtml($configHelper->getApiUuid()) ?>',
+            organization_id: '<?= $e->escapeJs($configHelper->getApiUuid()) ?>',
             api_url: 'https://api.rebill.to/v2',
         }
         let checkout = new Rebill.PhantomSDK(initialization);
 
         checkout.setCustomer({
-            firstName: "<?= $escaper->escapeHtml($order->getCustomerFirstname()) ?>",
-            lastName: "<?= $escaper->escapeHtml($order->getCustomerLastname()) ?>",
-            email: '<?= $escaper->escapeHtml($order->getCustomerEmail()) ?>',
+            firstName: "<?= $e->escapeJs($order->getCustomerFirstname()) ?>",
+            lastName: "<?= $e->escapeJs($order->getCustomerLastname()) ?>",
+            email: '<?= $e->escapeJs($order->getCustomerEmail()) ?>',
             phone: {
                 countryCode: "00",
                 areaCode: "00",
-                number: "<?= $escaper->escapeHtml($order->getBillingAddress()->getTelephone()) ?>"
+                number: "<?= $e->escapeJs($order->getBillingAddress()->getTelephone()) ?>"
             },
             personalId: {
-                type: "<?= $escaper->escapeHtml($configHelper->getCustomerDocumentType()) ?>",
-                value: "<?= $escaper->escapeHtml($order->getBillingAddress()->getData($configHelper->getCustomerAttributeForDocument())) ?>"
+                type: "<?= $e->escapeJs($configHelper->getCustomerDocumentType()) ?>",
+                value: "<?= $e->escapeJs($order->getBillingAddress()->getData($configHelper->getCustomerAttributeForDocument())) ?>"
             },
             address: {
-                street: "<?= $escaper->escapeHtml($order->getBillingAddress()->getStreet()[0]) ?>",
-                number: "<?= $escaper->escapeHtml($order->getBillingAddress()->getStreet()[1]) ?? 'none' ?>",
-                floor: "<?= $escaper->escapeHtml($order->getBillingAddress()->getStreet()[2]) ?? 'none' ?>",
-                apt: "<?= $escaper->escapeHtml($order->getBillingAddress()->getStreet()[3]) ?? 'none' ?>",
-                city: "<?= $escaper->escapeHtml($order->getBillingAddress()->getCity()) ?>",
-                state: "<?= $escaper->escapeHtml($order->getBillingAddress()->getRegion()) ?>",
-                zipCode: "<?= $escaper->escapeHtml($order->getBillingAddress()->getPostcode()) ?? '' ?>",
-                country: "<?= $escaper->escapeHtml($order->getBillingAddress()->getCountryId()) ?>",
+                street: "<?= $e->escapeJs($order->getBillingAddress()->getStreet()[0]) ?>",
+                number: "<?= $e->escapeJs($order->getBillingAddress()->getStreet()[1] ?? 'none') ?>",
+                floor: "<?= $e->escapeJs($order->getBillingAddress()->getStreet()[2] ?? 'none') ?>",
+                apt: "<?= $e->escapeJs($order->getBillingAddress()->getStreet()[3] ?? 'none') ?>",
+                city: "<?= $e->escapeJs($order->getBillingAddress()->getCity()) ?>",
+                state: "<?= $e->escapeJs($order->getBillingAddress()->getRegion()) ?>",
+                zipCode: "<?= $e->escapeJs($order->getBillingAddress()->getPostcode()) ?? '' ?>",
+                country: "<?= $e->escapeJs($order->getBillingAddress()->getCountryId()) ?>",
                 description: "Billing Address"
             }
         });
         checkout.setCardHolder({
-            name: '<?= $escaper->escapeHtml($order->getBillingAddress()->getFirstname() . ' ' . $order->getBillingAddress()->getLastname()) ?>',
+            name: '<?= $e->escapeJs($order->getBillingAddress()->getFirstname() . ' ' . $order->getBillingAddress()->getLastname()) ?>',
             identification: {
-                type: '<?= $escaper->escapeHtml($configHelper->getCustomerDocumentType()) ?>',
-                value: "<?= $escaper->escapeHtml($order->getBillingAddress()->getData($configHelper->getCustomerAttributeForDocument())) ?>"
+                type: '<?= $e->escapeJs($configHelper->getCustomerDocumentType()) ?>',
+                value: "<?= $e->escapeJs($order->getBillingAddress()->getData($configHelper->getCustomerAttributeForDocument())) ?>"
             },
         })
         checkout.setTransaction({prices: <?= /** @noEscape */json_encode($prices) ?>});
+        let errorsMessage = $('.rebill-errors');
         checkout.setCallbacks({
             onSuccess: function (response) {
-                $('.rebill-errors').html('');
+                errorsMessage.html('');
                 if (response.invoice) {
                     $.ajax({
-                        url: '<?= /** @noEscape  */ $block->getUrl('rebill/payment/success', ['order_id' => $order->getId()]) ?>',
+                        url: '<?= $e->escapeUrl($block->getUrl('rebill/payment/success', ['order_id' => $order->getId()])) ?>',
                         data: response,
                         type: 'post',
                         success: function () {
-                            window.location.href = '<?= /** @noEscape  */ $block->getUrl('checkout/onepage/success') ?>';
+                            window.location.href = '<?= $e->escapeUrl($block->getUrl('checkout/onepage/success')) ?>';
                         }
                     });
                 } else {
-                    $('.rebill-errors').append($('<div class="error-message"></div>').text("<?= /** @noEscape  */ __('The payment can\'t be processed, try again with another card.') ?>"));
+                    errorsMessage.append($('<div class="error-message"></div>')
+                        .text("<?= $e->escapeJs(__('The payment can\'t be processed, try again with another card.')) ?>"));
                 }
             },
             onError: function (error) {
-                $('.rebill-errors').html('')
-                    .append($('<div class="error-message"></div>').text("<?= /** @noEscape  */ __('The payment can\'t be processed, try again with another card.') ?>"));
+                errorsMessage.html('')
+                    .append($('<div class="error-message"></div>')
+                    .text("<?= /** @noEscape  */ __('The payment can\'t be processed, try again with another card.') ?>"));
             },
         });
         checkout.setText({

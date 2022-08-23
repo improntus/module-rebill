@@ -1,11 +1,10 @@
 {
     "name": "improntus/module-rebill",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "N/A",
     "type": "magento2-module",
     "require": {
-        "magento/framework": "*",
-        "magento/module-checkout": "100.4.*"
+        "magento/framework": "*"
     },
     "autoload": {
         "files": [
