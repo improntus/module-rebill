@@ -39,7 +39,7 @@ $configHelper = $this->helper(Config::class);
             phone: {
                 countryCode: "00",
                 areaCode: "00",
-                number: "<?= $e->escapeJs($order->getBillingAddress()->getTelephone()) ?>"
+                phoneNumber: "<?= $e->escapeJs($order->getBillingAddress()->getTelephone()) ?>"
             },
             personalId: {
                 type: "<?= $e->escapeJs($configHelper->getCustomerDocumentType()) ?>",

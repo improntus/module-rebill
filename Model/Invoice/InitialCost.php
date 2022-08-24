@@ -56,7 +56,6 @@ class InitialCost extends AbstractTotal
             $invoice->setData('base_rebill_initial_cost_amount', $cost);
             $invoice->setGrandTotal($invoice->getGrandTotal() + $cost);
             $invoice->setBaseGrandTotal($invoice->getBaseGrandTotal() + $cost);
-            $invoice->save();
         }
 
         return $this;

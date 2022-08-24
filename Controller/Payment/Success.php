@@ -95,7 +95,8 @@ class Success extends Action
                 /** @var Order $order */
                 $order = $this->orderRepository->get($orderId);
                 $this->invoice->execute($order);
-                $order->setStatus($this->configHelper->getApprovedStatus())->save();
+                $order->setStatus($this->configHelper->getApprovedStatus());
+                $this->orderRepository->save($order);
                 $subscriptions = $this->subscription->getSubscriptionFromClient($this->session->getCustomer()->getEmail());
                 $_subscriptions = [];
                 foreach ($subscriptions as $subscription) {

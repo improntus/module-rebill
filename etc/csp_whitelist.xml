@@ -42,6 +42,7 @@
         <policy id="frame-src">
             <values>
                 <value id="rebill" type="host">*.rebill.to</value>
+                <value id="rebill_dev" type="host">*.rebill.dev</value>
             </values>
         </policy>
     </policies>

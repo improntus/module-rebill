@@ -74,7 +74,7 @@
                     <field id="user_email" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Api User Email</label>
                     </field>
-                    <field id="password" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <field id="password" translate="label" type="password" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Api Password</label>
                     </field>
                     <field id="alias" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">

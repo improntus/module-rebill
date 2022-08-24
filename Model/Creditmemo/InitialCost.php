@@ -56,7 +56,6 @@ class InitialCost extends AbstractTotal
             $creditmemo->setData('base_rebill_initial_cost_amount', $cost);
             $creditmemo->setGrandTotal($creditmemo->getGrandTotal() + $cost);
             $creditmemo->setBaseGrandTotal($creditmemo->getBaseGrandTotal() + $cost);
-            $creditmemo->save();
         }
 
         return $this;

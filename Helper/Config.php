@@ -12,51 +12,11 @@ use Magento\Store\Model\ScopeInterface;
 class Config extends Subscription
 {
     /**
-     * @var string[]
-     */
-    public $allowedCountries = [
-        'AR', // ARGENTINA
-        'BR', // BRAZIL
-        'CL', // CHILE
-        'CO', // COLOMBIA
-        'MX', // MEXICO
-        'PE', // PERU
-        'PY', // PARAGUAY
-        'UY', // URUGUAY
-        'VE', // VENEZUELA
-    ];
-
-    /**
-     * @var string[]
-     */
-    public $allowedCurrencies = [
-        'ARS', // ARGENTINE PESO
-        'BRL', // BRAZILIAN REAL
-        'CLP', // CHILEAN PESO
-        'COP', // COLUMBIAN PESO
-        'MXN', // MEXICAN PESO
-        'PYG', // PARAGUAYAN GUARANI
-        'PEN', // PERUVIAN SOL
-        'UYU', // URUGUAYAN PESO
-        'VEB', // VENEZUELAN BOLIVAR (1871-2008)
-        'VEF', // VENEZUELAN BOLIVAR (2008-2018)
-        'USD', // US DOLLAR
-        'EUR', // EURO
-    ];
-
-    /**
      * @return bool
      */
     public function isEnabled()
     {
-        $result = (bool)$this->getPaymentConfig('active');
-        if ($result) {
-            $result = in_array($this->getCountry(), $this->allowedCountries);
-        }
-        if ($result) {
-            $result = in_array($this->getCurrency(), $this->allowedCurrencies);
-        }
-        return $result;
+        return (bool)$this->getPaymentConfig('active');
     }
 
     /**

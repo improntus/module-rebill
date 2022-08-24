@@ -58,11 +58,6 @@ class LayoutProcessorPlugin
                 if ($this->configHelper->hasQuoteSubscriptionProducts($quote)) {
                     unset($paymentRenderers[$renderName]);
                 }
-            } else {
-                if (!in_array($this->configHelper->getCountry(), $this->configHelper->allowedCountries)
-                    || !in_array($this->configHelper->getCurrency(), $this->configHelper->allowedCurrencies)) {
-                    unset($paymentRenderers[$renderName]);
-                }
             }
         }
         return $result;

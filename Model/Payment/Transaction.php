@@ -205,7 +205,7 @@ class Transaction
         $rebillItem = $this->getRebillItem(
             $item->getProduct()->getSku(),
             $item->getProduct()->getName(),
-            $item->getProduct()->getData('short_description')
+            (string)$item->getProduct()->getData('short_description')
         );
         $_item = $item;
         if ($item->getParentItemId()) {
@@ -261,7 +261,7 @@ class Transaction
                 'gatewayId'   => $gateway,
                 'enabled'     => true,
             ];
-            if ($rebillDetails['enable_subscription'] && $frequency) {
+            if (isset($rebillDetails['enable_subscription']) && $rebillDetails['enable_subscription'] && $frequency) {
                 $rebillPriceData['frequency'] = [
                     'type'     => $frequency['frequencyType'] ?? 'months',
                     'quantity' => (int)($frequency['frequency'] ?: 1),
