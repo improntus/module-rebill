@@ -38,7 +38,7 @@ $configHelper = $this->helper(Config::class);
             "rebill_product_form": {
                 "attributes": <?= /** @noEscape */ $block->getRebillAttributesJson() ?>,
                 "product_type": "<?= /** @noEscape */ $block->getProductType() ?>",
-                "is_product_child": <?= /** @noEscape */ (int)$configHelper->isProductChild($block->getProduct()) ?>,
+                "is_product_child": <?= /** @noEscape */ (int)$configHelper->isProductChild($block->getProduct()) ?>
             }
         }
     }
