@@ -26,6 +26,7 @@ use Magento\Payment\Model\Method\ConfigInterface;
 use Magento\Payment\Model\Method\Logger;
 use Magento\Payment\Model\Method\Online\GatewayInterface;
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Framework\UrlInterface;
 
 class Rebill extends Cc implements GatewayInterface
 {
@@ -52,23 +53,41 @@ class Rebill extends Cc implements GatewayInterface
      * @var string
      */
     protected $_code = self::CODE;
+
+    /**
+     * @var bool
+     */
     protected $_isGateway = true;
+
+    /**
+     * @var bool
+     */
     protected $_canCapture = true;
+
+    /**
+     * @var bool
+     */
     protected $_canCapturePartial = false;
+
+    /**
+     * @var bool
+     */
     protected $_canRefund = false;
+
+    /**
+     * @var int
+     */
     protected $_minOrderTotal = 0;
+
+    /**
+     * @var Config
+     */
     protected $configHelper;
-    protected $_supportedCurrencyCodes = [
-        'USD',
-        'ARS',
-        'CLP',
-        'MXN',
-        'BRL',
-        'COP',
-        'PEN',
-        'VEB',
-        'VEF',
-    ];
+
+    /**
+     * @var UrlInterface
+     */
+    protected $_urlBuilder;
 
     /**
      * @param Context $context
@@ -81,6 +100,7 @@ class Rebill extends Cc implements GatewayInterface
      * @param ModuleListInterface $moduleList
      * @param TimezoneInterface $localeDate
      * @param Config $configHelper
+     * @param UrlInterface $urlBuilder
      * @param array $data
      */
     public function __construct(
@@ -94,9 +114,12 @@ class Rebill extends Cc implements GatewayInterface
         ModuleListInterface        $moduleList,
         TimezoneInterface          $localeDate,
         Config                     $configHelper,
+        UrlInterface               $urlBuilder,
         array                      $data = []
     ) {
         $this->configHelper = $configHelper;
+        $this->_urlBuilder = $urlBuilder;
+
         parent::__construct(
             $context,
             $registry,
@@ -114,15 +137,13 @@ class Rebill extends Cc implements GatewayInterface
     }
 
     /**
-     * @param $currencyCode
-     * @return bool
+     * A flag to set that there will be redirect to third party after confirmation
+     *
+     * @return string
      */
-    public function canUseForCurrency($currencyCode)
+    public function getOrderPlaceRedirectUrl()
     {
-        if (!in_array($currencyCode, $this->_supportedCurrencyCodes)) {
-            return false;
-        }
-        return true;
+        return $this->_urlBuilder->getUrl(self::ACTION_URL);
     }
 
     /**

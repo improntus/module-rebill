@@ -20,6 +20,7 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 
 class Success extends Action
 {
@@ -54,6 +55,11 @@ class Success extends Action
     protected $configHelper;
 
     /**
+     * @var OrderSender
+     */
+    protected $orderSender;
+
+    /**
      * @param Context $context
      * @param Session $session
      * @param Subscription $subscription
@@ -69,7 +75,8 @@ class Success extends Action
         SubscriptionFactory $subscriptionFactory,
         OrderRepository     $orderRepository,
         Invoice             $invoice,
-        Config              $configHelper
+        Config              $configHelper,
+        OrderSender         $orderSender
     ) {
         $this->configHelper = $configHelper;
         $this->invoice = $invoice;
@@ -77,6 +84,8 @@ class Success extends Action
         $this->session = $session;
         $this->subscription = $subscription;
         $this->subscriptionFactory = $subscriptionFactory;
+        $this->orderSender = $orderSender;
+
         parent::__construct($context);
     }
 
@@ -96,6 +105,8 @@ class Success extends Action
                 $order = $this->orderRepository->get($orderId);
                 $this->invoice->execute($order);
                 $order->setStatus($this->configHelper->getApprovedStatus());
+                $this->orderSender->send($order);
+                $order->setIsCustomerNotified(true);
                 $this->orderRepository->save($order);
                 $subscriptions = $this->subscription->getSubscriptionFromClient($this->session->getCustomer()->getEmail());
                 $_subscriptions = [];
