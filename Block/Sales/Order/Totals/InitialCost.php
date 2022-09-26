@@ -66,7 +66,7 @@ class InitialCost extends Template
                 $rebillInfo = $this->configHelper->getOrderSubscriptionInformation($order);
                 $cost = 0;
                 foreach ($rebillInfo as $info) {
-                    $cost += $info['initialCost'];
+                    $cost += $info['initialCost'] ?? 0;
                 }
                 $order->setData('rebill_initial_cost_amount', $cost);
                 $order->setData('base_rebill_initial_cost_amount', $cost);

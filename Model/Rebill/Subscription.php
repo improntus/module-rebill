@@ -16,7 +16,7 @@ class Subscription extends Rebill
      * @param $email
      * @return mixed|null
      */
-    public function getSubscriptionFromClient($email)
+    public function getSubscriptionFromClientEmail($email)
     {
         try {
             return $this->request('subscription', 'GET', [$email]);
@@ -27,14 +27,59 @@ class Subscription extends Rebill
     }
 
     /**
+     * @return array|mixed|null
+     */
+    public function getSubscriptionFromClient($customerEmail)
+    {
+        try {
+            return $this->request('client_subscription_list', 'GET', [], ['customerEmail' => $customerEmail]);
+        } catch (Exception $exception) {
+            $this->configHelper->logError($exception->getMessage());
+        }
+        return [];
+    }
+
+    /**
      * @param $id
+     * @param $customerEmail
      * @return mixed|null
      * @throws Exception
      */
-    public function cancelSubscription($id)
+    public function cancelSubscription($id, $customerEmail)
     {
         try {
-            return $this->request('cancel_subscription', 'DELETE', [$id]);
+            return $this->request('client_subscription', 'DELETE', [$id], ['customerEmail' => $customerEmail]);
+        } catch (Exception $exception) {
+            $this->configHelper->logError($exception->getMessage());
+            throw $exception;
+        }
+    }
+
+    /**
+     * @param $id
+     * @param $customerEmail
+     * @return mixed|null
+     * @throws Exception
+     */
+    public function getSubscription($id, $customerEmail)
+    {
+        try {
+            return $this->request('client_subscription', 'GET', [$id], ['customerEmail' => $customerEmail]);
+        } catch (Exception $exception) {
+            $this->configHelper->logError($exception->getMessage());
+            throw $exception;
+        }
+    }
+
+    /**
+     * @param $customerEmail
+     * @return mixed|null
+     * @throws Exception
+     */
+    public function getCustomerToken($customerEmail)
+    {
+        try {
+            return $this->request('customer_auth', 'POST', [], ['customerEmail' => $customerEmail]);
         } catch (Exception $exception) {
             $this->configHelper->logError($exception->getMessage());
             throw $exception;

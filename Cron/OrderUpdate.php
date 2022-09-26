@@ -176,7 +176,6 @@ class OrderUpdate
             $oldOrder = $order;
             /** @var Order $order */
             $order = $this->reorder->execute($order);
-            $this->invoice->execute($order);
             /** @comment Match up the previous order items with the items in the new one */
             $oldOrderItems = [];
             /** @var Order\Item $item */
@@ -188,6 +187,9 @@ class OrderUpdate
                 $data = hash('md5', implode('-', $this->getItemData($item)));
                 $orderItems[$oldOrderItems[$data]] = $item->getId();
             }
+        }
+        if ($status == 'new_payment') {
+            $this->invoice->execute($order);
         }
         /** @var Subscription $subscription */
         foreach ($subscriptions as $subscription) {

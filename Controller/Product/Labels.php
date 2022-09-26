@@ -68,7 +68,7 @@ class Labels extends Action implements HttpPostActionInterface
         /** @var Product $product */
         foreach ($productCollection as $product) {
             $rebillDetails = $this->configHelper->getProductRebillSubscriptionDetails($product);
-            if ($rebillDetails['enable_subscription']) {
+            if (isset($rebillDetails['enable_subscription']) && $rebillDetails['enable_subscription']) {
                 $rebillItems[$product->getId()] = true;
             }
         }

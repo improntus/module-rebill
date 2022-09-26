@@ -16,10 +16,10 @@ class Card extends Rebill
      * @param $cardId
      * @return mixed|null
      */
-    public function getCard($cardId)
+    public function getCard($cardId, $customerEmail)
     {
         try {
-            return $this->request('card', 'GET', [$cardId]);
+            return $this->request('card', 'GET', [$cardId], ['customerEmail' => $customerEmail]);
         } catch (Exception $exception) {
             $this->configHelper->logError($exception->getMessage());
         }

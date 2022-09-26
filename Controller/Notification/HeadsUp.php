@@ -48,17 +48,21 @@ class HeadsUp extends Action implements HttpGetActionInterface
          * @todo 24hs heads up
          */
         if ($id = $this->getRequest()->getParam('id')) {
-            /** @var Subscription $subscription */
-            $subscription = $this->subscriptionFactory->create();
-            $subscription->load($id, 'subscription_id');
-            $subscription->setData([
-                'subscription_id' => $id,
-                'price_id'        => $this->getRequest()->getParam('price')['id'],
-                'quantity'        => $this->getRequest()->getParam('quantity'),
-                'status'          => 'recalculate',
-                'order_id'        => null,
-            ]);
-            $subscription->save();
+            try {
+                /** @var Subscription $subscription */
+                $subscription = $this->subscriptionFactory->create();
+                $subscription->load($id, 'subscription_id');
+                $subscription->setData([
+                    'subscription_id' => $id,
+                    'price_id'        => $this->getRequest()->getParam('price')['id'],
+                    'quantity'        => $this->getRequest()->getParam('quantity'),
+                    'status'          => 'recalculate',
+                    'order_id'        => null,
+                ]);
+                $subscription->save();
+            } catch (Exception $exception) {
+
+            }
         }
     }
 }

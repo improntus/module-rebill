@@ -6,29 +6,57 @@
  */
 
 /**
- * @var $block Transaction
+ * @var $block Edit
  * @var $escaper Escaper
  */
 
 use Magento\Framework\Escaper;
-use Improntus\Rebill\Block\Payment\Transaction;
-use Improntus\Rebill\Helper\Config;
+use Improntus\Rebill\Block\Customer\Edit;
+use Magento\Framework\Pricing\Helper\Data;
 
-$e = $escaper;
-$order = $block->getOrder();
-$prices = $block->getPrices();
-/** @var Config $configHelper */
-$configHelper = $this->helper(Config::class);
-$documentTypes = $block->getDocumentTypes();
+/** @var Data $currencyHelper */
+$currencyHelper = $this->helper(Data::class);
+$subscription = $block->getSubscription() ?? [];
+$card = $block->getCard($subscription['card']);
+$documentTypes = $block->getDocumentTypes($subscription['price']['gateway']['type']);
 ?>
-<h2 class="rebill.payment.transaction.title"><?= $e->escapeHtml(__('Pay with rebill')) ?></h2>
+<div class="rebill-subscription-data">
+    <div class="section">
+        <span class="section-title"><?= /** @noEscape */__('Product:') ?></span>
+        <span class="section-value"><?= $escaper->escapeHtml($subscription['title'] . ' x ' . $subscription['quantity']) ?></span>
+    </div>
+    <div class="section">
+        <span class="section-title"><?= /** @noEscape */__('Status:') ?></span>
+        <span class="section-value"><?= $escaper->escapeHtml($subscription['status']) ?></span>
+    </div>
+    <div class="section">
+        <span class="section-title"><?= /** @noEscape */__('Period:') ?></span>
+        <span class="section-value"><?= $escaper->escapeHtml($block->getSubscriptionText($subscription)) ?></span>
+    </div>
+    <div class="section">
+        <span class="section-title"><?= /** @noEscape */__('Next payment date:') ?></span>
+        <span class="section-value"><?= $escaper->escapeHtml(date('Y-m-d', strtotime($subscription['nextChargeDate']))) ?></span>
+    </div>
+    <?php if ($subscription['remainingIterations'] > 0) : ?>
+        <div class="section">
+            <span class="section-title"><?= /** @noEscape */__('Remaining payments:') ?></span>
+            <span class="section-value"><?= $escaper->escapeHtml($subscription['remainingIterations']) ?></span>
+        </div>
+    <?php endif ?>
+    <div class="section">
+        <span class="section-title"><?= /** @noEscape */__('Current payment method:') ?></span>
+        <span class="section-value"><?= $escaper->escapeHtml($block->getPaymentMethod($card)) ?></span>
+    </div>
+</div>
+
 <?php if ($documentTypes) : ?>
     <div class="rebill-identification-field">
         <div class="type">
             <label for="identification-type"><?= /** @noEscape  */__('Document Type') ?></label>
             <select name="identification_type" id="identification-type">
                 <?php foreach ($documentTypes as $documentType) : ?>
-                    <option value="<?= $e->escapeHtmlAttr($documentType['value']) ?>"><?= $e->escapeHtml($documentType['value']) ?></option>
+                    <option
+                        value="<?= $escaper->escapeHtmlAttr($documentType['value']) ?>"><?= $escaper->escapeHtml($documentType['value']) ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -39,62 +67,29 @@ $documentTypes = $block->getDocumentTypes();
     </div>
 <?php endif ?>
 <div id="rebill_elements"></div>
-<div class="rebill-errors"></div>
 
 <script>
     require(['jquery', 'rebill'], function ($) {
         let initialization = {
-            organization_id: '<?= $e->escapeJs($configHelper->getApiUuid()) ?>',
+            organization_id: '<?= $escaper->escapeJs($block->getApiUuid()) ?>',
             api_url: 'https://api.rebill.to/v2',
+            subscription_id: '<?= $escaper->escapeJs($subscription['id']) ?>',
+            customer_token: '<?= $escaper->escapeJs($block->getCustomerToken()) ?>',
         }
         let checkout = new Rebill.PhantomSDK(initialization);
 
-        checkout.setCustomer({
-            firstName: "<?= $e->escapeJs($order->getCustomerFirstname()) ?>",
-            lastName: "<?= $e->escapeJs($order->getCustomerLastname()) ?>",
-            email: '<?= $e->escapeJs($order->getCustomerEmail()) ?>',
-            phone: {
-                countryCode: "00",
-                areaCode: "00",
-                phoneNumber: "<?= $e->escapeJs($order->getBillingAddress()->getTelephone()) ?>"
-            },
-            address: {
-                street: "<?= $e->escapeJs($order->getBillingAddress()->getStreet()[0]) ?>",
-                number: "<?= $e->escapeJs($order->getBillingAddress()->getStreet()[1] ?? 'none') ?>",
-                floor: "<?= $e->escapeJs($order->getBillingAddress()->getStreet()[2] ?? 'none') ?>",
-                apt: "<?= $e->escapeJs($order->getBillingAddress()->getStreet()[3] ?? 'none') ?>",
-                city: "<?= $e->escapeJs($order->getBillingAddress()->getCity()) ?>",
-                state: "<?= $e->escapeJs($order->getBillingAddress()->getRegion()) ?>",
-                zipCode: "<?= $e->escapeJs($order->getBillingAddress()->getPostcode()) ?? '' ?>",
-                country: "<?= $e->escapeJs($order->getBillingAddress()->getCountryId()) ?>",
-                description: "Billing Address"
-            }
-        });
         let cardHolder = {
-            name: '<?= $e->escapeJs($order->getBillingAddress()->getFirstname() . ' ' . $order->getBillingAddress()->getLastname()) ?>',
+            name: '<?= $escaper->escapeJs($card['cardHolder']) ?>',
             identification: {
                 type: $('#identification-type').val()
             }
         }
         checkout.setCardHolder(cardHolder);
-        checkout.setTransaction({prices: <?= /** @noEscape */json_encode($prices) ?>});
         let errorsMessage = $('.rebill-errors');
         checkout.setCallbacks({
             onSuccess: function (response) {
                 errorsMessage.html('');
-                if (response.invoice) {
-                    $.ajax({
-                        url: '<?= $e->escapeUrl($block->getUrl('rebill/payment/success', ['order_id' => $order->getId()])) ?>',
-                        data: response,
-                        type: 'post',
-                        success: function () {
-                            window.location.href = '<?= $e->escapeUrl($block->getUrl('checkout/onepage/success')) ?>';
-                        }
-                    });
-                } else {
-                    errorsMessage.append($('<div class="error-message"></div>')
-                        .text("<?= $e->escapeJs(__('The payment can\'t be processed, try again with another card.')) ?>"));
-                }
+                window.location.href = '<?= $escaper->escapeUrl($block->getUrl('*/*/*')) ?>';
             },
             onError: function (error) {
                 errorsMessage.html('')
@@ -104,7 +99,7 @@ $documentTypes = $block->getDocumentTypes();
         });
         checkout.setText({
             card_number: '<?= /** @noEscape */ __('Card Number') ?>',
-            pay_button: '<?= /** @noEscape */ __('Pay') ?>',
+            pay_button: '<?= /** @noEscape */ __('Update your subscription') ?>',
             error_messages: {
                 emptyCardNumber: '<?= /** @noEscape */ __('Enter a card number') ?>',
                 invalidCardNumber: '<?= /** @noEscape */ __('Card number is invalid') ?>',

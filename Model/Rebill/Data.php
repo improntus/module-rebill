@@ -34,17 +34,20 @@ class Data extends Rebill
     }
 
     /**
+     * @param $gateway
      * @return mixed|null
      */
-    public function getIdentificationsByGateway()
+    public function getIdentificationsByGateway($gateway = null)
     {
         try {
-            $gatewayId = $this->configHelper->getGatewayId();
-            $gateways = $this->gateway->getGateways();
-            $gateway = 'mercadopago';
-            foreach ($gateways as $_gateway) {
-                if ($_gateway['id'] == $gatewayId) {
-                    $gateway = $_gateway['type'];
+            if (!$gateway) {
+                $gatewayId = $this->configHelper->getGatewayId();
+                $gateways = $this->gateway->getGateways();
+                $gateway = 'mercadopago';
+                foreach ($gateways as $_gateway) {
+                    if ($_gateway['id'] == $gatewayId) {
+                        $gateway = $_gateway['type'];
+                    }
                 }
             }
             $country = $this->configHelper->getCountry();

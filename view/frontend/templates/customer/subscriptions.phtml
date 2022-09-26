@@ -23,12 +23,12 @@ $subscriptions = $block->getSubscriptions() ?? [];
         <table class="data table">
             <thead>
             <tr>
-                <th><?= /** @noEscape */__('Subscription') ?></th>
-                <th><?= /** @noEscape */__('Quantity') ?></th>
-                <th><?= /** @noEscape */__('Status') ?></th>
-                <th><?= /** @noEscape */__('Total') ?></th>
-                <th><?= /** @noEscape */__('Payment Method') ?></th>
-                <th><?= /** @noEscape */__('Created at') ?></th>
+                <th><?= $escaper->escapeHtml(__('Subscription')) ?></th>
+                <th><?= $escaper->escapeHtml(__('Quantity')) ?></th>
+                <th><?= $escaper->escapeHtml(__('Status')) ?></th>
+                <th><?= $escaper->escapeHtml(__('Total')) ?></th>
+                <th><?= $escaper->escapeHtml(__('Payment Method')) ?></th>
+                <th><?= $escaper->escapeHtml(__('Created at')) ?></th>
                 <th></th>
             </tr>
             </thead>
@@ -38,18 +38,56 @@ $subscriptions = $block->getSubscriptions() ?? [];
                     <td><?= $escaper->escapeHtml($subscription['title']) ?></td>
                     <td><?= $escaper->escapeHtml($subscription['quantity']) ?></td>
                     <td><?= $escaper->escapeHtml($subscription['status']) ?></td>
-                    <td><?= $escaper->escapeHtml($currencyHelper->currencyByStore((float)$subscription['price']['amount'])) ?></td>
+                    <td><?= $currencyHelper->currencyByStore((float)$subscription['price']['amount']) ?></td>
                     <td><?= $escaper->escapeHtml($block->getPaymentMethod($subscription)) ?></td>
                     <td><?= $escaper->escapeHtml(date('Y-m-d', strtotime($subscription['createdAt']))) ?></td>
                     <td class="col actions">
-                        <a class="action delete"
-                           href="<?= /** @noEscape */$block->getUrl('rebill/customer/cancel', ['id' => $subscription['id']]) ?>"><?= /** @noEscape */__('Cancel') ?></a>
+                        <a class="action edit" href="<?= $escaper->escapeUrl($block->getUrl('rebill/customer/edit', ['id' => $subscription['id']])) ?>">
+                            <span><?= $escaper->escapeHtml(__('Update')) ?></span>
+                        </a>
+                        <a class="action delete" href="<?= $escaper->escapeUrl($block->getUrl('rebill/customer/cancel', ['id' => $subscription['id']])) ?>">
+                            <span><?= $escaper->escapeHtml(__('Cancel')) ?></span>
+                        </a>
                     </td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
         </table>
     </div>
+
+    <script>
+        require(['jquery', 'Magento_Ui/js/modal/confirm'], function ($, confirmation) {
+            $(document).ready(function () {
+                $('a.delete').click(function (event) {
+                    let element = $(this);
+                    event.preventDefault();
+                    let confirmationPopup = confirmation({
+                        title: $.mage.__('Cancel Subscription'),
+                        content: $.mage.__('You are about to cancel a subscription. Are you sure?'),
+                        actions: {
+                            confirm: function() {
+                                window.location = element.attr('href');
+                            },
+                        },
+                        buttons: [{
+                            text: $.mage.__('Cancel'),
+                            class: 'action-secondary action-dismiss',
+                            click: function (event) {
+                                this.closeModal(event);
+                            }
+                        }, {
+                            text: $.mage.__('Ok'),
+                            class: 'action primary action-accept',
+                            click: function (event) {
+                                this.closeModal(event, true);
+                            }
+                        }]
+                    });
+                    confirmationPopup.open();
+                })
+            });
+        });
+    </script>
 <?php else : ?>
 <div class="subscription-grid-wrapper table-wrapper">
     <span class="no-subscriptions"><?= /** @noEscape */__('You have no active subscriptions') ?></span>

@@ -78,8 +78,8 @@ class Collection extends \Magento\Framework\Data\Collection
         $pricesIds = [];
         $x = 0;
         try {
-            $cycleList = $this->subscription->getList('cycle');
-            $recurrentList = $this->subscription->getList('recurrent');
+            $cycleList = $this->subscription->getList('cycle')['data'] ?? [];
+            $recurrentList = $this->subscription->getList('recurrent')['data'] ?? [];
             foreach ($cycleList as $item) {
                 $items[$x] = $this->getNewEmptyItem()->setData($this->getItemsData($item));
                 $pricesIds[$item['price']['id']] = $x;
@@ -111,6 +111,10 @@ class Collection extends \Magento\Framework\Data\Collection
             }
             if (count($pricesIds)) {
                 foreach ($items as &$item) {
+                    $item->setData('cancel_id', implode('|', [
+                        $item->getData('id'),
+                        $item->getData('user_email')
+                    ]));
                     if (isset($pricesIds[$item->getData('price')['id']])) {
                         $price = $item->getData('price');
                         if ($price) {

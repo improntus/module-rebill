@@ -108,10 +108,14 @@ class Success extends Action
                 $this->orderSender->send($order);
                 $order->setIsCustomerNotified(true);
                 $this->orderRepository->save($order);
-                $subscriptions = $this->subscription->getSubscriptionFromClient($this->session->getCustomer()->getEmail());
                 $_subscriptions = [];
-                foreach ($subscriptions as $subscription) {
-                    if ($invoice['id'] == $subscription['invoices'][0]['id']) {
+                foreach ($invoice['paidBags'] as $paidBag) {
+                    foreach ($paidBag['schedules'] as $schedule) {
+                        $subscription = $this->subscription->getSubscription($schedule, $invoice['buyer']['customer']['userEmail']);
+                        if (!isset($subscription['id'])
+                            || ($subscription['remainingIterations'] <= 0 && strtotime($subscription['nextChargeDate']) < time())) {
+                            continue;
+                        }
                         $_subscriptions[] = [
                             'subscription_id' => $subscription['id'],
                             'price_id'        => $subscription['price']['id'],

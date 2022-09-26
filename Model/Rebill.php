@@ -39,6 +39,7 @@ class Rebill
      */
     protected $endpoints = [
         'auth'                      => '/v2/auth/login/%s',
+        'customer_auth'             => '/v2/organization/customer-token',
         'create_item'               => '/v2/item',
         'update_item'               => '/v2/item/%s',
         'create_price'              => '/v2/item/%s/price',
@@ -51,10 +52,19 @@ class Rebill
         'payment_list'              => '/v2/payments',
         'card'                      => '/v2/clients/cards/%s',
         'subscription'              => '/v2/subscriptions/customer/%s',
-        'cancel_subscription'       => '/v2/clients/subscriptions/%s',
+        'client_subscription_list'  => '/v2/clients/subscriptions',
+        'client_subscription'       => '/v2/clients/subscriptions/%s',
         'subscription_list'         => '/v2/subscriptions/%s/all',
         'subscription_change_price' => '/v2/subscriptions/%s/change-plan',
         'invoice'                   => '/v2/receipts/%s',
+    ];
+    /**
+     * @var string[]
+     */
+    protected $customerEndpoints = [
+        'client_subscription_list',
+        'client_subscription',
+        'card',
     ];
 
     /**
@@ -119,8 +129,18 @@ class Rebill
             'password' => $this->configHelper->getApiPassword(),
         ];
         $result = $this->request('auth', 'POST', [$this->configHelper->getApiAlias()], $authParams);
-        $this->setToken($result['authToken']);
+        $this->setToken($result['authToken'] ?? null);
         return $result['authToken'] ?? null;
+    }
+
+
+    public function customerAuth(string $customerEmail)
+    {
+        $authParams = [
+            'customerEmail' => $customerEmail,
+        ];
+        $result = $this->request('customer_auth', 'POST', [], $authParams);
+        return $result['token'] ?? null;
     }
 
     /**
@@ -162,6 +182,10 @@ class Rebill
         }
         if ($endpoint != 'auth' && !$token && $needToken) {
             return null;
+        }
+        if (in_array($endpoint, $this->customerEndpoints)) {
+            $token = $this->customerAuth($data['customerEmail']);
+            unset($data['customerEmail']);
         }
         $method = $method ?? "GET";
         $curl = $this->curl;

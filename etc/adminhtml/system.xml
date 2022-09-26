@@ -27,14 +27,6 @@
                 <group id="general" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>General</label>
                     <attribute type="expanded">1</attribute>
-                    <field id="customer_document_type" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Customer Document Type</label>
-                        <source_model>Improntus\Rebill\Model\Config\Source\CustomerDocumentType</source_model>
-                    </field>
-                    <field id="customer_document_attribute" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Customer Attribute for Document</label>
-                        <source_model>Improntus\Rebill\Model\Config\Source\CustomerDocument</source_model>
-                    </field>
                     <field id="approved_status" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Status for Approved Orders</label>
                         <source_model>Improntus\Rebill\Model\Config\Source\ApprovedStatus</source_model>

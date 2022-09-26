@@ -7,6 +7,7 @@
 
 namespace Improntus\Rebill\Model\Config\Source;
 
+use Exception;
 use Improntus\Rebill\Model\Rebill\Data;
 use Magento\Framework\Option\ArrayInterface;
 
@@ -29,17 +30,18 @@ class CustomerDocumentType implements ArrayInterface
     /**
      * @return array
      */
-    public function toOptionArray()
+    public function toOptionArray($gateway = null)
     {
-        $documents = $this->data->getIdentificationsByGateway();
         $options = [];
-        if ($documents && !isset($documents['statusCode'])) {
-            foreach ($documents as $item) {
-                $options[] = ['value' => $item['value'], 'label' => $item['name']];
+        try {
+            $documents = $this->data->getIdentificationsByGateway($gateway);
+            if ($documents && !isset($documents['statusCode'])) {
+                foreach ($documents as $item) {
+                    $options[] = ['value' => $item['value'], 'label' => $item['name']];
+                }
             }
-        }
-        if (!$options) {
-            $options[] = ['value' => 'DNI', 'label' => 'DNI'];
+        } catch (Exception $exception) {
+
         }
         return $options;
     }

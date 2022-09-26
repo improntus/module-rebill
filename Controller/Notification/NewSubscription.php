@@ -48,17 +48,21 @@ class NewSubscription extends Action implements HttpGetActionInterface
          * @todo new subscription
          */
         if ($request = $this->getRequest()->getParam('subscription')) {
-            /** @var Subscription $subscription */
-            $subscription = $this->subscriptionFactory->create();
-            $subscription->load($request['id'], 'subscription_id');
-            $subscription->setData([
-                'subscription_id' => $request['id'],
-                'price_id'        => $request['price']['id'],
-                'quantity'        => $request['quantity'],
-                'status'          => 'new_subscription_generated',
-                'order_id'        => null,
-            ]);
-            $subscription->save();
+            try {
+                /** @var Subscription $subscription */
+                $subscription = $this->subscriptionFactory->create();
+                $subscription->load($request['id'], 'subscription_id');
+                $subscription->setData([
+                    'subscription_id' => $request['id'],
+                    'price_id'        => $request['price']['id'],
+                    'quantity'        => $request['quantity'],
+                    'status'          => 'new_subscription_generated',
+                    'order_id'        => null,
+                ]);
+                $subscription->save();
+            } catch (Exception $exception) {
+
+            }
         }
     }
 }

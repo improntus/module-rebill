@@ -79,7 +79,7 @@ class Subscriptions extends Template
     public function getPaymentMethod($subscription)
     {
         $card = $subscription['invoices'][0]['buyer']['card'];
-        return "XXXX XXXX XXXX " . $card['last4'] . ' ' . $this->getCardDate($card);
+        return "**** **** **** " . $card['last4'] . ' ' . $this->getCardDate($card);
     }
 
     /**
