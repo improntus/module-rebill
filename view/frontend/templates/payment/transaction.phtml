@@ -83,14 +83,7 @@ $documentTypes = $block->getDocumentTypes();
             onSuccess: function (response) {
                 errorsMessage.html('');
                 if (response.invoice) {
-                    $.ajax({
-                        url: '<?= $e->escapeUrl($block->getUrl('rebill/payment/success', ['order_id' => $order->getId()])) ?>',
-                        data: response,
-                        type: 'post',
-                        success: function () {
-                            window.location.href = '<?= $e->escapeUrl($block->getUrl('checkout/onepage/success')) ?>';
-                        }
-                    });
+                    window.location.href = '<?= $e->escapeUrl($block->getUrl('rebill/payment/success', ['order_id' => $order->getId()])) ?>';
                 } else {
                     errorsMessage.append($('<div class="error-message"></div>')
                         .text("<?= $e->escapeJs(__('The payment can\'t be processed, try again with another card.')) ?>"));

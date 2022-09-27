@@ -19,8 +19,10 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
+use Magento\Framework\Exception\AlreadyExistsException;
 
 class Success extends Action
 {
@@ -67,6 +69,7 @@ class Success extends Action
      * @param OrderRepository $orderRepository
      * @param Invoice $invoice
      * @param Config $configHelper
+     * @param OrderSender $orderSender
      */
     public function __construct(
         Context             $context,
@@ -90,8 +93,10 @@ class Success extends Action
     }
 
     /**
-     * @return ResponseInterface|ResultInterface|void
+     * @return void
+     * @throws AlreadyExistsException
      * @throws InputException
+     * @throws LocalizedException
      * @throws NoSuchEntityException
      */
     public function execute()
@@ -133,5 +138,6 @@ class Success extends Action
                 }
             }
         }
+        $this->_redirect('checkout/onepage/success');
     }
 }
