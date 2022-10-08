@@ -121,10 +121,11 @@ class ConfigProvider implements ConfigProviderInterface
         /** @var Collection $rules */
         $rules = $this->ruleCollectionFactory->create();
         $rules->addFieldToFilter('rule_id', explode(',', $quote->getAppliedRuleIds() ?? ''));
-        $rulesMatched = false;
+        $rulesMatched = true;
         foreach ($rules as $rule) {
-            if ($this->configHelper->cartRuleApplyToSubscriptionProducts($rule)) {
-                $rulesMatched = true;
+            if (!$this->configHelper->cartRuleApplyToSubscriptionProducts($rule)) {
+                $rulesMatched = false;
+                break;
             }
         }
         if ($this->configHelper->hasQuoteSubscriptionProducts($quote) && !$rulesMatched) {

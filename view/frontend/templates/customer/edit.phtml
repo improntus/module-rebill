@@ -89,7 +89,7 @@ $documentTypes = $block->getDocumentTypes($subscription['price']['gateway']['typ
         checkout.setCallbacks({
             onSuccess: function (response) {
                 errorsMessage.html('');
-                window.location.href = '<?= $escaper->escapeUrl($block->getUrl('*/*/*')) ?>';
+                window.location.href = '<?= $escaper->escapeUrl($block->getUrl('*/*/*',['id' => $subscription['id']])) ?>';
             },
             onError: function (error) {
                 errorsMessage.html('')
