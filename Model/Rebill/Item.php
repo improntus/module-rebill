@@ -13,10 +13,10 @@ use Improntus\Rebill\Model\Rebill;
 class Item extends Rebill
 {
     /**
-     * @param $data
+     * @param array $data
      * @return mixed|null
      */
-    public function createItem($data = [])
+    public function createItem(array $data = [])
     {
         try {
             $result = $this->request('create_item', 'POST', [], $data);
@@ -28,11 +28,11 @@ class Item extends Rebill
     }
 
     /**
-     * @param $itemId
-     * @param $data
+     * @param string $itemId
+     * @param array $data
      * @return mixed|null
      */
-    public function createPriceForItem($itemId, $data = [])
+    public function createPriceForItem(string $itemId, array $data = [])
     {
         try {
             $result = $this->request('create_price', 'POST', [$itemId], $data);
@@ -44,14 +44,15 @@ class Item extends Rebill
     }
 
     /**
-     * @param $id
+     * @param string $id
      * @return mixed|null
      */
-    public function getPriceFromId($id)
+    public function getPriceFromId(string $id)
     {
         try {
             /**
-             * @note the endpoint says "update_price" but is based on method used: to get a price use GET method, tu update a price use PUT
+             * @note the endpoint says "update_price" but is based on method used:
+             * to get a price use GET method, tu update a price use PUT
              */
             return $this->request(
                 'update_price',
@@ -67,11 +68,11 @@ class Item extends Rebill
     }
 
     /**
-     * @param $priceId
-     * @param $data
+     * @param string $priceId
+     * @param array $data
      * @return mixed|null
      */
-    public function updatePrice($priceId, $data = [])
+    public function updatePrice(string $priceId, array $data = [])
     {
         try {
             return $this->request('update_price', 'PUT', [$priceId], $data);

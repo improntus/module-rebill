@@ -7,18 +7,15 @@
 
 namespace Improntus\Rebill\Setup\Patch\Data;
 
-use Zend_Validate_Exception;
+use Improntus\Rebill\Model\Product\Attribute\Source\SubscriptionType as SourceSubscriptionType;
 use Magento\Catalog\Model\Product;
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface;
 use Magento\Eav\Setup\EavSetupFactory;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Framework\Setup\Patch\PatchRevertableInterface;
-use Magento\Eav\Model\Entity\Attribute\Source\Boolean as SourceBoolean;
-use Improntus\Rebill\Model\Product\Attribute\Source\Gateway as SourceGateway;
-use Magento\Catalog\Model\Product\Attribute\Backend\Boolean as BackendBoolean;
-use Improntus\Rebill\Model\Product\Attribute\Source\SubscriptionType as SourceSubscriptionType;
+use Zend_Validate_Exception;
 
 class ProductAttributes implements DataPatchInterface, PatchRevertableInterface
 {
@@ -36,7 +33,7 @@ class ProductAttributes implements DataPatchInterface, PatchRevertableInterface
      * @var array[]
      */
     protected $attributes = [
-        'rebill_subscription_type'             => [
+        'rebill_subscription_type'     => [
             'type'    => 'varchar',
             'input'   => 'select',
             'label'   => 'Subscription Type',
@@ -44,23 +41,7 @@ class ProductAttributes implements DataPatchInterface, PatchRevertableInterface
             'source'  => SourceSubscriptionType::class,
             'default' => null,
         ],
-        'rebill_gateway_id'                    => [
-            'type'    => 'varchar',
-            'input'   => 'select',
-            'label'   => 'Gateway',
-            'backend' => null,
-            'source'  => SourceGateway::class,
-            'default' => null,
-        ],
-        'rebill_free_trial_time_lapse'         => [
-            'type'    => 'int',
-            'input'   => 'text',
-            'label'   => 'Free trial time (days)',
-            'backend' => null,
-            'source'  => null,
-            'default' => 0,
-        ],
-        'rebill_frequency'                     => [
+        'rebill_frequency'             => [
             'type'    => 'text',
             'input'   => 'text',
             'label'   => 'Frequency',
@@ -107,7 +88,10 @@ class ProductAttributes implements DataPatchInterface, PatchRevertableInterface
             'used_in_product_listing' => true,
         ];
         foreach ($this->attributes as $attribute => $options) {
-            $_options = array_merge($defaultOptions, $options);
+            $_options = $defaultOptions;
+            foreach ($options as $k => $v) {
+                $_options[$k] = $v;
+            }
             $eavSetup->addAttribute(Product::ENTITY, $attribute, $_options);
         }
         $this->moduleDataSetup->getConnection()->endSetup();
@@ -139,9 +123,6 @@ class ProductAttributes implements DataPatchInterface, PatchRevertableInterface
      */
     public static function getDependencies()
     {
-        return [
-
-        ];
+        return [];
     }
 }
-

@@ -7,7 +7,7 @@
  */
 -->
 <schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
-    <table name="rebill_item" resource="default" engine="innodb" comment="Improntus Rebill Item">
+    <table name="rebill_item" resource="default" engine="innodb" comment="Rebill Item">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="varchar" name="product_sku" length="255" nullable="false" comment="Product SKU"/>
         <column xsi:type="varchar" name="rebill_item_id" length="255" nullable="false" comment="Rebill Item ID"/>
@@ -15,49 +15,81 @@
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
-        <constraint xsi:type="unique" referenceId="UNIQUE_KEY_1">
+        <constraint xsi:type="unique" referenceId="REBILL_ITEM_PRODUCT_SKU">
             <column name="product_sku"/>
         </constraint>
-        <constraint xsi:type="unique" referenceId="UNIQUE_KEY_2">
+        <constraint xsi:type="unique" referenceId="REBILL_ITEM_REBILL_ITEM_ID">
             <column name="rebill_item_id"/>
         </constraint>
     </table>
-    <table name="rebill_item_price" resource="default" engine="innodb" comment="Improntus Rebill Item Price">
+    <table name="rebill_item_price" resource="default" engine="innodb" comment="Rebill Item Price">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
-        <column xsi:type="int" name="rebill_item_id" unsigned="true" nullable="false" comment="Rebill Item ID"/>
+        <column xsi:type="int" name="item_id" unsigned="true" nullable="false" comment="Rebill Item ID"/>
+        <column xsi:type="varchar" name="type" length="255" nullable="false" comment="Type"/>
+        <column xsi:type="varchar" name="rebill_item_id" length="255" nullable="false" comment="Rebill Price ID"/>
         <column xsi:type="varchar" name="rebill_price_id" length="255" nullable="false" comment="Rebill Price ID"/>
-        <column xsi:type="varchar" name="details_hash" length="255" nullable="false" comment="Details"/>
+        <column xsi:type="varchar" name="details_hash" length="255" nullable="false" comment="Details Hash"/>
+        <column xsi:type="varchar" name="frequency_hash" length="255" nullable="false" comment="Frequency Hash"/>
         <column xsi:type="text" name="details" nullable="false" comment="Details"/>
-        <column xsi:type="int" name="order_id" unsigned="true" nullable="true" comment="Order ID"/>
-        <column xsi:type="int" name="order_item_id" unsigned="true" nullable="true" comment="Order Item ID"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
-        <constraint xsi:type="unique" referenceId="UNIQUE_KEY_1">
+        <constraint xsi:type="unique" referenceId="REBILL_ITEM_PRICE_REBILL_PRICE_ID">
             <column name="rebill_price_id"/>
         </constraint>
-        <constraint xsi:type="unique" referenceId="UNIQUE_KEY_2">
+        <constraint xsi:type="unique" referenceId="REBILL_ITEM_PRICE_DETAILS_HASH">
             <column name="details_hash"/>
         </constraint>
-        <constraint xsi:type="unique" referenceId="REBILL_ITEM_PRICE_ID">
-            <column name="rebill_item_id"/>
-            <column name="rebill_price_id"/>
-            <column name="order_id"/>
-            <column name="order_item_id"/>
-        </constraint>
     </table>
-    <table name="rebill_subscription" resource="default" engine="innodb" comment="Improntus Rebill Item Price">
+    <table name="rebill_subscription" resource="default" engine="innodb" comment="Rebill Subscription">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
-        <column xsi:type="varchar" name="subscription_id" length="255" nullable="false" comment="Details"/>
-        <column xsi:type="varchar" name="price_id" length="255" nullable="false" comment="Rebill Price ID"/>
-        <column xsi:type="varchar" name="status" length="255" nullable="false" comment="Rebill Price ID"/>
-        <column xsi:type="int" name="quantity" unsigned="true" nullable="true" comment="Order ID"/>
+        <column xsi:type="varchar" name="rebill_id" length="255" nullable="false" comment="Rebill Id"/>
+        <column xsi:type="varchar" name="rebill_price_id" length="255" nullable="false" comment="Rebill Price ID"/>
+        <column xsi:type="varchar" name="status" length="255" nullable="false" comment="Status"/>
+        <column xsi:type="int" name="quantity" unsigned="true" nullable="true" comment="Quantity"/>
         <column xsi:type="int" name="order_id" unsigned="true" nullable="true" comment="Order ID"/>
+        <column xsi:type="text" name="details" nullable="true" comment="Details"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
         <constraint xsi:type="unique" referenceId="REBILL_SUBSCRIPTION">
-            <column name="subscription_id"/>
+            <column name="rebill_id"/>
+        </constraint>
+    </table>
+    <table name="rebill_subscription_shipment" resource="default" engine="innodb" comment="Rebill Subscription Shipment">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="subscription_id" unsigned="true" nullable="false" comment="Subscription ID"/>
+        <column xsi:type="varchar" name="rebill_id" length="255" nullable="false" comment="Rebill Id"/>
+        <column xsi:type="varchar" name="rebill_price_id" length="255" nullable="false" comment="Rebill Price ID"/>
+        <column xsi:type="varchar" name="status" length="255" nullable="false" comment="Status"/>
+        <column xsi:type="int" name="quantity" unsigned="true" nullable="true" comment="Quantity"/>
+        <column xsi:type="int" name="order_id" unsigned="true" nullable="true" comment="Order ID"/>
+        <column xsi:type="text" name="details" nullable="true" comment="Details"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="REBILL_SUBSCRIPTION_SHIPMENT">
+            <column name="rebill_id"/>
+        </constraint>
+        <constraint xsi:type="foreign"
+                    referenceId="REBILL_SUBSCRIPTION_SHIPMENT_SUBSCRIPTION_ID_REBILL_SUBSCRIPTION_ENTITY_ID"
+                    table="rebill_subscription_shipment"
+                    column="subscription_id"
+                    referenceTable="rebill_subscription"
+                    referenceColumn="entity_id"
+                    onDelete="CASCADE"/>
+    </table>
+    <table name="rebill_payment" resource="default" engine="innodb" comment="Rebill Payment">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="subscription_id" unsigned="true" nullable="false" comment="Subscription ID"/>
+        <column xsi:type="varchar" name="rebill_id" length="255" nullable="false" comment="Rebill Id"/>
+        <column xsi:type="varchar" name="status" length="255" nullable="false" comment="Status"/>
+        <column xsi:type="text" name="details" nullable="true" comment="Details"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="REBILL_SUBSCRIPTION_SHIPMENT">
+            <column name="rebill_id"/>
         </constraint>
     </table>
     <table name="salesrule">

@@ -25,6 +25,16 @@ class Transaction extends Template
     protected $customerDocumentType;
 
     /**
+     * @var Order
+     */
+    protected $order;
+
+    /**
+     * @var array
+     */
+    protected $prices;
+
+    /**
      * @param Template\Context $context
      * @param Registry $registry
      * @param CustomerDocumentType $customerDocumentType
@@ -42,21 +52,44 @@ class Transaction extends Template
     }
 
     /**
-     * @return mixed|null
+     * @param Order $order
+     * @return $this
      */
-    public function getOrder()
+    public function setOrder(Order $order)
     {
-        return $this->registry->registry('prepared_order');
+        $this->order = $order;
+        return $this;
     }
 
     /**
-     * @return mixed|null
+     * @param array $prices
+     * @return $this
+     */
+    public function setPrices(array $prices)
+    {
+        $this->prices = $prices;
+        return $this;
+    }
+
+    /**
+     * @return Order
+     */
+    public function getOrder()
+    {
+        return $this->order;
+    }
+
+    /**
+     * @return array
      */
     public function getPrices()
     {
-        return $this->registry->registry('rebill_prices');
+        return $this->prices;
     }
 
+    /**
+     * @return array
+     */
     public function getDocumentTypes()
     {
         return $this->customerDocumentType->toOptionArray();

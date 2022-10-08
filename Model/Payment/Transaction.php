@@ -8,17 +8,19 @@
 namespace Improntus\Rebill\Model\Payment;
 
 use Exception;
-use Magento\Quote\Model\Quote;
 use Improntus\Rebill\Helper\Config;
 use Improntus\Rebill\Model\ItemFactory;
+use Improntus\Rebill\Model\Payment\Rebill as RebillPayment;
 use Improntus\Rebill\Model\Price;
 use Improntus\Rebill\Model\PriceFactory;
-use Magento\Checkout\Model\Session;
 use Improntus\Rebill\Model\Rebill;
+use Magento\Checkout\Model\Session;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Registry;
+use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\QuoteRepository;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Item;
-use Magento\Quote\Model\QuoteRepository;
 
 class Transaction
 {
@@ -58,6 +60,20 @@ class Transaction
     protected $quoteRepository;
 
     /**
+     * @var array
+     */
+    private array $defaultFrequency = [
+        'frequency'          => 0,
+        'frequency_type'     => 'months',
+        'recurring_payments' => 1,
+    ];
+
+    /**
+     * @var array
+     */
+    private array $frequencyHashes = [];
+
+    /**
      * @param Config $configHelper
      * @param Session $session
      * @param Rebill\Item $item
@@ -85,259 +101,272 @@ class Transaction
     }
 
     /**
-     * @param Order|null $order
-     * @return bool
-     * @throws Exception
+     * @return array
+     * @throws LocalizedException
      */
-    public function prepareTransaction(Order $order = null)
+    public function prepareTransaction()
     {
         try {
-            if (!$order) {
-                $order = $this->session->getLastRealOrder();
+            $order = $this->session->getLastRealOrder();
+            if (!$order->getId() || $order->getPayment()->getMethod() !== RebillPayment::CODE) {
+                throw new LocalizedException(__('Can\'t find any order to pay with rebill.'));
             }
-            if (!$order->getId() || $order->getPayment()->getMethod() !== \Improntus\Rebill\Model\Payment\Rebill::CODE) {
-                $this->session->restoreQuote();
-                throw new Exception(__('Can\'t find any order to pay with rebill.'));
-            }
-            $this->registry->register('prepared_order', $order);
             $this->registry->register('current_order', $order);
             $quote = $this->quoteRepository->get($order->getQuoteId());
-            $items = $order->getAllVisibleItems();
-            $prices = [];
-            /** @var Item $item */
-            foreach ($items as $item) {
-                $rebillPriceId = $this->getRebillPriceIdForItem($item, $quote);
-                $prices[] = [
-                    'id'       => $rebillPriceId,
-                    'quantity' => (int)$item->getQtyOrdered(),
-                ];
-            }
-            if ($id = $this->getRebillPriceIdForShipping($order)) {
-                $prices[] = [
-                    'id'       => $id,
-                    'quantity' => 1,
-                ];
-            }
-            if ($id = $this->getRebillPriceIdForAdditionalCosts($order, $quote)) {
-                $prices[] = [
-                    'id'       => $id,
-                    'quantity' => 1,
-                ];
-            }
-            $this->registry->register('rebill_prices', $prices);
+            $items = $this->prepareItems($quote, $order);
+            $this->prepareAdditionalItems($order, $quote, $items);
+            $rebillDetails = $this->sendItems($order, $items);
+            return [
+                'order'          => $order,
+                'rebill_details' => $rebillDetails,
+            ];
         } catch (Exception $exception) {
             $this->session->restoreQuote();
             $this->configHelper->logError($exception->getMessage());
-            throw new \Exception('There was an error creating the payment, please try againt.');
+            throw new LocalizedException(__('There was an error creating the payment, please try againt.'));
         }
-        return true;
     }
 
     /**
      * @param Order $order
-     * @param Quote $quote
-     * @return array|mixed|null
-     * @throws Exception
-     */
-    protected function getRebillPriceIdForAdditionalCosts(Order $order, Quote $quote)
-    {
-        $total = $order->getGrandTotal()
-            - $order->getShippingAmount()
-            - $order->getShippingTaxAmount();
-        /** @var Item $item */
-        foreach ($order->getAllVisibleItems() as $item) {
-            $total -= $item->getRowTotal();
-            $quoteItem = $quote->getItemById($item->getQuoteItemId());
-            $rebillSubscription = $quoteItem->getOptionByCode('rebill_subscription');
-            $rebillSubscription = $rebillSubscription ? json_decode($rebillSubscription->getValue(), true) : [];
-            $total += ($rebillSubscription['initialCost'] ?? 0) * $item->getQtyOrdered();
-        }
-        $total += $order->getTaxAmount();
-        if ($total <= 0) {
-            return null;
-        }
-        $rebillItem = $this->getRebillItem(
-            "order_{$order->getIncrementId()}_additional",
-            "Order #{$order->getIncrementId()} Additional",
-            "Order #{$order->getIncrementId()} Additional"
-        );
-        $gateway = $this->configHelper->getGatewayId();
-        $hash = hash('md5', $total . $order->getShippingDescription() . $gateway);
-        $rebillPrice = $this->getRebillPrice($rebillItem, $hash, $gateway, $total);
-        return $rebillPrice->getData('rebill_price_id');
-    }
-
-    /**
-     * @param Order $order
-     * @return array|mixed|null
-     * @throws Exception
-     */
-    protected function getRebillPriceIdForShipping(Order $order)
-    {
-        if (!$order->getShippingAmount() == 0) {
-            return null;
-        }
-        $rebillItem = $this->getRebillItem(
-            $order->getShippingMethod(),
-            $order->getShippingDescription(),
-            $order->getShippingDescription()
-        );
-        $rowTotal = $order->getShippingAmount()
-            - $order->getShippingDiscountAmount()
-            + $order->getShippingTaxAmount()
-            + $order->getShippingDiscountTaxCompensationAmount();
-        $itemQty = 1;
-        $price = $rowTotal / $itemQty;
-        $gateway = $this->configHelper->getGatewayId();
-        $hash = hash('md5', $price . $order->getShippingDescription() . $gateway);
-        $rebillPrice = $this->getRebillPrice($rebillItem, $hash, $gateway, $price);
-        return $rebillPrice->getData('rebill_price_id');
-    }
-
-    /**
-     * @param Item $item
-     * @param Quote $quote
-     * @return array|mixed|null
-     * @throws Exception
-     */
-    public function getRebillPriceIdForItem(Item $item, Quote $quote)
-    {
-        $rebillItem = $this->getRebillItem(
-            $item->getProduct()->getSku(),
-            $item->getProduct()->getName(),
-            (string)$item->getProduct()->getData('short_description')
-        );
-        $_item = $item;
-        if ($item->getParentItemId()) {
-            $_item = $item->getParentItem();
-        }
-        $rowTotal = $_item->getRowTotal()
-            - $_item->getDiscountAmount()
-            + $_item->getTaxAmount()
-            + $_item->getDiscountTaxCompensationAmount();
-        $itemQty = $_item->getQtyOrdered();
-        $price = $rowTotal / $itemQty;
-        $rebillDetails = $this->configHelper->getProductRebillSubscriptionDetails($item->getProduct());
-        $quoteItem = $quote->getItemById($item->getQuoteItemId());
-        $frequency = $quoteItem->getOptionByCode('rebill_subscription');
-        $frequency = $frequency ? json_decode($frequency->getValue(), true) : [];
-        $cost = $frequency['initialCost'] ?? 0;
-        /**
-         * @TODO in future implementation it will be needed the gateway in $rebillDetails
-         */
-        $gateway = $this->configHelper->getGatewayId();
-        $hash = hash('md5', json_encode($frequency) . $price . $cost . $item->getProduct()->getSku() . $gateway);
-        $rebillPrice = $this->getRebillPrice($rebillItem, $hash, $gateway, $price + $cost, $rebillDetails, $frequency);
-        return $rebillPrice->getData('rebill_price_id');
-    }
-
-    /**
-     * @param \Improntus\Rebill\Model\Item $item
-     * @param string $hash
-     * @param string $gateway
-     * @param float $price
-     * @param float $cost
-     * @param array $rebillDetails
-     * @param array $frequency
-     * @return Price
-     * @throws Exception
-     */
-    protected function getRebillPrice(
-        \Improntus\Rebill\Model\Item $item,
-        string $hash,
-        string $gateway,
-        float $price,
-        array $rebillDetails = [],
-        array $frequency = []
-    ) {
-        $rebillPrice = $this->priceFactory->create();
-        $rebillPrice->load($hash, 'details_hash');
-        if (!$rebillPrice->getId()) {
-            $rebillPriceData = [
-                'amount'      => (string)$price,
-                'type'        => 'fixed',
-                'repetitions' => 1,
-                'currency'    => $this->configHelper->getCurrency(),
-                'gatewayId'   => $gateway,
-                'enabled'     => true,
-            ];
-            if (isset($rebillDetails['enable_subscription']) && $rebillDetails['enable_subscription'] && $frequency) {
-                $rebillPriceData['frequency'] = [
-                    'type'     => $frequency['frequencyType'] ?? 'months',
-                    'quantity' => (int)($frequency['frequency'] ?: 1),
-                ];
-                $rebillPriceData['free_trial'] = [
-                    'type'     => 'days',
-                    'quantity' => $rebillDetails['free_trial_time_lapse'] ?? 0,
-                ];
-                $rebillPriceData['repetitions'] = $frequency['recurringPayments'] ?: 0;
-            }
-            $rebillPriceId = $this->item->createPriceForItem($item->getData('rebill_item_id'), $rebillPriceData);
-            if ($rebillPriceId === null) {
-                throw new Exception(__('Unable to create prices on Rebill.'));
-            }
-            $rebillPrice->setData($this->formatPriceData($item->getId(), $rebillPriceId, $rebillDetails, $hash));
-            $rebillPrice->save();
-        }
-        return $rebillPrice;
-    }
-
-    /**
-     * @param string $itemId
-     * @param string $priceId
-     * @param array $details
-     * @param string $hash
+     * @param array $items
      * @return array
+     * @throws Exception
      */
-    protected function formatPriceData(string $itemId, string $priceId, array $details, string $hash)
+    private function sendItems(Order $order, array $items)
     {
-        return [
-            'rebill_item_id'  => $itemId,
-            'rebill_price_id' => $priceId,
-            'details'         => json_encode($details),
-            'details_hash'    => $hash,
-        ];
+        $defaultFrequencyHash = $this->createHashFromArray($this->defaultFrequency);
+        $gateway = $this->configHelper->getGatewayId();
+        $compiledItems = [];
+        $frequenciesQty = count($items);
+        foreach ($items as $hash => $_items) {
+            if ($hash == $defaultFrequencyHash && $frequenciesQty == 1) {
+                $compiledItems[] = [
+                    'type'           => 'order',
+                    'frequency_hash' => $defaultFrequencyHash,
+                    'frequency'      => $this->defaultFrequency,
+                    'sku'            => "order-{$order->getIncrementId()}",
+                    'product_name'   => "Order #{$order->getIncrementId()}",
+                    'price'          => $order->getGrandTotal(),
+                    'quantity'       => 1,
+                    'gateway'        => $gateway,
+                ];
+            } else {
+                foreach ($_items as $item) {
+                    $compiledItems[] = $item;
+                }
+            }
+        }
+        $result = [];
+        foreach ($compiledItems as $item) {
+            if (in_array($item['type'], ['shipment', 'additional']) && $item['price'] <= 0) {
+                continue;
+            }
+            $rebillItem = $this->getRebillItem($item);
+            $rebillPrice = $this->getRebillPrice($rebillItem, $item);
+            $result[] = [
+                'id'       => $rebillPrice->getData('rebill_price_id'),
+                'quantity' => (int)$item['quantity'],
+            ];
+        }
+        return $result;
     }
 
     /**
-     * @param string $sku
-     * @param string $name
-     * @param string $description
+     * @param array $item
      * @return \Improntus\Rebill\Model\Item
      * @throws Exception
      */
-    protected function getRebillItem(string $sku, string $name, string $description = '')
+    private function getRebillItem(array $item)
     {
         $rebillItem = $this->itemFactory->create();
-        $rebillItem->load($sku, 'product_sku');
+        $rebillItem->load($item['sku'], 'product_sku');
         if (!$rebillItem->getId()) {
-            $rebillItem->setData('product_sku', $sku);
-            $rebillItemId = $this->item->createItem(
-                $this->formatItemData(
-                    $name,
-                    $description
-                )
-            );
-            if ($rebillItemId === null) {
+            $rebillItem->setData('product_sku', $item['sku']);
+            $itemId = $this->item->createItem([
+                'name'        => $item['product_name'],
+                'description' => $item['product_name'],
+            ]);
+            if ($itemId === null) {
                 throw new Exception(__('Unable to create items on Rebill.'));
             }
-            $rebillItem->setData('rebill_item_id', $rebillItemId);
-            $rebillItem->setData('product_description', "$sku - $name");
+            $rebillItem->setData('rebill_item_id', $itemId);
+            $rebillItem->setData('product_description', $item['product_name']);
             $rebillItem->save();
         }
         return $rebillItem;
     }
 
     /**
-     * @param string $name
-     * @param string $description
-     * @return string[]
+     * @param \Improntus\Rebill\Model\Item $rebillItem
+     * @param array $item
+     * @return Price
+     * @throws Exception
      */
-    protected function formatItemData(string $name, string $description)
+    private function getRebillPrice(
+        \Improntus\Rebill\Model\Item $rebillItem,
+        array                        $item,
+    ) {
+        $hash = $this->createHashFromArray($item);
+        $rebillPrice = $this->priceFactory->create();
+        $rebillPrice->load($hash, 'details_hash');
+        if (!$rebillPrice->getId()) {
+            $details = [
+                'amount'      => (string)$item['price'],
+                'type'        => 'fixed',
+                'repetitions' => 1,
+                'currency'    => $this->configHelper->getCurrency(),
+                'gatewayId'   => $item['gateway'],
+                'enabled'     => true,
+            ];
+            if ($item['frequency']['frequency'] > 0) {
+                $details['frequency'] = [
+                    'type'     => $item['frequency']['frequency_type'],
+                    'quantity' => (int)$item['frequency']['frequency'],
+                ];
+                $details['repetitions'] = $item['frequency']['recurring_payments'];
+            }
+            $priceId = $this->item->createPriceForItem(
+                $rebillItem->getData('rebill_item_id'),
+                $details
+            );
+            if ($priceId === null) {
+                throw new Exception(__('Unable to create prices on Rebill.'));
+            }
+            $rebillPrice->setData([
+                'item_id'         => $rebillItem->getId(),
+                'type'            => $item['type'],
+                'rebill_item_id'  => $rebillItem->getData('rebill_item_id'),
+                'rebill_price_id' => $priceId,
+                'details'         => json_encode($details),
+                'frequency_hash'  => $item['frequency_hash'],
+                'details_hash'    => $hash,
+            ]);
+            $rebillPrice->save();
+        }
+        return $rebillPrice;
+    }
+
+    /**
+     * @param Quote $quote
+     * @param Order $order
+     * @return array
+     */
+    private function prepareItems(Quote $quote, Order $order)
     {
-        return [
-            'name'        => $name,
-            'description' => $description,
+        $items = $order->getAllVisibleItems();
+        $gateway = $this->configHelper->getGatewayId();
+        $preparedItems = [];
+        $frequency = $this->defaultFrequency;
+        /** @var Item $item */
+        foreach ($items as $item) {
+            $_item = $item;
+            if ($item->getParentItemId()) {
+                $_item = $item->getParentItem();
+            }
+            $discount = $_item->getDiscountAmount();
+            $rowTotal = array_sum([
+                $_item->getRowTotal(),
+                $discount > 0 ? $discount * -1 : $discount,
+                $_item->getTaxAmount(),
+                $_item->getDiscountTaxCompensationAmount(),
+            ]);
+            $itemQty = $_item->getQtyOrdered();
+            $price = $rowTotal / $itemQty;
+            $frequencyOption = $quote->getItemById($item->getQuoteItemId())
+                ->getOptionByCode('rebill_subscription');
+            if ($frequencyOption) {
+                $frequencyOption = json_decode($frequencyOption->getValue(), true);
+                $frequency = [
+                    'frequency'          => $frequencyOption['frequency'] ?? 0,
+                    'frequency_type'     => $frequencyOption['frequencyType'] ?? 'months',
+                    'recurring_payments' => $frequencyOption['recurringPayments'] ?? 1,
+                ];
+            }
+            $frequencyHash = $this->createHashFromArray($frequency);
+            $this->frequencyHashes[$frequencyHash] = $frequency;
+            $preparedItems[$frequencyHash][] = [
+                'type'           => 'product',
+                'frequency_hash' => $frequencyHash,
+                'frequency'      => $frequency,
+                'sku'            => $item->getSku(),
+                'product_name'   => $item->getName(),
+                'price'          => $price,
+                'quantity'       => $itemQty,
+                'gateway'        => $gateway,
+            ];
+        }
+        return $preparedItems;
+    }
+
+    /**
+     * @param Order $order
+     * @param Quote $quote
+     * @param array $items
+     * @return void
+     */
+    private function prepareAdditionalItems(Order $order, Quote $quote, array &$items)
+    {
+        $defaultFrequencyHash = $this->createHashFromArray($this->defaultFrequency);
+        $gateway = $this->configHelper->getGatewayId();
+        $total = array_sum([
+            $order->getGrandTotal(),
+            $order->getShippingAmount() * -1,
+            $order->getShippingTaxAmount() * -1,
+            array_sum(array_map(function ($item) {
+                /** @var Item $item */
+                return $item->getRowTotal() * -1;
+            }, $order->getAllVisibleItems())),
+        ]);
+        $additionalItem = [
+            'type'           => 'additional',
+            'frequency_hash' => $defaultFrequencyHash,
+            'frequency'      => $this->defaultFrequency,
+            'sku'            => "order-{$order->getIncrementId()}-additional-costs",
+            'product_name'   => "Order #{$order->getIncrementId()} Additional Costs",
+            'price'          => $total,
+            'quantity'       => 1,
+            'gateway'        => $gateway,
         ];
+        if (isset($items[$defaultFrequencyHash]) && count($items) == 1) {
+            $additionalItem['price'] += $order->getShippingAmount() + $order->getShippingTaxAmount();
+        } else {
+            $shipmentPrice = ($order->getShippingAmount() + $order->getShippingTaxAmount()) / count($items);
+            $_items = $items;
+            foreach ($_items as $hash => $item) {
+                $frequency = $this->frequencyHashes[$hash];
+                $itemsSkus = array_map(function ($item) {
+                    return $item['sku'];
+                }, $item);
+                $itemsNames = array_map(function ($item) {
+                    return "({$item['product_name']})";
+                }, $item);
+                $sku = 'shipment-' . implode('-', $itemsSkus);
+                $orderId = $order->getIncrementId();
+                $name = "Order #{$orderId} Shipment " . implode(' ', $itemsNames);
+                $items[$hash][] = [
+                    'type'           => 'shipment',
+                    'frequency_hash' => $hash,
+                    'frequency'      => $frequency,
+                    'sku'            => $sku,
+                    'product_name'   => $name,
+                    'price'          => $shipmentPrice,
+                    'quantity'       => 1,
+                    'gateway'        => $gateway,
+                ];
+            }
+        }
+        $items[$defaultFrequencyHash][] = $additionalItem;
+    }
+
+    /**
+     * @param array $array
+     * @return string
+     */
+    private function createHashFromArray(array $array)
+    {
+        return hash('md5', implode('-', array_map(function ($item) {
+            return is_array($item) ? json_encode($item) : $item;
+        }, $array)));
     }
 }

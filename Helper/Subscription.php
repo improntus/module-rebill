@@ -135,9 +135,7 @@ class Subscription extends Data
         return [
             'enable_subscription'   => (bool)$product->getData('rebill_subscription_type'),
             'subscription_type'     => $product->getData('rebill_subscription_type'),
-            'free_trial_time_lapse' => $product->getData('rebill_free_trial_time_lapse'),
             'frequency'             => json_decode($product->getData('rebill_frequency') ?? '[]', true),
-            'gateway_id'            => $product->getData('rebill_gateway_id'),
         ];
     }
 

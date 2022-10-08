@@ -38,13 +38,17 @@ class Transaction extends Action
     public function execute()
     {
         try {
-            $this->transaction->prepareTransaction();
+            $result = $this->transaction->prepareTransaction();
         } catch (Exception $exception) {
             $this->messageManager->addErrorMessage($exception->getMessage());
             $this->_redirect('checkout/cart/index');
             return;
         }
         $this->_view->loadLayout();
+        /** @var \Improntus\Rebill\Block\Payment\Transaction $rebillBlock */
+        $rebillBlock = $this->_view->getLayout()->getBlock('rebill_payment_transaction');
+        $rebillBlock->setOrder($result['order']);
+        $rebillBlock->setPrices($result['rebill_details']);
         $this->_view->renderLayout();
     }
 }
