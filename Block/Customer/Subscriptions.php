@@ -9,9 +9,10 @@ namespace Improntus\Rebill\Block\Customer;
 
 use Exception;
 use Improntus\Rebill\Helper\Config;
-use Improntus\Rebill\Model\Rebill\Subscription;
 use Magento\Customer\Model\Session;
+use Improntus\Rebill\Model\Rebill\Card;
 use Magento\Framework\View\Element\Template;
+use Improntus\Rebill\Model\Rebill\Subscription;
 
 class Subscriptions extends Template
 {
@@ -31,6 +32,11 @@ class Subscriptions extends Template
     protected $configHelper;
 
     /**
+     * @var Card
+     */
+    protected $card;
+
+    /**
      * @param Template\Context $context
      * @param Session $session
      * @param Subscription $subscription
@@ -42,11 +48,13 @@ class Subscriptions extends Template
         Session          $session,
         Subscription     $subscription,
         Config           $configHelper,
+        Card             $card,
         array            $data = []
     ) {
         $this->configHelper = $configHelper;
         $this->subscription = $subscription;
         $this->session = $session;
+        $this->card = $card;
         parent::__construct($context, $data);
     }
 
@@ -78,7 +86,8 @@ class Subscriptions extends Template
      */
     public function getPaymentMethod($subscription)
     {
-        $card = $subscription['invoices'][0]['buyer']['card'];
+        $customerEmail = $this->session->getCustomer()->getEmail();
+        $card = $this->card->getCard($subscription["card"], $customerEmail);
         return "**** **** **** " . $card['last4'] . ' ' . $this->getCardDate($card);
     }
 
