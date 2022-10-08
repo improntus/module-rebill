@@ -101,10 +101,10 @@ class Success extends Action
      */
     public function execute()
     {
-        $invoice = $this->getRequest()->getParam('invoice');
-        if (isset($invoice['id'])) {
-            $rebillInvoice = $this->subscription->getInvoice($invoice['id']);
-            if (isset($rebillInvoice['id'])) {
+        $invoiceId = $this->getRequest()->getParam('invoice_id');
+        if ($invoiceId) {
+            $invoice = $this->subscription->getInvoice($invoiceId);
+            if (isset($invoice['id'])) {
                 $orderId = $this->getRequest()->getParam('order_id');
                 /** @var Order $order */
                 $order = $this->orderRepository->get($orderId);

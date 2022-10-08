@@ -1,123 +1,42 @@
 <?php
 /**
- * @author Improntus Dev Team
- * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
- * @package Improntus_Rebill
- */
-
-/**
  * @var $block Transaction
- * @var $escaper Escaper
  */
 
-use Magento\Framework\Escaper;
 use Improntus\Rebill\Block\Payment\Transaction;
-use Improntus\Rebill\Helper\Config;
 
-$e = $escaper;
-$order = $block->getOrder();
-$prices = $block->getPrices();
-/** @var Config $configHelper */
-$configHelper = $this->helper(Config::class);
-$documentTypes = $block->getDocumentTypes();
+$rebillTransaction = $block->getRebillTransaction();
 ?>
-<h2 class="rebill.payment.transaction.title"><?= $e->escapeHtml(__('Pay with rebill')) ?></h2>
-<?php if ($documentTypes) : ?>
-    <div class="rebill-identification-field">
-        <div class="type">
-            <label for="identification-type"><?= /** @noEscape  */__('Document Type') ?></label>
-            <select name="identification_type" id="identification-type">
-                <?php foreach ($documentTypes as $documentType) : ?>
-                    <option value="<?= $e->escapeHtmlAttr($documentType['value']) ?>"><?= $e->escapeHtml($documentType['value']) ?></option>
-                <?php endforeach; ?>
-            </select>
+<div id="rebill-transaction-wrapper">
+    <div class="rebill-transaction-container" data-bind="scope: 'rebill'">
+        <h2 class="rebill.payment.transaction.title"><!-- ko i18n: 'Pay with rebill' --><!-- /ko --></h2>
+        <!-- ko if: needCardHolderIdentification() -->
+        <div class="rebill-identification-field">
+            <div class="type">
+                <label for="identification-type"><!-- ko i18n: 'Document Type' --><!-- /ko --></label>
+                <select name="identification_type" id="identification-type"
+                        data-bind="options: documentTypes, event: {change: function (data, event) {selectDocumentType(event)}}"></select>
+            </div>
+            <div class="value">
+                <label for="identification-value"><!-- ko i18n: 'Document Number' --><!-- /ko --></label>
+                <input type="text" id="identification-value" name="identification_value"
+                       data-bind="event: {keyup: function (data, event) {changeDocumentNumber(event)}}">
+            </div>
         </div>
-        <div class="value">
-            <label for="identification-value"><?= /** @noEscape  */__('Document Number') ?></label>
-            <input type="text" id="identification-value" name="identification_value">
-        </div>
+        <!-- /ko -->
+        <div id="rebill_elements"></div>
+        <div class="rebill-errors"></div>
     </div>
-<?php endif ?>
-<div id="rebill_elements"></div>
-<div class="rebill-errors"></div>
-
-<script>
-    require(['jquery', 'rebill'], function ($) {
-        let initialization = {
-            organization_id: '<?= $e->escapeJs($configHelper->getApiUuid()) ?>',
-            api_url: 'https://api.rebill.to/v2',
-        }
-        let checkout = new Rebill.PhantomSDK(initialization);
-
-        checkout.setCustomer({
-            firstName: "<?= $e->escapeJs($order->getCustomerFirstname()) ?>",
-            lastName: "<?= $e->escapeJs($order->getCustomerLastname()) ?>",
-            email: '<?= $e->escapeJs($order->getCustomerEmail()) ?>',
-            phone: {
-                countryCode: "00",
-                areaCode: "00",
-                phoneNumber: "<?= $e->escapeJs($order->getBillingAddress()->getTelephone()) ?>"
-            },
-            address: {
-                street: "<?= $e->escapeJs($order->getBillingAddress()->getStreet()[0]) ?>",
-                number: "<?= $e->escapeJs($order->getBillingAddress()->getStreet()[1] ?? 'none') ?>",
-                floor: "<?= $e->escapeJs($order->getBillingAddress()->getStreet()[2] ?? 'none') ?>",
-                apt: "<?= $e->escapeJs($order->getBillingAddress()->getStreet()[3] ?? 'none') ?>",
-                city: "<?= $e->escapeJs($order->getBillingAddress()->getCity()) ?>",
-                state: "<?= $e->escapeJs($order->getBillingAddress()->getRegion()) ?>",
-                zipCode: "<?= $e->escapeJs($order->getBillingAddress()->getPostcode()) ?? '' ?>",
-                country: "<?= $e->escapeJs($order->getBillingAddress()->getCountryId()) ?>",
-                description: "Billing Address"
-            }
-        });
-        let cardHolder = {
-            name: '<?= $e->escapeJs($order->getBillingAddress()->getFirstname() . ' ' . $order->getBillingAddress()->getLastname()) ?>',
-            identification: {
-                type: $('#identification-type').val()
-            }
-        }
-        checkout.setCardHolder(cardHolder);
-        checkout.setTransaction({prices: <?= /** @noEscape */json_encode($prices) ?>});
-        let errorsMessage = $('.rebill-errors');
-        checkout.setCallbacks({
-            onSuccess: function (response) {
-                errorsMessage.html('');
-                if (response.invoice) {
-                    window.location.href = '<?= $e->escapeUrl($block->getUrl('rebill/payment/success', ['order_id' => $order->getId()])) ?>';
-                } else {
-                    errorsMessage.append($('<div class="error-message"></div>')
-                        .text("<?= $e->escapeJs(__('The payment can\'t be processed, try again with another card.')) ?>"));
+</div>
+<script type="text/x-magento-init">
+    {
+        "#rebill-transaction-wrapper": {
+            "Magento_Ui/js/core/app": {
+                "components": {
+                    "rebill": <?= json_encode($rebillTransaction) ?>
                 }
-            },
-            onError: function (error) {
-                errorsMessage.html('')
-                    .append($('<div class="error-message"></div>')
-                        .text("<?= /** @noEscape */ __('The payment can\'t be processed, try again with another card.') ?>"));
-            },
-        });
-        checkout.setText({
-            card_number: '<?= /** @noEscape */ __('Card Number') ?>',
-            pay_button: '<?= /** @noEscape */ __('Pay') ?>',
-            error_messages: {
-                emptyCardNumber: '<?= /** @noEscape */ __('Enter a card number') ?>',
-                invalidCardNumber: '<?= /** @noEscape */ __('Card number is invalid') ?>',
-                emptyExpiryDate: '<?= /** @noEscape */ __('Enter an expiry date') ?>',
-                monthOutOfRange: '<?= /** @noEscape */ __('Expiry month must be between 01 and 12') ?>',
-                yearOutOfRange: '<?= /** @noEscape */ __('Expiry year cannot be in the past') ?>',
-                dateOutOfRange: '<?= /** @noEscape */ __('Expiry date cannot be in the past') ?>',
-                invalidExpiryDate: '<?= /** @noEscape */ __('Expiry date is invalid') ?>',
-                emptyCVC: '<?= /** @noEscape */ __('Enter a CVC') ?>',
-                invalidCVC: '<?= /** @noEscape */ __('CVC is invalid') ?>',
-            },
-        });
-        checkout.setElements('rebill_elements');
-        $('#identification-type').change(function () {
-            cardHolder.identification.type = $(this).val();
-            checkout.setCardHolder(cardHolder);
-        });
-        $('#identification-value').keyup(function () {
-            cardHolder.identification.value = $(this).val();
-            checkout.setCardHolder(cardHolder);
-        });
-    });
+            }
+        }
+    }
+
 </script>

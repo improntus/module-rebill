@@ -150,6 +150,7 @@ class Transaction
                     'price'          => $order->getGrandTotal(),
                     'quantity'       => 1,
                     'gateway'        => $gateway,
+                    'currency'       => $this->configHelper->getCurrency(),
                 ];
             } else {
                 foreach ($_items as $item) {
@@ -215,7 +216,7 @@ class Transaction
                 'amount'      => (string)$item['price'],
                 'type'        => 'fixed',
                 'repetitions' => 1,
-                'currency'    => $this->configHelper->getCurrency(),
+                'currency'    => $item['currency'],
                 'gatewayId'   => $item['gateway'],
                 'enabled'     => true,
             ];
@@ -294,6 +295,7 @@ class Transaction
                 'price'          => $price,
                 'quantity'       => $itemQty,
                 'gateway'        => $gateway,
+                'currency'       => $this->configHelper->getCurrency(),
             ];
         }
         return $preparedItems;
@@ -327,6 +329,7 @@ class Transaction
             'price'          => $total,
             'quantity'       => 1,
             'gateway'        => $gateway,
+            'currency'       => $this->configHelper->getCurrency(),
         ];
         if (isset($items[$defaultFrequencyHash]) && count($items) == 1) {
             $additionalItem['price'] += $order->getShippingAmount() + $order->getShippingTaxAmount();
@@ -353,6 +356,7 @@ class Transaction
                     'price'          => $shipmentPrice,
                     'quantity'       => 1,
                     'gateway'        => $gateway,
+                    'currency'       => $this->configHelper->getCurrency(),
                 ];
             }
         }

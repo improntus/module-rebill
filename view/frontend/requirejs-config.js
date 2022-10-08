@@ -12,8 +12,9 @@ var config = {
         }
     },
     map: {
-        '*':{
-            rebill: 'https://sdk.rebill.to/v2/rebill.min.js',
+        '*': {
+            rebill_sdk: 'https://sdk.rebill.to/v2/rebill.min.js',
+            rebill: 'Improntus_Rebill/js/rebill'
         }
     }
 };
