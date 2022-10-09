@@ -53,3 +53,4 @@ UUID,UUID
 "Don't keep applying to subscriptions if the coupon/rule is expired or disabled","No seguir aplicando a las suscripciones si la regla/cupón expiró o esta deshabilitada"
 "Quantity of payments in a subscription that the coupon/rule will be applied to","Cantidad de pagos a los que una regla/cupón aplicará a una suscripción"
 "Rebill Payment","Pagar con Rebill"
+"If it is 0 the subscription will be cyclical", "Si es 0 la suscripción será cíclica"

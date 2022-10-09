@@ -150,5 +150,75 @@
             max-width: 100px;
             text-align: center;
         }
+
+        [tooltip] {
+            position: relative;
+        }
+
+        [tooltip]::before,
+        [tooltip]::after {
+            text-transform: none;
+            font-size: .9em;
+            line-height: 1;
+            user-select: none;
+            pointer-events: none;
+            position: absolute;
+            display: none;
+            opacity: 0;
+        }
+        [tooltip]::before {
+            content: '';
+            border: 5px solid transparent;
+            z-index: 1001;
+        }
+        [tooltip]::after {
+            content: attr(tooltip);
+            font-size: 15px;
+            font-weight: 600;
+            text-align: center;
+            min-width: 3em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            z-index: 1000;
+            border: 1px solid #aaa;
+            padding: 25px;
+            background: #fff;
+        }
+
+        [tooltip]:hover::before,
+        [tooltip]:hover::after {
+            display: block;
+        }
+
+        [tooltip='']::before,
+        [tooltip='']::after {
+            display: none !important;
+        }
+
+        [tooltip][flow^="right"]::before {
+            top: 50%;
+            border-left-width: 0;
+            border-right-color: #333;
+            right: calc(0em - 5px);
+            transform: translate(.5em, -50%);
+        }
+        [tooltip][flow^="right"]::after {
+            top: 50%;
+            left: calc(100% + 5px);
+            transform: translate(.5em, -50%);
+        }
+
+        @keyframes tooltips-horz {
+            to {
+                opacity: .9;
+                transform: translate(0, -50%);
+            }
+        }
+
+        [tooltip][flow^="right"]:hover::before,
+        [tooltip][flow^="right"]:hover::after {
+            animation: tooltips-horz 300ms ease-out forwards;
+        }
     }
 }

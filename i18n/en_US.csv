@@ -55,3 +55,4 @@ UUID,UUID
 "Don't keep applying to subscriptions if the coupon/rule is expired or disabled","Don't keep applying to subscriptions if the coupon/rule is expired or disabled"
 "Quantity of payments in a subscription that the coupon/rule will be applied to","Quantity of payments in a subscription that the coupon/rule will be applied to"
 "Rebill Payment","Rebill Payment"
+"If it is 0 the subscription will be cyclical","If it is 0 the subscription will be cyclical"
