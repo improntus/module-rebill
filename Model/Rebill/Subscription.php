@@ -13,10 +13,10 @@ use Improntus\Rebill\Model\Rebill;
 class Subscription extends Rebill
 {
     /**
-     * @param $email
-     * @return mixed|null
+     * @param string $email
+     * @return array|mixed|null
      */
-    public function getSubscriptionFromClientEmail($email)
+    public function getSubscriptionFromClientEmail(string $email)
     {
         try {
             return $this->request('subscription', 'GET', [$email]);
@@ -27,9 +27,10 @@ class Subscription extends Rebill
     }
 
     /**
+     * @param string $customerEmail
      * @return array|mixed|null
      */
-    public function getSubscriptionFromClient($customerEmail)
+    public function getSubscriptionFromClient(string $customerEmail)
     {
         try {
             return $this->request('client_subscription_list', 'GET', [], ['customerEmail' => $customerEmail]);
@@ -40,12 +41,12 @@ class Subscription extends Rebill
     }
 
     /**
-     * @param $id
-     * @param $customerEmail
+     * @param string $id
+     * @param string $customerEmail
      * @return mixed|null
      * @throws Exception
      */
-    public function cancelSubscription($id, $customerEmail)
+    public function cancelSubscription(string $id, string $customerEmail)
     {
         try {
             return $this->request('client_subscription', 'DELETE', [$id], ['customerEmail' => $customerEmail]);
@@ -56,12 +57,12 @@ class Subscription extends Rebill
     }
 
     /**
-     * @param $id
-     * @param $customerEmail
+     * @param string $id
+     * @param string $customerEmail
      * @return mixed|null
      * @throws Exception
      */
-    public function getSubscription($id, $customerEmail)
+    public function getSubscription(string $id, string $customerEmail)
     {
         try {
             return $this->request('client_subscription', 'GET', [$id], ['customerEmail' => $customerEmail]);
@@ -72,11 +73,11 @@ class Subscription extends Rebill
     }
 
     /**
-     * @param $customerEmail
+     * @param string $customerEmail
      * @return mixed|null
      * @throws Exception
      */
-    public function getCustomerToken($customerEmail)
+    public function getCustomerToken(string $customerEmail)
     {
         try {
             return $this->request('customer_auth', 'POST', [], ['customerEmail' => $customerEmail]);
@@ -87,11 +88,11 @@ class Subscription extends Rebill
     }
 
     /**
-     * @param $type
+     * @param string $type
      * @return mixed|null
      * @throws Exception
      */
-    public function getList($type)
+    public function getList(string $type)
     {
         try {
             return $this->request('subscription_list', 'GET', [$type]);
@@ -102,12 +103,12 @@ class Subscription extends Rebill
     }
 
     /**
-     * @param $subscriptionId
-     * @param $priceId
+     * @param string $subscriptionId
+     * @param string $priceId
      * @return mixed|null
      * @throws Exception
      */
-    public function changePrice($subscriptionId, $priceId)
+    public function changePrice(string $subscriptionId, string $priceId)
     {
         try {
             return $this->request('subscription_change_price', 'POST', [$subscriptionId], ['price_id' => $priceId]);
@@ -118,11 +119,11 @@ class Subscription extends Rebill
     }
 
     /**
-     * @param $id
+     * @param string $id
      * @return mixed|null
      * @throws Exception
      */
-    public function getInvoice($id)
+    public function getInvoice(string $id)
     {
         try {
             return $this->request('invoice', 'GET', [$id]);

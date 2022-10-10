@@ -11,15 +11,16 @@
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="varchar" name="product_sku" length="255" nullable="false" comment="Product SKU"/>
         <column xsi:type="varchar" name="rebill_item_id" length="255" nullable="false" comment="Rebill Item ID"/>
+        <column xsi:type="varchar" name="hash" length="255" nullable="false" comment="Hash"/>
         <column xsi:type="text" name="product_description" comment="Product Description"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
-        <constraint xsi:type="unique" referenceId="REBILL_ITEM_PRODUCT_SKU">
-            <column name="product_sku"/>
-        </constraint>
         <constraint xsi:type="unique" referenceId="REBILL_ITEM_REBILL_ITEM_ID">
             <column name="rebill_item_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="REBILL_ITEM_HASH">
+            <column name="hash"/>
         </constraint>
     </table>
     <table name="rebill_item_price" resource="default" engine="innodb" comment="Rebill Item Price">
@@ -31,6 +32,7 @@
         <column xsi:type="varchar" name="details_hash" length="255" nullable="false" comment="Details Hash"/>
         <column xsi:type="varchar" name="frequency_hash" length="255" nullable="false" comment="Frequency Hash"/>
         <column xsi:type="text" name="details" nullable="false" comment="Details"/>
+        <column xsi:type="text" name="rebill_details" nullable="false" comment="Rebill Details"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
@@ -90,6 +92,15 @@
         </constraint>
         <constraint xsi:type="unique" referenceId="REBILL_SUBSCRIPTION_SHIPMENT">
             <column name="rebill_id"/>
+        </constraint>
+    </table>
+    <table name="rebill_queue" resource="default" engine="innodb" comment="Rebill Queue">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="type" length="255" nullable="false" comment="Type"/>
+        <column xsi:type="varchar" name="status" length="255" nullable="false" comment="Status"/>
+        <column xsi:type="text" name="parameters" nullable="true" comment="Parameters"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
         </constraint>
     </table>
     <table name="salesrule">

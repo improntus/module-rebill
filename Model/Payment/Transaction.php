@@ -8,12 +8,10 @@
 namespace Improntus\Rebill\Model\Payment;
 
 use Exception;
+use Improntus\Rebill\Api\Price\DataInterface;
 use Improntus\Rebill\Helper\Config;
-use Improntus\Rebill\Model\ItemFactory;
+use Improntus\Rebill\Model\Entity\Price\Repository;
 use Improntus\Rebill\Model\Payment\Rebill as RebillPayment;
-use Improntus\Rebill\Model\Price;
-use Improntus\Rebill\Model\PriceFactory;
-use Improntus\Rebill\Model\Rebill;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Registry;
@@ -35,21 +33,6 @@ class Transaction
     protected $session;
 
     /**
-     * @var Rebill\Item
-     */
-    protected $item;
-
-    /**
-     * @var ItemFactory
-     */
-    protected $itemFactory;
-
-    /**
-     * @var PriceFactory
-     */
-    protected $priceFactory;
-
-    /**
      * @var Registry
      */
     protected $registry;
@@ -58,6 +41,11 @@ class Transaction
      * @var QuoteRepository
      */
     protected $quoteRepository;
+
+    /**
+     * @var Repository
+     */
+    protected $priceRepository;
 
     /**
      * @var array
@@ -76,28 +64,22 @@ class Transaction
     /**
      * @param Config $configHelper
      * @param Session $session
-     * @param Rebill\Item $item
-     * @param ItemFactory $itemFactory
-     * @param PriceFactory $priceFactory
+     * @param Repository $priceRepository
      * @param Registry $registry
      * @param QuoteRepository $quoteRepository
      */
     public function __construct(
         Config          $configHelper,
         Session         $session,
-        Rebill\Item     $item,
-        ItemFactory     $itemFactory,
-        PriceFactory    $priceFactory,
+        Repository      $priceRepository,
         Registry        $registry,
         QuoteRepository $quoteRepository
     ) {
+        $this->priceRepository = $priceRepository;
         $this->quoteRepository = $quoteRepository;
         $this->registry = $registry;
         $this->configHelper = $configHelper;
         $this->session = $session;
-        $this->item = $item;
-        $this->itemFactory = $itemFactory;
-        $this->priceFactory = $priceFactory;
     }
 
     /**
@@ -163,10 +145,9 @@ class Transaction
             if (in_array($item['type'], ['shipment', 'additional']) && $item['price'] <= 0) {
                 continue;
             }
-            $rebillItem = $this->getRebillItem($item);
-            $rebillPrice = $this->getRebillPrice($rebillItem, $item);
+            $rebillPrice = $this->getRebillPrice($item);
             $result[] = [
-                'id'       => $rebillPrice->getData('rebill_price_id'),
+                'id'       => $rebillPrice->getRebillPriceId(),
                 'quantity' => (int)$item['quantity'],
             ];
         }
@@ -175,42 +156,13 @@ class Transaction
 
     /**
      * @param array $item
-     * @return \Improntus\Rebill\Model\Item
+     * @return DataInterface
      * @throws Exception
      */
-    private function getRebillItem(array $item)
+    private function getRebillPrice(array $item)
     {
-        $rebillItem = $this->itemFactory->create();
-        $rebillItem->load($item['sku'], 'product_sku');
-        if (!$rebillItem->getId()) {
-            $rebillItem->setData('product_sku', $item['sku']);
-            $itemId = $this->item->createItem([
-                'name'        => $item['product_name'],
-                'description' => $item['product_name'],
-            ]);
-            if ($itemId === null) {
-                throw new Exception(__('Unable to create items on Rebill.'));
-            }
-            $rebillItem->setData('rebill_item_id', $itemId);
-            $rebillItem->setData('product_description', $item['product_name']);
-            $rebillItem->save();
-        }
-        return $rebillItem;
-    }
-
-    /**
-     * @param \Improntus\Rebill\Model\Item $rebillItem
-     * @param array $item
-     * @return Price
-     * @throws Exception
-     */
-    private function getRebillPrice(
-        \Improntus\Rebill\Model\Item $rebillItem,
-        array                        $item,
-    ) {
         $hash = $this->createHashFromArray($item);
-        $rebillPrice = $this->priceFactory->create();
-        $rebillPrice->load($hash, 'details_hash');
+        $rebillPrice = $this->priceRepository->getByHash($hash);
         if (!$rebillPrice->getId()) {
             $details = [
                 'amount'      => (string)$item['price'],
@@ -227,23 +179,15 @@ class Transaction
                 ];
                 $details['repetitions'] = $item['frequency']['recurring_payments'];
             }
-            $priceId = $this->item->createPriceForItem(
-                $rebillItem->getData('rebill_item_id'),
-                $details
-            );
-            if ($priceId === null) {
-                throw new Exception(__('Unable to create prices on Rebill.'));
-            }
-            $rebillPrice->setData([
-                'item_id'         => $rebillItem->getId(),
-                'type'            => $item['type'],
-                'rebill_item_id'  => $rebillItem->getData('rebill_item_id'),
-                'rebill_price_id' => $priceId,
-                'details'         => json_encode($details),
-                'frequency_hash'  => $item['frequency_hash'],
-                'details_hash'    => $hash,
-            ]);
-            $rebillPrice->save();
+            $rebillPrice->setType($item['type']);
+            $rebillPrice->setDetails($item);
+            $rebillPrice->setRebillDetails($details);
+            $rebillPrice->setDetailsHash($hash);
+            $rebillPrice->setFrequencyHash($item['frequency_hash']);
+            $this->priceRepository->save($rebillPrice);
+        }
+        if ($rebillPrice->getRebillPriceId() === null) {
+            throw new Exception(__('Unable to create prices on Rebill.'));
         }
         return $rebillPrice;
     }

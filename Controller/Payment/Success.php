@@ -7,22 +7,24 @@
 
 namespace Improntus\Rebill\Controller\Payment;
 
-use Magento\Sales\Model\Order;
+use Exception;
 use Improntus\Rebill\Helper\Config;
-use Magento\Sales\Model\OrderRepository;
-use Improntus\Rebill\Model\Sales\Invoice;
-use Magento\Framework\App\ResponseInterface;
 use Improntus\Rebill\Model\Rebill\Subscription;
+use Improntus\Rebill\Model\Sales\Invoice;
 use Improntus\Rebill\Model\SubscriptionFactory;
+use Improntus\Rebill\Model\Webhook;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
-use Magento\Framework\Exception\InputException;
+use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Exception\AlreadyExistsException;
+use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
-use Magento\Framework\Exception\AlreadyExistsException;
+use Magento\Sales\Model\OrderRepository;
 
 class Success extends Action
 {
@@ -62,6 +64,11 @@ class Success extends Action
     protected $orderSender;
 
     /**
+     * @var Webhook
+     */
+    protected $webhook;
+
+    /**
      * @param Context $context
      * @param Session $session
      * @param Subscription $subscription
@@ -70,6 +77,7 @@ class Success extends Action
      * @param Invoice $invoice
      * @param Config $configHelper
      * @param OrderSender $orderSender
+     * @param Webhook $webhook
      */
     public function __construct(
         Context             $context,
@@ -79,8 +87,10 @@ class Success extends Action
         OrderRepository     $orderRepository,
         Invoice             $invoice,
         Config              $configHelper,
-        OrderSender         $orderSender
+        OrderSender         $orderSender,
+        Webhook             $webhook
     ) {
+        $this->webhook = $webhook;
         $this->configHelper = $configHelper;
         $this->invoice = $invoice;
         $this->orderRepository = $orderRepository;
@@ -94,49 +104,13 @@ class Success extends Action
 
     /**
      * @return void
-     * @throws AlreadyExistsException
-     * @throws InputException
-     * @throws LocalizedException
-     * @throws NoSuchEntityException
      */
     public function execute()
     {
-        $invoiceId = $this->getRequest()->getParam('invoice_id');
-        if ($invoiceId) {
-            $invoice = $this->subscription->getInvoice($invoiceId);
-            if (isset($invoice['id'])) {
-                $orderId = $this->getRequest()->getParam('order_id');
-                /** @var Order $order */
-                $order = $this->orderRepository->get($orderId);
-                $this->invoice->execute($order);
-                $order->setStatus($this->configHelper->getApprovedStatus());
-                $this->orderSender->send($order);
-                $order->setIsCustomerNotified(true);
-                $this->orderRepository->save($order);
-                $_subscriptions = [];
-                foreach ($invoice['paidBags'] as $paidBag) {
-                    foreach ($paidBag['schedules'] as $schedule) {
-                        $subscription = $this->subscription->getSubscription($schedule, $invoice['buyer']['customer']['userEmail']);
-                        if (!isset($subscription['id'])
-                            || ($subscription['remainingIterations'] <= 0 && strtotime($subscription['nextChargeDate']) < time())) {
-                            continue;
-                        }
-                        $_subscriptions[] = [
-                            'subscription_id' => $subscription['id'],
-                            'price_id'        => $subscription['price']['id'],
-                            'quantity'        => $subscription['quantity'],
-                            'order_id'        => $orderId,
-                            'status'          => 'updated',
-                        ];
-                    }
-                }
-                foreach ($_subscriptions as $subscription) {
-                    /** @var \Improntus\Rebill\Model\Subscription $sub */
-                    $sub = $this->subscriptionFactory->create();
-                    $sub->setData($subscription);
-                    $sub->save();
-                }
-            }
+        try {
+            $this->webhook->queueOrExecute('confirmation', $this->getRequest()->getParams());
+        } catch (Exception $exception) {
+            $this->messageManager->addErrorMessage($exception->getMessage());
         }
         $this->_redirect('checkout/onepage/success');
     }

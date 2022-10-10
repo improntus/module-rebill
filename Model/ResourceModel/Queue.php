@@ -9,13 +9,13 @@ namespace Improntus\Rebill\Model\ResourceModel;
 
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
-class Item extends AbstractDb
+class Queue extends AbstractDb
 {
     /**
      * @return void
      */
     protected function _construct()
     {
-        $this->_init('rebill_item', 'entity_id');
+        $this->_init('rebill_queue', 'entity_id');
     }
 }

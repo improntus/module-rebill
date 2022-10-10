@@ -54,7 +54,7 @@
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="rebill_order_update" xsi:type="object">Improntus\Rebill\Console\OrderUpdate</item>
+                <item name="rebill_webhook_queue" xsi:type="object">Improntus\Rebill\Console\WebhookQueue</item>
             </argument>
         </arguments>
     </type>
@@ -74,4 +74,25 @@
     <type name="Magento\Catalog\Model\Product">
         <plugin name="Improntus_Rebill::afterIsSalable" type="Improntus\Rebill\Plugin\Catalog\Product" sortOrder="10"/>
     </type>
+
+    <preference for="Improntus\Rebill\Api\Item\DataInterface" type="Improntus\Rebill\Model\Entity\Item\Model" />
+    <preference for="Improntus\Rebill\Api\Price\DataInterface" type="Improntus\Rebill\Model\Entity\Price\Model" />
+    <preference for="Improntus\Rebill\Api\Payment\DataInterface" type="Improntus\Rebill\Model\Entity\Payment\Model" />
+    <preference for="Improntus\Rebill\Api\Queue\DataInterface" type="Improntus\Rebill\Model\Entity\Queue\Model" />
+    <preference for="Improntus\Rebill\Api\Subscription\DataInterface" type="Improntus\Rebill\Model\Entity\Subscription\Model" />
+    <preference for="Improntus\Rebill\Api\SubscriptionShipment\DataInterface" type="Improntus\Rebill\Model\Entity\SubscriptionShipment\Model" />
+
+    <preference for="Improntus\Rebill\Api\Item\RepositoryInterface" type="Improntus\Rebill\Model\Entity\Item\Repository" />
+    <preference for="Improntus\Rebill\Api\Price\RepositoryInterface" type="Improntus\Rebill\Model\Entity\Price\Repository" />
+    <preference for="Improntus\Rebill\Api\Payment\RepositoryInterface" type="Improntus\Rebill\Model\Entity\Payment\Repository" />
+    <preference for="Improntus\Rebill\Api\Queue\RepositoryInterface" type="Improntus\Rebill\Model\Entity\Queue\Repository" />
+    <preference for="Improntus\Rebill\Api\Subscription\RepositoryInterface" type="Improntus\Rebill\Model\Entity\Subscription\Repository" />
+    <preference for="Improntus\Rebill\Api\SubscriptionShipment\RepositoryInterface" type="Improntus\Rebill\Model\Entity\SubscriptionShipment\Repository" />
+
+    <preference for="Improntus\Rebill\Api\Item\SearchResultInterface" type="Improntus\Rebill\Model\Entity\Item\SearchResults" />
+    <preference for="Improntus\Rebill\Api\Price\SearchResultInterface" type="Improntus\Rebill\Model\Entity\Price\SearchResults" />
+    <preference for="Improntus\Rebill\Api\Payment\SearchResultInterface" type="Improntus\Rebill\Model\Entity\Payment\SearchResults" />
+    <preference for="Improntus\Rebill\Api\Queue\SearchResultInterface" type="Improntus\Rebill\Model\Entity\Queue\SearchResults" />
+    <preference for="Improntus\Rebill\Api\Subscription\SearchResultInterface" type="Improntus\Rebill\Model\Entity\Subscription\SearchResults" />
+    <preference for="Improntus\Rebill\Api\SubscriptionShipment\SearchResultInterface" type="Improntus\Rebill\Model\Entity\SubscriptionShipment\SearchResults" />
 </config>

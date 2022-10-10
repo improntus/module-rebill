@@ -7,17 +7,19 @@
 
 namespace Improntus\Rebill\Model\ResourceModel\Price;
 
+use Improntus\Rebill\Model\Entity\Price\Model;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
-use Improntus\Rebill\Model\Price as Model;
 use Improntus\Rebill\Model\ResourceModel\Price as ResourceModel;
 
 class Collection extends AbstractCollection
 {
     /**
-     * @return void
+     * @var string
      */
-    protected function _construct()
-    {
-        $this->_init(Model::class, ResourceModel::class);
-    }
+    protected $_model = Model::class;
+
+    /**
+     * @var string
+     */
+    protected $_resourceModel = ResourceModel::class;
 }

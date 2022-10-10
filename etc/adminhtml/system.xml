@@ -40,6 +40,11 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <comment>This option will allow the customer to pay subscription and not subscription products in the same order</comment>
                     </field>
+                    <field id="enqueue_webhooks" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enqueue Webhooks</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>If enabled, webhooks will be processed by a queue message system. Turning off this option may cause performance issues.</comment>
+                    </field>
                     <field id="subscription_product_text" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Text for subscription products</label>
                         <comment>This text will be shown in product page to let customer know that the product is subscription type.</comment>

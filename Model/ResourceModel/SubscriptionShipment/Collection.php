@@ -5,11 +5,11 @@
  * @package Improntus_Rebill
  */
 
-namespace Improntus\Rebill\Model\ResourceModel\Subscription;
+namespace Improntus\Rebill\Model\ResourceModel\SubscriptionShipment;
 
-use Improntus\Rebill\Model\Entity\Subscription\Model;
+use Improntus\Rebill\Model\Entity\SubscriptionShipment\Model;
+use Improntus\Rebill\Model\ResourceModel\SubscriptionShipment as ResourceModel;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
-use Improntus\Rebill\Model\ResourceModel\Subscription as ResourceModel;
 
 class Collection extends AbstractCollection
 {

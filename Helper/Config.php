@@ -76,6 +76,14 @@ class Config extends Subscription
     }
 
     /**
+     * @return bool
+     */
+    public function isEnqueueWebhooksEnabled()
+    {
+        return (bool)$this->getPaymentConfig('general/enqueue_webhooks');
+    }
+
+    /**
      * @return string
      */
     public function getSubscriptionProductText()

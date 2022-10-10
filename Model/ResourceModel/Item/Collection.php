@@ -7,17 +7,19 @@
 
 namespace Improntus\Rebill\Model\ResourceModel\Item;
 
+use Improntus\Rebill\Model\Entity\Item\Model;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
-use Improntus\Rebill\Model\Item as Model;
 use Improntus\Rebill\Model\ResourceModel\Item as ResourceModel;
 
 class Collection extends AbstractCollection
 {
     /**
-     * @return void
+     * @var string
      */
-    protected function _construct()
-    {
-        $this->_init(Model::class, ResourceModel::class);
-    }
+    protected $_model = Model::class;
+
+    /**
+     * @var string
+     */
+    protected $_resourceModel = ResourceModel::class;
 }
