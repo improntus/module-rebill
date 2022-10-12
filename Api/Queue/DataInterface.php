@@ -21,9 +21,9 @@ interface DataInterface
     public function setId($id);
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getType(): string;
+    public function getType(): ?string;
 
     /**
      * @param string $type
@@ -32,9 +32,9 @@ interface DataInterface
     public function setType(string $type): DataInterface;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getStatus(): string;
+    public function getStatus(): ?string;
 
     /**
      * @param string $status
@@ -43,9 +43,9 @@ interface DataInterface
     public function setStatus(string $status): DataInterface;
 
     /**
-     * @return array
+     * @return array|null
      */
-    public function getParameters(): array;
+    public function getParameters(): ?array;
 
     /**
      * @param array $parameters

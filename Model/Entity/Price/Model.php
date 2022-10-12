@@ -19,9 +19,14 @@ class Model extends AbstractModel implements DataInterface
     protected $_resourceName = Price::class;
 
     /**
-     * @return int
+     * @var string
      */
-    public function getItemId(): int
+    protected $_idFieldName = 'entity_id';
+
+    /**
+     * @return int|null
+     */
+    public function getItemId(): ?int
     {
         return $this->getData('item_id');
     }
@@ -37,9 +42,9 @@ class Model extends AbstractModel implements DataInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getType(): string
+    public function getType(): ?string
     {
         return $this->getData('type');
     }
@@ -55,9 +60,9 @@ class Model extends AbstractModel implements DataInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getRebillItemId(): string
+    public function getRebillItemId(): ?string
     {
         return $this->getData('rebill_item_id');
     }
@@ -73,9 +78,9 @@ class Model extends AbstractModel implements DataInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getRebillPriceId(): string
+    public function getRebillPriceId(): ?string
     {
         return $this->getData('rebill_price_id');
     }
@@ -91,9 +96,9 @@ class Model extends AbstractModel implements DataInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDetailsHash(): string
+    public function getDetailsHash(): ?string
     {
         return $this->getData('details_hash');
     }
@@ -109,9 +114,9 @@ class Model extends AbstractModel implements DataInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getFrequencyHash(): string
+    public function getFrequencyHash(): ?string
     {
         return $this->getData('frequency_hash');
     }
@@ -127,9 +132,9 @@ class Model extends AbstractModel implements DataInterface
     }
 
     /**
-     * @return array
+     * @return array|null
      */
-    public function getDetails(): array
+    public function getDetails(): ?array
     {
         return json_decode($this->getData('details'), true);
     }
@@ -145,9 +150,9 @@ class Model extends AbstractModel implements DataInterface
     }
 
     /**
-     * @return array
+     * @return array|null
      */
-    public function getRebillDetails(): array
+    public function getRebillDetails(): ?array
     {
         return json_decode($this->getData('rebill_details'), true);
     }

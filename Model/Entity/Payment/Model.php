@@ -19,9 +19,14 @@ class Model extends AbstractModel implements DataInterface
     protected $_resourceName = Payment::class;
 
     /**
-     * @return int
+     * @var string
      */
-    public function getSubscriptionId(): int
+    protected $_idFieldName = 'entity_id';
+
+    /**
+     * @return int|null
+     */
+    public function getSubscriptionId(): ?int
     {
         return $this->getData('subscription_id');
     }
@@ -37,9 +42,9 @@ class Model extends AbstractModel implements DataInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getRebillId(): string
+    public function getRebillId(): ?string
     {
         return $this->getData('rebill_id');
     }
@@ -55,9 +60,9 @@ class Model extends AbstractModel implements DataInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getStatus(): string
+    public function getStatus(): ?string
     {
         return $this->getData('status');
     }
@@ -73,9 +78,9 @@ class Model extends AbstractModel implements DataInterface
     }
 
     /**
-     * @return array
+     * @return array|null
      */
-    public function getDetails(): array
+    public function getDetails(): ?array
     {
         return json_decode($this->getData('details'), true);
     }

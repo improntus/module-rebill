@@ -39,19 +39,21 @@ class LayoutProcessorPlugin
 
     /**
      * @param LayoutProcessor $subject
-     * @param $result
-     * @return mixed
+     * @param array $result
+     * @return array
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    public function afterProcess(LayoutProcessor $subject, $result)
+    public function afterProcess(LayoutProcessor $subject, array $result)
     {
         /**
          * In case of buying subscription products, any other payment method has to be removed
          * Because otherwise, the customer could pay with a platform
          */
         $c = 'children';
+        //phpcs:disable
         $paymentRenderers = &$result['components']['checkout'][$c]['steps'][$c]['billing-step'][$c]['payment'][$c]['renders'][$c];
+        //phpcs:enable
         $quote = $this->session->getQuote();
         foreach ($paymentRenderers as $renderName => $paymentRenderer) {
             if ($renderName != 'improntus_rebill-payment') {

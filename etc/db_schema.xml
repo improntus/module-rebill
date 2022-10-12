@@ -45,6 +45,7 @@
     </table>
     <table name="rebill_subscription" resource="default" engine="innodb" comment="Rebill Subscription">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="shipment_id" unsigned="true" nullable="false" comment="Shipment ID"/>
         <column xsi:type="varchar" name="rebill_id" length="255" nullable="false" comment="Rebill Id"/>
         <column xsi:type="varchar" name="rebill_price_id" length="255" nullable="false" comment="Rebill Price ID"/>
         <column xsi:type="varchar" name="status" length="255" nullable="false" comment="Status"/>
@@ -57,10 +58,16 @@
         <constraint xsi:type="unique" referenceId="REBILL_SUBSCRIPTION">
             <column name="rebill_id"/>
         </constraint>
+        <constraint xsi:type="foreign"
+                    referenceId="REBILL_SUBSCRIPTION_SHIPMENT_ID_REBILL_SUBSCRIPTION_SHIPMENT_ENTITY_ID"
+                    table="rebill_subscription"
+                    column="shipment_id"
+                    referenceTable="rebill_subscription_shipment"
+                    referenceColumn="entity_id"
+                    onDelete="CASCADE"/>
     </table>
     <table name="rebill_subscription_shipment" resource="default" engine="innodb" comment="Rebill Subscription Shipment">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
-        <column xsi:type="int" name="subscription_id" unsigned="true" nullable="false" comment="Subscription ID"/>
         <column xsi:type="varchar" name="rebill_id" length="255" nullable="false" comment="Rebill Id"/>
         <column xsi:type="varchar" name="rebill_price_id" length="255" nullable="false" comment="Rebill Price ID"/>
         <column xsi:type="varchar" name="status" length="255" nullable="false" comment="Status"/>
@@ -73,13 +80,6 @@
         <constraint xsi:type="unique" referenceId="REBILL_SUBSCRIPTION_SHIPMENT">
             <column name="rebill_id"/>
         </constraint>
-        <constraint xsi:type="foreign"
-                    referenceId="REBILL_SUBSCRIPTION_SHIPMENT_SUBSCRIPTION_ID_REBILL_SUBSCRIPTION_ENTITY_ID"
-                    table="rebill_subscription_shipment"
-                    column="subscription_id"
-                    referenceTable="rebill_subscription"
-                    referenceColumn="entity_id"
-                    onDelete="CASCADE"/>
     </table>
     <table name="rebill_payment" resource="default" engine="innodb" comment="Rebill Payment">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>

@@ -24,10 +24,10 @@ class Subscription extends Data
      */
     public function cartRuleApplyToSubscriptionProducts(Rule $rule)
     {
-        if ($rule->getData('rebill_apply_to_subscriptions')) {
-            return true;
+        if ($rule->getData('rebill_apply_to_subscriptions') === 0) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     /**

@@ -20,7 +20,7 @@
                     <approved_status>processing</approved_status>
                     <denied_status>cancelled</denied_status>
                     <allow_mixed_cart>0</allow_mixed_cart>
-                    <enqueue_message>0</enqueue_message>
+                    <enqueue_message>1</enqueue_message>
                     <subscription_product_text>Subscribe</subscription_product_text>
                     <guest_customer_text>Log in to subscribe to this product</guest_customer_text>
                     <product_label>none</product_label>

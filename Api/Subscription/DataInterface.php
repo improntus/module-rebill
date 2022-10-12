@@ -21,9 +21,20 @@ interface DataInterface
     public function setId($id);
 
     /**
-     * @return string
+     * @return int|null
      */
-    public function getRebillId(): string;
+    public function getShipmentId(): ?int;
+
+    /**
+     * @param int $shipmentId
+     * @return DataInterface
+     */
+    public function setShipmentId(int $shipmentId): DataInterface;
+
+    /**
+     * @return string|null
+     */
+    public function getRebillId(): ?string;
 
     /**
      * @param string $rebillId
@@ -32,9 +43,9 @@ interface DataInterface
     public function setRebillId(string $rebillId): DataInterface;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getRebillPriceId(): string;
+    public function getRebillPriceId(): ?string;
 
     /**
      * @param string $rebillPriceId
@@ -43,9 +54,9 @@ interface DataInterface
     public function setRebillPriceId(string $rebillPriceId): DataInterface;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getStatus(): string;
+    public function getStatus(): ?string;
 
     /**
      * @param string $status
@@ -54,9 +65,9 @@ interface DataInterface
     public function setStatus(string $status): DataInterface;
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getQuantity(): int;
+    public function getQuantity(): ?int;
 
     /**
      * @param int $quantity
@@ -65,9 +76,9 @@ interface DataInterface
     public function setQuantity(int $quantity): DataInterface;
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getOrderId(): int;
+    public function getOrderId(): ?int;
 
     /**
      * @param int $orderId
@@ -76,9 +87,9 @@ interface DataInterface
     public function setOrderId(int $orderId): DataInterface;
 
     /**
-     * @return array
+     * @return array|null
      */
-    public function getDetails(): array;
+    public function getDetails(): ?array;
 
     /**
      * @param array $details

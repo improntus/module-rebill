@@ -19,9 +19,14 @@ class Model extends AbstractModel implements DataInterface
     protected $_resourceName = Item::class;
 
     /**
-     * @return string
+     * @var string
      */
-    public function getSku(): string
+    protected $_idFieldName = 'entity_id';
+
+    /**
+     * @return string|null
+     */
+    public function getSku(): ?string
     {
         return $this->getData('product_sku');
     }
@@ -37,9 +42,9 @@ class Model extends AbstractModel implements DataInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getRebillId(): string
+    public function getRebillId(): ?string
     {
         return $this->getData('rebill_item_id');
     }
@@ -55,9 +60,9 @@ class Model extends AbstractModel implements DataInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->getData('product_description');
     }
@@ -73,9 +78,9 @@ class Model extends AbstractModel implements DataInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getHash(): string
+    public function getHash(): ?string
     {
         return $this->getData('hash');
     }

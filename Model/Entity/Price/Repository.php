@@ -80,6 +80,17 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
     }
 
     /**
+     * @param string $id
+     * @return DataInterface|null
+     */
+    public function getByRebillId(string $id)
+    {
+        $price = $this->create();
+        $this->getResourceModel()->load($price, $id, 'rebill_id');
+        return $price;
+    }
+
+    /**
      * @param string $hash
      * @return DataInterface
      */
@@ -108,6 +119,20 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
     {
         $result = parent::getEzList($filters);
         return $result instanceof SearchResultInterface ? $result : null;
+    }
+
+    /**
+     * @param array $pricesIds
+     * @return array
+     */
+    public function getPricesByFrequency(array $pricesIds)
+    {
+        $result = $this->getEzList(['rebill_price_id' => ['in' => $pricesIds]]);
+        $prices = [];
+        foreach ($result->getItems() as $item) {
+            $prices[$item->getFrequencyHash()][] = $item;
+        }
+        return $prices;
     }
 
     /**

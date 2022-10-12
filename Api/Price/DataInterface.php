@@ -10,7 +10,7 @@ namespace Improntus\Rebill\Api\Price;
 interface DataInterface
 {
     /**
-     * @return int
+     * @return int|null
      */
     public function getId();
 
@@ -21,9 +21,9 @@ interface DataInterface
     public function setId($id);
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getItemId(): int;
+    public function getItemId(): ?int;
 
     /**
      * @param int $itemId
@@ -32,9 +32,9 @@ interface DataInterface
     public function setItemId(int $itemId): DataInterface;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getType(): string;
+    public function getType(): ?string;
 
     /**
      * @param string $type
@@ -43,9 +43,9 @@ interface DataInterface
     public function setType(string $type): DataInterface;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getRebillItemId(): string;
+    public function getRebillItemId(): ?string;
 
     /**
      * @param string $rebillItemId
@@ -54,9 +54,9 @@ interface DataInterface
     public function setRebillItemId(string $rebillItemId): DataInterface;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getRebillPriceId(): string;
+    public function getRebillPriceId(): ?string;
 
     /**
      * @param string $rebillPriceId
@@ -65,9 +65,9 @@ interface DataInterface
     public function setRebillPriceId(string $rebillPriceId): DataInterface;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDetailsHash(): string;
+    public function getDetailsHash(): ?string;
 
     /**
      * @param string $detailsHash
@@ -76,9 +76,9 @@ interface DataInterface
     public function setDetailsHash(string $detailsHash): DataInterface;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getFrequencyHash(): string;
+    public function getFrequencyHash(): ?string;
 
     /**
      * @param string $frequencyHash
@@ -87,9 +87,9 @@ interface DataInterface
     public function setFrequencyHash(string $frequencyHash): DataInterface;
 
     /**
-     * @return array
+     * @return array|null
      */
-    public function getDetails(): array;
+    public function getDetails(): ?array;
 
     /**
      * @param array $details
@@ -98,9 +98,9 @@ interface DataInterface
     public function setDetails(array $details): DataInterface;
 
     /**
-     * @return array
+     * @return array|null
      */
-    public function getRebillDetails(): array;
+    public function getRebillDetails(): ?array;
 
     /**
      * @param array $details

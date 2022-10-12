@@ -19,27 +19,14 @@ class Model extends AbstractModel implements DataInterface
     protected $_resourceName = SubscriptionShipment::class;
 
     /**
-     * @return int
+     * @var string
      */
-    public function getSubscriptionId(): int
-    {
-        return $this->getData('subscription_id');
-    }
+    protected $_idFieldName = 'entity_id';
 
     /**
-     * @param int $subscriptionId
-     * @return DataInterface
+     * @return string|null
      */
-    public function setSubscriptionId(int $subscriptionId): DataInterface
-    {
-        $this->setData('subscription_id', $subscriptionId);
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRebillId(): string
+    public function getRebillId(): ?string
     {
         return $this->getData('rebill_id');
     }
@@ -55,9 +42,9 @@ class Model extends AbstractModel implements DataInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getRebillPriceId(): string
+    public function getRebillPriceId(): ?string
     {
         return $this->getData('rebill_price_id');
     }
@@ -73,9 +60,9 @@ class Model extends AbstractModel implements DataInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getStatus(): string
+    public function getStatus(): ?string
     {
         return $this->getData('status');
     }
@@ -91,9 +78,9 @@ class Model extends AbstractModel implements DataInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getQuantity(): int
+    public function getQuantity(): ?int
     {
         return $this->getData('quantity');
     }
@@ -109,9 +96,9 @@ class Model extends AbstractModel implements DataInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getOrderId(): int
+    public function getOrderId(): ?int
     {
         return $this->getData('order_id');
     }
@@ -127,9 +114,9 @@ class Model extends AbstractModel implements DataInterface
     }
 
     /**
-     * @return array
+     * @return array|null
      */
-    public function getDetails(): array
+    public function getDetails(): ?array
     {
         return json_decode($this->getData('details'), true);
     }

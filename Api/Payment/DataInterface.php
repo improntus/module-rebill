@@ -21,9 +21,9 @@ interface DataInterface
     public function setId($id);
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getSubscriptionId(): int;
+    public function getSubscriptionId(): ?int;
 
     /**
      * @param int $subscriptionId
@@ -32,9 +32,9 @@ interface DataInterface
     public function setSubscriptionId(int $subscriptionId): DataInterface;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getRebillId(): string;
+    public function getRebillId(): ?string;
 
     /**
      * @param string $rebillId
@@ -43,9 +43,9 @@ interface DataInterface
     public function setRebillId(string $rebillId): DataInterface;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getStatus(): string;
+    public function getStatus(): ?string;
 
     /**
      * @param string $status
@@ -54,9 +54,9 @@ interface DataInterface
     public function setStatus(string $status): DataInterface;
 
     /**
-     * @return array
+     * @return array|null
      */
-    public function getDetails(): array;
+    public function getDetails(): ?array;
 
     /**
      * @param array $details

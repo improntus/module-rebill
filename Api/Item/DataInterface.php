@@ -21,9 +21,9 @@ interface DataInterface
     public function setId($id);
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getSku(): string;
+    public function getSku(): ?string;
 
     /**
      * @param string $sku
@@ -32,9 +32,9 @@ interface DataInterface
     public function setSku(string $sku): DataInterface;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getRebillId(): string;
+    public function getRebillId(): ?string;
 
     /**
      * @param string $rebillId
@@ -43,9 +43,9 @@ interface DataInterface
     public function setRebillId(string $rebillId): DataInterface;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDescription(): string;
+    public function getDescription(): ?string;
 
     /**
      * @param string $description
@@ -54,9 +54,9 @@ interface DataInterface
     public function setDescription(string $description): DataInterface;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getHash(): string;
+    public function getHash(): ?string;
 
     /**
      * @param string $hash

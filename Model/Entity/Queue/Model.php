@@ -19,27 +19,14 @@ class Model extends AbstractModel implements DataInterface
     protected $_resourceName = Price::class;
 
     /**
-     * @return int
+     * @var string
      */
-    public function getItemId(): int
-    {
-        return $this->getData('item_id');
-    }
+    protected $_idFieldName = 'entity_id';
 
     /**
-     * @param int $itemId
-     * @return DataInterface
+     * @return string|null
      */
-    public function setItemId(int $itemId): DataInterface
-    {
-        $this->setData('item_id', $itemId);
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType(): string
+    public function getType(): ?string
     {
         return $this->getData('type');
     }
@@ -55,110 +42,38 @@ class Model extends AbstractModel implements DataInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getRebillItemId(): string
+    public function getStatus(): ?string
     {
-        return $this->getData('rebill_item_id');
+        return $this->getData('status');
     }
 
     /**
-     * @param string $rebillItemId
+     * @param string $status
      * @return DataInterface
      */
-    public function setRebillItemId(string $rebillItemId): DataInterface
+    public function setStatus(string $status): DataInterface
     {
-        $this->setData('rebill_item_id', $rebillItemId);
+        $this->setData('status', $status);
         return $this;
     }
 
     /**
-     * @return string
+     * @return array|null
      */
-    public function getRebillPriceId(): string
+    public function getParameters(): ?array
     {
-        return $this->getData('rebill_price_id');
+        return json_decode($this->getData('paremeters'), true);
     }
 
     /**
-     * @param string $rebillPriceId
+     * @param array $parameters
      * @return DataInterface
      */
-    public function setRebillPriceId(string $rebillPriceId): DataInterface
+    public function setParameters(array $parameters): DataInterface
     {
-        $this->setData('rebill_price_id', $rebillPriceId);
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDetailsHash(): string
-    {
-        return $this->getData('details_hash');
-    }
-
-    /**
-     * @param string $detailsHash
-     * @return DataInterface
-     */
-    public function setDetailsHash(string $detailsHash): DataInterface
-    {
-        $this->setData('details_hash', $detailsHash);
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFrequencyHash(): string
-    {
-        return $this->getData('frequency_hash');
-    }
-
-    /**
-     * @param string $frequencyHash
-     * @return DataInterface
-     */
-    public function setFrequencyHash(string $frequencyHash): DataInterface
-    {
-        $this->setData('frequency_hash', $frequencyHash);
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getDetails(): array
-    {
-        return json_decode($this->getData('details'), true);
-    }
-
-    /**
-     * @param array $details
-     * @return DataInterface
-     */
-    public function setDetails(array $details): DataInterface
-    {
-        $this->setData('details', json_encode($details));
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getRebillDetails(): array
-    {
-        return json_decode($this->getData('rebill_details'), true);
-    }
-
-    /**
-     * @param array $details
-     * @return DataInterface
-     */
-    public function setRebillDetails(array $details): DataInterface
-    {
-        $this->setData('rebill_details', json_encode($details));
+        $this->setData('paremeters', json_encode($parameters));
         return $this;
     }
 }
