@@ -48,10 +48,7 @@ class SalesQuoteAddItem implements ObserverInterface
                             $frequency = $_frequency;
                         }
                     }
-                    $price = $frequency['price'];
-                    if ($product->getTypeId() == 'configurable' && !(int)$product->getData('rebill_individual_settings_in_simple')) {
-                        $price += $product->getFinalPrice();
-                    }
+                    $price = $frequency['price'] + $product->getFinalPrice();
                     $item->setCustomPrice($price);
                     $item->setOriginalCustomPrice($price);
                     $item->getProduct()->setIsSuperMode(true);

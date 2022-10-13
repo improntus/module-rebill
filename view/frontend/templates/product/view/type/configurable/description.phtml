@@ -43,7 +43,7 @@ $frequencies = $configHelper->getProductRebillSubscriptionDetails($block->getPro
                 <span class="option">
                     <select name="frequency" id="frequency">
                         <?php foreach ($frequencies as $frequency) : ?>
-                            <option value="<?= /** @noEscape */ $frequency['id'] ?>"><?= /** @noEscape */ $configHelper->getFrequencyDescription($block->getProduct(), $frequency) ?></option>
+                            <option value="<?= /** @noEscape */ $frequency['id'] ?>" data-price="<?= /** @noEscape */ $configHelper->getFrequencyPriceFormat($frequency['price']);?>"><?= /** @noEscape */ $configHelper->getFrequencyDescription($block->getProduct(), $frequency) ?></option>
                         <?php endforeach; ?>
                     </select>
                 </span>
@@ -53,16 +53,30 @@ $frequencies = $configHelper->getProductRebillSubscriptionDetails($block->getPro
     <script>
         require(['jquery'], function ($) {
             $(document).ready(function () {
+                let productOriginalPrice = $("span.price").html();
                 let cartButton = $("#product-addtocart-button");
                 let cartText = cartButton.text();
                 $("#use-subscription").click(function () {
+                    // Update Price
+                    addFrequencyPrice("#frequency");
                     $(".rebill-subscription .description").show();
                     cartButton.text("<?= $escaper->escapeJs($configHelper->getSubscriptionProductText()) ?>");
                 });
                 $("#one-time-purchase").click(function () {
+                    // Restore original Price
+                    $("span.price").html(productOriginalPrice);
                     $(".rebill-subscription .description").hide();
                     cartButton.text(cartText);
                 });
+                $("#frequency").change(function (){
+                    addFrequencyPrice(this);
+                })
+
+                function addFrequencyPrice(el){
+                    var frequencyPrice = $(el).find('option:selected').data('price');
+                    var frequencyOperator = frequencyPrice.indexOf("-") === -1 ? " +" : " ";
+                    $("span.price").html(productOriginalPrice + frequencyOperator + frequencyPrice);
+                }
             });
         });
     </script>

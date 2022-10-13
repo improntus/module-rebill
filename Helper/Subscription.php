@@ -207,9 +207,7 @@ class Subscription extends Data
             $initialCost = $frequencyArray['initialCost'];
             if (!$price) {
                 $price = $this->currencyHelper->currencyByStore($frequencyArray['price'], null, true, false);
-                if ($product->getTypeId() == 'configurable' && !(int)$product->getData('rebill_individual_settings_in_simple')) {
-                    $price = "+" . $price;
-                }
+                $price = ($frequencyArray['price'] > 0 ? '+' : ' ').$price;
             } else {
                 $price = $this->currencyHelper->currencyByStore($price, null, true, false);
             }
@@ -342,6 +340,24 @@ class Subscription extends Data
                     }
                 }
             }
+        } catch (Exception $exception) {
+            return '';
+        }
+    }
+
+    /**
+     * @param $price
+     * @return string|void
+     */
+    public function getFrequencyPriceFormat($price = null){
+        try {
+            if (!$price) {
+                $price = $this->currencyHelper->currencyByStore($price, null, true, false);
+                $price = ($price > 0 ? '+' : ' ').$price;
+            } else {
+                $price = $this->currencyHelper->currencyByStore($price, null, true, false);
+            }
+            return $price;
         } catch (Exception $exception) {
             return '';
         }
