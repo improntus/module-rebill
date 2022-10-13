@@ -12,12 +12,9 @@ use Improntus\Rebill\Helper\Config;
 use Improntus\Rebill\Model\Entity\Price\Repository as PriceRepository;
 use Improntus\Rebill\Model\Entity\Subscription\Repository as SubscriptionRepository;
 use Improntus\Rebill\Model\Entity\SubscriptionShipment\Repository as ShipmentRepository;
+use Improntus\Rebill\Model\Entity\Payment\Repository as PaymentRepository;
+use Improntus\Rebill\Model\Payment\Transaction;
 use Improntus\Rebill\Model\Sales\Invoice;
-use Magento\Framework\Exception\AlreadyExistsException;
-use Magento\Framework\Exception\CouldNotSaveException;
-use Magento\Framework\Exception\InputException;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Sales\Model\OrderRepository;
@@ -60,12 +57,18 @@ class Confirmation extends WebhookAbstract
     protected $shipmentRepository;
 
     /**
+     * @var PaymentRepository
+     */
+    protected $paymentRepository;
+
+    /**
      * @param Config $configHelper
      * @param Invoice $rebillInvoice
      * @param OrderRepository $orderRepository
      * @param SubscriptionRepository $subscriptionRepository
      * @param ShipmentRepository $shipmentRepository
      * @param PriceRepository $priceRepository
+     * @param PaymentRepository $paymentRepository
      * @param OrderSender $orderSender
      * @param array $parameters
      */
@@ -76,9 +79,11 @@ class Confirmation extends WebhookAbstract
         SubscriptionRepository $subscriptionRepository,
         ShipmentRepository     $shipmentRepository,
         PriceRepository        $priceRepository,
+        PaymentRepository      $paymentRepository,
         OrderSender            $orderSender,
         array                  $parameters = []
     ) {
+        $this->paymentRepository = $paymentRepository;
         $this->priceRepository = $priceRepository;
         $this->configHelper = $configHelper;
         $this->rebillInvoice = $rebillInvoice;
@@ -107,13 +112,22 @@ class Confirmation extends WebhookAbstract
                     $this->orderSender->send($order);
                     $order->setIsCustomerNotified(true);
                     $this->orderRepository->save($order);
+                    foreach ($invoice['paidBags'] as $_payment) {
+                        $payment = $this->paymentRepository->getByRebillId($_payment['payment']['id']);
+                        $payment->setRebillId($_payment['payment']['id']);
+                        $payment->setStatus($_payment['payment']['status']);
+                        $this->paymentRepository->save($payment);
+                    }
                     $subscriptions = [];
                     $prices = [];
                     $this->getSubscriptions($invoice, $subscriptions, $prices);
-                    foreach ($subscriptions as $_subscriptions) {
-                        $shipment = $_subscriptions['shipment'];
+                    foreach ($subscriptions as $hash => $_subscriptions) {
+                        if ($hash == Transaction::getDefaultFrequencyHash()) {
+                            continue;
+                        }
+                        $shipment = $_subscriptions['shipment'][0];
                         $price = $prices[$shipment['price']['id']];
-                        $shipmentModel = $this->shipmentRepository->create();
+                        $shipmentModel = $this->shipmentRepository->getByRebillId($shipment['id']);
                         $shipmentModel->setStatus($shipment['status']);
                         $shipmentModel->setRebillId($shipment['id']);
                         $shipmentModel->setRebillPriceId($price->getRebillPriceId());
@@ -123,7 +137,7 @@ class Confirmation extends WebhookAbstract
                         $this->shipmentRepository->save($shipmentModel);
                         foreach ($_subscriptions['product'] as $subscription) {
                             $price = $prices[$subscription['price']['id']];
-                            $model = $this->subscriptionRepository->create();
+                            $model = $this->subscriptionRepository->getByRebillId($subscription['id']);
                             $model->setShipmentId($shipmentModel->getId());
                             $model->setStatus($subscription['status']);
                             $model->setRebillId($subscription['id']);

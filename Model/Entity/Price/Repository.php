@@ -86,7 +86,7 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
     public function getByRebillId(string $id)
     {
         $price = $this->create();
-        $this->getResourceModel()->load($price, $id, 'rebill_id');
+        $this->getResourceModel()->load($price, $id, 'rebill_price_id');
         return $price;
     }
 

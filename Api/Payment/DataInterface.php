@@ -21,17 +21,6 @@ interface DataInterface
     public function setId($id);
 
     /**
-     * @return int|null
-     */
-    public function getSubscriptionId(): ?int;
-
-    /**
-     * @param int $subscriptionId
-     * @return DataInterface
-     */
-    public function setSubscriptionId(int $subscriptionId): DataInterface;
-
-    /**
      * @return string|null
      */
     public function getRebillId(): ?string;

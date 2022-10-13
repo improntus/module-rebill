@@ -136,7 +136,7 @@ class Model extends AbstractModel implements DataInterface
      */
     public function getDetails(): ?array
     {
-        return json_decode($this->getData('details'), true);
+        return json_decode($this->getData('details') ?? '', true);
     }
 
     /**

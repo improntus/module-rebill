@@ -24,24 +24,6 @@ class Model extends AbstractModel implements DataInterface
     protected $_idFieldName = 'entity_id';
 
     /**
-     * @return int|null
-     */
-    public function getSubscriptionId(): ?int
-    {
-        return $this->getData('subscription_id');
-    }
-
-    /**
-     * @param int $subscriptionId
-     * @return DataInterface
-     */
-    public function setSubscriptionId(int $subscriptionId): DataInterface
-    {
-        $this->setData('subscription_id', $subscriptionId);
-        return $this;
-    }
-
-    /**
      * @return string|null
      */
     public function getRebillId(): ?string
@@ -82,7 +64,7 @@ class Model extends AbstractModel implements DataInterface
      */
     public function getDetails(): ?array
     {
-        return json_decode($this->getData('details'), true);
+        return json_decode($this->getData('details') ?? '', true);
     }
 
     /**

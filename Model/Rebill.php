@@ -50,6 +50,7 @@ class Rebill
         'organization_info'         => '/v2/organization',
         'payment'                   => '/v2/payments/%s',
         'payment_list'              => '/v2/payments',
+        'payment_subscriptions'     => '/v2/payments/%s/billingSchedules',
         'card'                      => '/v2/clients/cards/%s',
         'subscription'              => '/v2/subscriptions/customer/%s',
         'client_subscription_list'  => '/v2/clients/subscriptions',

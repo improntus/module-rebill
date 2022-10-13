@@ -27,11 +27,11 @@ class Payment extends Rebill
     }
 
     /**
-     * @param $id
+     * @param string $id
      * @return mixed|null
      * @throws Exception
      */
-    public function getPaymentById($id)
+    public function getPaymentById(string $id)
     {
         try {
             return $this->request('payment', 'GET', [$id]);

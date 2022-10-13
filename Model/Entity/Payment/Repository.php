@@ -18,19 +18,28 @@ use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\EntityManager\HydratorInterface;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
+use Improntus\Rebill\Model\Rebill\Payment as RebillPayment;
 
 class Repository extends RepositoryAbstract implements RepositoryInterface
 {
     /**
+     * @var RebillPayment
+     */
+    protected $rebillPayment;
+
+    /**
+     * @param RebillPayment $rebillPayment
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param CollectionProcessorInterface|null $collectionProcessor
      * @param HydratorInterface|null $hydrator
      */
     public function __construct(
-        SearchCriteriaBuilder $searchCriteriaBuilder,
+        RebillPayment                $rebillPayment,
+        SearchCriteriaBuilder        $searchCriteriaBuilder,
         CollectionProcessorInterface $collectionProcessor = null,
-        ?HydratorInterface $hydrator = null
+        ?HydratorInterface           $hydrator = null
     ) {
+        $this->rebillPayment = $rebillPayment;
         parent::__construct(
             Model::class,
             Payment::class,
@@ -62,6 +71,17 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
     }
 
     /**
+     * @param string $id
+     * @return DataInterface|null
+     */
+    public function getByRebillId(string $id)
+    {
+        $price = $this->create();
+        $this->getResourceModel()->load($price, $id, 'rebill_id');
+        return $price;
+    }
+
+    /**
      * @param SearchCriteriaInterface $searchCriteria
      * @return SearchResultInterface
      */
@@ -89,6 +109,15 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
     public function save($item)
     {
         if ($item instanceof DataInterface) {
+            if (!$item->getRebillId()) {
+                return $item;
+            }
+            if (!$item->getDetails() && $item->getRebillId()) {
+                $details = $this->rebillPayment->getPaymentById($item->getRebillId());
+                if ($details) {
+                    $item->setDetails($details);
+                }
+            }
             return parent::save($item);
         }
         return null;

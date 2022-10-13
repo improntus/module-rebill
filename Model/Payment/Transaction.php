@@ -317,4 +317,20 @@ class Transaction
             return is_array($item) ? json_encode($item) : $item;
         }, $array)));
     }
+
+    /**
+     * @return string
+     * phpcs:disable
+     */
+    public static function getDefaultFrequencyHash()
+    {
+
+        return hash('md5', implode('-', array_map(function ($item) {
+            return is_array($item) ? json_encode($item) : $item;
+        }, [
+            'frequency'          => 0,
+            'frequency_type'     => 'months',
+            'recurring_payments' => 1,
+        ])));
+    }
 }
