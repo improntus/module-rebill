@@ -43,10 +43,10 @@ class Queue
         ]);
         foreach ($queues->getItems() as $queue) {
             if ($this->queueRepository->validateStatus($queue->getId(), 'pending')) {
-//                $queue->setStatus('processing');
-//                $this->queueRepository->save($queue);
+                $queue->setStatus('processing');
+                $this->queueRepository->save($queue);
                 $this->webhook->execute($queue->getType(), $queue->getParameters());
-//                $this->queueRepository->delete($queue);
+                $this->queueRepository->delete($queue);
             }
         }
     }

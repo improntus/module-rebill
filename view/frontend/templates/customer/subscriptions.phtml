@@ -19,7 +19,7 @@ use Magento\Framework\Pricing\Helper\Data;
 $currencyHelper = $this->helper(Data::class);
 $subscriptions = $block->getSubscriptions();
 ?>
-<?php if ($subscriptions) : ?>
+<?php if ($subscriptions->getSize()) : ?>
     <?php
     $cards = $block->getCustomerCards($subscriptions->getFirstItem()->getRebillId());
     ?>
