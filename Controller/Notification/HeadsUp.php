@@ -8,13 +8,12 @@
 namespace Improntus\Rebill\Controller\Notification;
 
 use Exception;
-use Improntus\Rebill\Model\Subscription;
-use Magento\Framework\App\ResponseInterface;
-use Improntus\Rebill\Model\SubscriptionFactory;
+use Improntus\Rebill\Model\Webhook;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
-use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\ResultInterface;
 
 /**
  * @description Webhook for 24 hours heads up before new payment in a recurrent or cycling subscription
@@ -22,19 +21,19 @@ use Magento\Framework\App\Action\HttpGetActionInterface;
 class HeadsUp extends Action implements HttpGetActionInterface
 {
     /**
-     * @var SubscriptionFactory
+     * @var Webhook
      */
-    protected $subscriptionFactory;
+    protected $webhook;
 
     /**
      * @param Context $context
-     * @param SubscriptionFactory $subscriptionFactory
+     * @param Webhook $webhook
      */
     public function __construct(
         Context             $context,
-        SubscriptionFactory $subscriptionFactory
+        Webhook             $webhook
     ) {
-        $this->subscriptionFactory = $subscriptionFactory;
+        $this->webhook = $webhook;
         parent::__construct($context);
     }
 
@@ -44,25 +43,10 @@ class HeadsUp extends Action implements HttpGetActionInterface
      */
     public function execute()
     {
-        /**
-         * @todo 24hs heads up
-         */
-        if ($id = $this->getRequest()->getParam('id')) {
-            try {
-                /** @var Subscription $subscription */
-                $subscription = $this->subscriptionFactory->create();
-                $subscription->load($id, 'subscription_id');
-                $subscription->setData([
-                    'subscription_id' => $id,
-                    'price_id'        => $this->getRequest()->getParam('price')['id'],
-                    'quantity'        => $this->getRequest()->getParam('quantity'),
-                    'status'          => 'recalculate',
-                    'order_id'        => null,
-                ]);
-                $subscription->save();
-            } catch (Exception $exception) {
-
-            }
+        try {
+            $this->webhook->queueOrExecute('heads_up', $this->getRequest()->getParams());
+        } catch (Exception $exception) {
+            $this->messageManager->addErrorMessage($exception->getMessage());
         }
     }
 }
