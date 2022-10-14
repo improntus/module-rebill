@@ -71,6 +71,7 @@
             <settings>
                 <dataType>text</dataType>
                 <filter>false</filter>
+                <sortable>false</sortable>
                 <bodyTmpl>ui/grid/cells/html</bodyTmpl>
                 <label translate="true">Order Id</label>
             </settings>
