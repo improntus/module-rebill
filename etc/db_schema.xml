@@ -87,6 +87,7 @@
     </table>
     <table name="rebill_payment" resource="default" engine="innodb" comment="Rebill Payment">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="order_id" unsigned="true" nullable="false" comment="Order Id"/>
         <column xsi:type="varchar" name="rebill_id" length="255" nullable="false" comment="Rebill Id"/>
         <column xsi:type="varchar" name="status" length="255" nullable="false" comment="Status"/>
         <column xsi:type="text" name="details" nullable="true" comment="Details"/>

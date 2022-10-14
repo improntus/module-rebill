@@ -115,6 +115,7 @@ class Confirmation extends WebhookAbstract
                     $this->orderRepository->save($order);
                     foreach ($invoice['paidBags'] as $_payment) {
                         $payment = $this->paymentRepository->getByRebillId($_payment['payment']['id']);
+                        $payment->setOrderId($orderId);
                         $payment->setRebillId($_payment['payment']['id']);
                         $payment->setStatus($_payment['payment']['status']);
                         $this->paymentRepository->save($payment);

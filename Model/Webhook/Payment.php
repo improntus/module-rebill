@@ -101,12 +101,8 @@ class Payment extends WebhookAbstract
                 if (!isset($rebillPayment['id']) && $rebillPayment['status'] !== 'SUCCEEDED') {
                     return;
                 }
-                $payment = $this->paymentRepository->getByRebillId($rebillPayment['id']);
-                $payment->setRebillId($rebillPayment['id']);
-                $payment->setStatus($rebillPayment['status']);
-                $payment->setDetails($rebillPayment);
-                $this->paymentRepository->save($payment);
                 $packagesHashes = [];
+                $orderId = 0;
                 foreach ($rebillPayment['billingSchedulesId'] as $subscriptionId) {
                     $subscription = $this->subscriptionRepository->getByRebillId($subscriptionId);
                     if (!$subscription->getId()) {
@@ -115,6 +111,7 @@ class Payment extends WebhookAbstract
                     if (!$subscription->getId()) {
                         continue;
                     }
+                    $orderId = $subscription->getOrderId();
                     $subscription->setPayed(1);
                     if ($subscription instanceof Model) {
                         $packagesHashes[$subscription->getPackageHash()] = $subscription->getPackageHash();
@@ -123,6 +120,12 @@ class Payment extends WebhookAbstract
                         $this->shipmentRepository->save($subscription);
                     }
                 }
+                $payment = $this->paymentRepository->getByRebillId($rebillPayment['id']);
+                $payment->setOrderId($orderId);
+                $payment->setRebillId($rebillPayment['id']);
+                $payment->setStatus($rebillPayment['status']);
+                $payment->setDetails($rebillPayment);
+                $this->paymentRepository->save($payment);
                 foreach ($packagesHashes as $hash) {
                     $packages = $this->subscriptionRepository->getCollection();
                     $packages->addFieldToFilter('package_hash', $hash);

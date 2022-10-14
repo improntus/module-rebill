@@ -82,4 +82,22 @@ class Model extends AbstractModel implements DataInterface
         $this->setData('details', json_encode($details));
         return $this;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getOrderId(): ?string
+    {
+        return $this->getData('orderId');
+    }
+
+    /**
+     * @param int $orderId
+     * @return DataInterface
+     */
+    public function setOrderId(int $orderId): DataInterface
+    {
+        $this->setData('orderId', $orderId);
+        return $this;
+    }
 }

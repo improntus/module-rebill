@@ -92,11 +92,8 @@ class Payment extends SearchResult
             "gateway_description" => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.gateway.description')),'')",
         ];
 
-        // rs => Rebill Subscription
-        $this->getSelect()->joinLeft(['rs' => 'rebill_subscription'], 'main_table.subscription_id = rs.entity_id', []);
-
         // o => Sales Order
-        $this->getSelect()->joinLeft(['o' => 'sales_order'], 'rs.order_id = o.entity_id', []);
+        $this->getSelect()->joinLeft(['o' => 'sales_order'], 'main_table.order_id = o.entity_id', []);
 
         $this->getSelect()->reset('columns');
         foreach ($columns as $alias => $column) {

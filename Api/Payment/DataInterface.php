@@ -52,4 +52,15 @@ interface DataInterface
      * @return DataInterface
      */
     public function setDetails(array $details): DataInterface;
+
+    /**
+     * @return string|null
+     */
+    public function getOrderId(): ?string;
+
+    /**
+     * @param int $orderId
+     * @return DataInterface
+     */
+    public function setOrderId(int $orderId): DataInterface;
 }
