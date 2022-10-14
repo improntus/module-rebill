@@ -1,19 +1,71 @@
-"Can't find any order to pay with rebill.","Can't find any order to pay with rebill."
+"Rebill Subscriptions","Rebill Subscriptions"
+"Add the option to subscribe to this product","Add the option to subscribe to this product"
+"Time lapse of free trial expressed in days. Once it's finished, it will be billed for the first time","Time lapse of free trial expressed in days. Once it's finished, it will be billed for the first time"
+"Frequency in which the subscription will be billed, expressed in months or years","Frequency in which the subscription will be billed, expressed in months or years"
+"Payment gateway through which the product will be charged","Payment gateway through which the product will be charged"
+"Subscription Initial Cost","Subscription Initial Cost"
+"Rebill Payments","Rebill Payments"
+"The subscription was cancelled.","The subscription was cancelled."
+"There was an error cancelling the subscription. Error: %1","There was an error cancelling the subscription. Error: %1"
+"To enter this section you need to be logged in","To enter this section you need to be logged in"
+"There was an error cancelling your subscription, contact the store owner to get more information.","There was an error cancelling your subscription, contact the store owner to get more information."
+"monthly for %1","monthly for %1"
+"monthly for %1 with a sign-up fee of %2","monthly for %1 with a sign-up fee of %2"
+months,months
+year,year
+years,years
+"monthly for %1 for %2 %3","monthly for %1 for %2 %3"
+"monthly for %1 for %2 %3 with a sign-up fee of %4","monthly for %1 for %2 %3 with a sign-up fee of %4"
+"yearly for %1","yearly for %1"
+"yearly for %1 with a sign-up fee of %2","yearly for %1 with a sign-up fee of %2"
+"yearly for %1 for %2 %3","yearly for %1 for %2 %3"
+"yearly for %1 for %2 %3 with a sign-up fee of %4","yearly for %1 for %2 %3 with a sign-up fee of %4"
+"every %1 months for %2","every %1 months for %2"
+"every %1 months for %2 with a sign-up fee of %3","every %1 months for %2 with a sign-up fee of %3"
+"every %1 months for %2 for %3 %4","every %1 months for %2 for %3 %4"
+"every %1 months for %2 for %3 %4 with a sign-up fee of %5","every %1 months for %2 for %3 %4 with a sign-up fee of %5"
+"every %1 years for %2","every %1 years for %2"
+"every %1 years for %2 with a sign-up fee of %3","every %1 years for %2 with a sign-up fee of %3"
+"every %1 years for %2 for %3 %4","every %1 years for %2 for %3 %4"
+"every %1 years for %2 for %3 %4 with a sign-up fee of %5","every %1 years for %2 for %3 %4 with a sign-up fee of %5"
 "None selected","None selected"
 Sandbox,Sandbox
 Production,Production
-"Unable to create items on Rebill.","Unable to create items on Rebill."
+"No product label","No product label"
+"Custom Text","Custom Text"
+"Rebill Logo","Rebill Logo"
+"Can't find any order to pay with rebill.","Can't find any order to pay with rebill."
+"There was an error creating the payment, please try againt.","There was an error creating the payment, please try againt."
 "Unable to create prices on Rebill.","Unable to create prices on Rebill."
-Days,Days
-Months,Months
-Years,Years
+"One-time only","One-time only"
+"One-time and Subscription","One-time and Subscription"
+"Subscription Only","Subscription Only"
+"%1 x %2 - %3","%1 x %2 - %3"
+"Invoice generation process","Invoice generation process"
+"Before trying to buy a subscription product, you have to be logged in first","Before trying to buy a subscription product, you have to be logged in first"
+Subscription,Subscription
+Cancel,Cancel
+"Are you sure you want to cancel a subscription?","Are you sure you want to cancel a subscription?"
 status_detail,status_detail
 "Card Holder Name","Card Holder Name"
 "Last 4 four digits","Last 4 four digits"
-"Print Payment","Print Payment"
-"Pay with rebill","Pay with rebill"
+Frequency,Frequency
+"Frequency Type","Frequency Type"
+"Max Recurring Payments","Max Recurring Payments"
+Price,Price
+"SignUp Cost","SignUp Cost"
+Actions,Actions
+Product:,Product:
+Status:,Status:
+Period:,Period:
+"Next payment date:","Next payment date:"
+"Remaining payments:","Remaining payments:"
+"Current payment method:","Current payment method:"
+"Document Type","Document Type"
+"Document Number","Document Number"
+"The payment can't be processed, try again with another card.","The payment can't be processed, try again with another card."
 "Card Number","Card Number"
-Pay,Pay
+"Update your subscription","Update your subscription"
 "Enter a card number","Enter a card number"
 "Card number is invalid","Card number is invalid"
 "Enter an expiry date","Enter an expiry date"
@@ -23,25 +75,49 @@ Pay,Pay
 "Expiry date is invalid","Expiry date is invalid"
 "Enter a CVC","Enter a CVC"
 "CVC is invalid","CVC is invalid"
+Quantity,Quantity
+Status,Status
+Total,Total
+"Payment Method","Payment Method"
+"Created at","Created at"
+Update,Update
+"You have no active subscriptions","You have no active subscriptions"
+"Print Payment","Print Payment"
+"Product Subscription with Rebill","Product Subscription with Rebill"
+"One time purchase","One time purchase"
+"Subscribe to this product %1","Subscribe to this product %1"
+"Subscribe to this product","Subscribe to this product"
 "Place Order","Place Order"
 Continue,Continue
+"Add Frequency","Add Frequency"
+Save,Save
+"Edit Frequencies","Edit Frequencies"
+Months,Months
+Years,Years
+"If it is 0 the subscription will be cyclical","If it is 0 the subscription will be cyclical"
+Delete,Delete
+"Cancel Subscription","Cancel Subscription"
+"You are about to cancel a subscription. Are you sure?","You are about to cancel a subscription. Are you sure?"
+Ok,Ok
+Pay,Pay
 Rebill,Rebill
-"Rebill Menu","Rebill Menu"
-"Rebill Gateways","Rebill Gateways"
 Enabled,Enabled
 Title,Title
 "Sort Order","Sort Order"
 General,General
-"Customer Document Type","Customer Document Type"
-"Customer Attribute for Document","Customer Attribute for Document"
 "Status for Approved Orders","Status for Approved Orders"
 "Status for Denied Orders","Status for Denied Orders"
 "Allow mixed cart","Allow mixed cart"
 "This option will allow the customer to pay subscription and not subscription products in the same order","This option will allow the customer to pay subscription and not subscription products in the same order"
+"Enqueue Webhooks","Enqueue Webhooks"
+"If enabled, webhooks will be processed by a queue message system. Turning off this option may cause performance issues.","If enabled, webhooks will be processed by a queue message system. Turning off this option may cause performance issues."
 "Text for subscription products","Text for subscription products"
 "This text will be shown in product page to let customer know that the product is subscription type.","This text will be shown in product page to let customer know that the product is subscription type."
 "Text for guest customer in subscription products","Text for guest customer in subscription products"
 "This text will be shown in product page to let guest customer know that they can subscribe to the product only if they have an account.","This text will be shown in product page to let guest customer know that they can subscribe to the product only if they have an account."
+"Label for Subscription Products","Label for Subscription Products"
+"Label in form of a text or image to more easily identify subscription products","Label in form of a text or image to more easily identify subscription products"
+"Text for Label","Text for Label"
 "Api Options","Api Options"
 "Api User Email","Api User Email"
 "Api Password","Api Password"
@@ -51,8 +127,24 @@ UUID,UUID
 "Integration mode","Integration mode"
 "Default Gateway","Default Gateway"
 "Enable debug logs","Enable debug logs"
+"Rebill Id","Rebill Id"
+"Payment Id","Payment Id"
+status,status
+Amount,Amount
+Currency,Currency
+"Card Last Numbers","Card Last Numbers"
+"Card Brand","Card Brand"
+"Order Id","Order Id"
+"Customer Firstname","Customer Firstname"
+"Customer Lastname","Customer Lastname"
+"Gateway Type","Gateway Type"
+"Gateway Description","Gateway Description"
+Description,Description
+"Created At","Created At"
+"User Email","User Email"
+"Last Charge Date","Last Charge Date"
+"Next Charge Date","Next Charge Date"
 "Apply to Subscriptions","Apply to Subscriptions"
-"Don't keep applying to subscriptions if the coupon/rule is expired or disabled","Don't keep applying to subscriptions if the coupon/rule is expired or disabled"
-"Quantity of payments in a subscription that the coupon/rule will be applied to","Quantity of payments in a subscription that the coupon/rule will be applied to"
+Subscriptions,Subscriptions
+"Subscription Update","Subscription Update"
 "Rebill Payment","Rebill Payment"
-"If it is 0 the subscription will be cyclical","If it is 0 the subscription will be cyclical"

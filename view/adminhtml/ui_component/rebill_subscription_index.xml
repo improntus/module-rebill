@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">rebill_subscription_index.rebill_subscription_grid_data_source</item>
+            <item name="deps" xsi:type="string">rebill_subscription_index.rebill_subscription_grid_data_source</item>
+        </item>
+        <item name="spinner" xsi:type="string">rebill_subscription_grid_table_columns</item>
+    </argument>
+
+    <dataSource name="rebill_subscription_grid_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>Improntus_Rebill::main</aclResource>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="rebill_subscription_grid_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>main_table.entity_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="rebill_subscription_grid_table_columns">
+        <column name="rebill_id">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Rebill Id</label>
+            </settings>
+        </column>
+        <column name="status">
+            <settings>
+                <filter>false</filter>
+                <label translate="true">Status</label>
+            </settings>
+        </column>
+        <column name="quantity">
+            <settings>
+                <filter>false</filter>
+                <label translate="true">Quantity</label>
+            </settings>
+        </column>
+        <column name="user_email">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">User Email</label>
+            </settings>
+        </column>
+        <column name="title">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Title</label>
+            </settings>
+        </column>
+        <column name="orderLink" class="Improntus\Rebill\Ui\Component\Listing\Column\OrderLink">
+            <settings>
+                <dataType>text</dataType>
+                <filter>false</filter>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <label translate="true">Order Id</label>
+            </settings>
+        </column>
+        <column name="gateway_type">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Gateway Type</label>
+            </settings>
+        </column>
+        <column name="gateway_description">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Gateway Description</label>
+            </settings>
+        </column>
+        <column name="frequency" class="Improntus\Rebill\Ui\Component\Listing\Column\Frequency">
+            <settings>
+                <filter>false</filter>
+                <sortable>false</sortable>
+                <label translate="true">Frequency</label>
+            </settings>
+        </column>
+        <column name="last_charge_date" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dateFormat>yyyy-MM-dd</dateFormat>
+                <label translate="true">Last Charge Date</label>
+            </settings>
+        </column>
+        <column name="next_charge_date" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dateFormat>yyyy-MM-dd</dateFormat>
+                <label translate="true">Next Charge Date</label>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="Improntus\Rebill\Ui\Component\Listing\Column\CancelSubscription">
+            <settings>
+                <indexField>entity_id</indexField>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>
