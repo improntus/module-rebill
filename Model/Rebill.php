@@ -52,9 +52,12 @@ class Rebill
         'payment_list'              => '/v2/payments',
         'payment_subscriptions'     => '/v2/payments/%s/billingSchedules',
         'card'                      => '/v2/clients/cards/%s',
+        'cards'                     => '/v2/clients/cards',
         'subscription'              => '/v2/subscriptions/customer/%s',
         'client_subscription_list'  => '/v2/clients/subscriptions',
         'client_subscription'       => '/v2/clients/subscriptions/%s',
+        'update_subscription'       => '/v2/subscriptions/%s',
+        'subscription_cards'        => '/v2/subscriptions/%s/customer_cards',
         'subscription_list'         => '/v2/subscriptions/%s/all',
         'subscription_change_price' => '/v2/subscriptions/%s/change-plan',
         'invoice'                   => '/v2/receipts/%s',
@@ -66,6 +69,7 @@ class Rebill
         'client_subscription_list',
         'client_subscription',
         'card',
+        'cards',
     ];
 
     /**
@@ -108,10 +112,10 @@ class Rebill
     }
 
     /**
-     * @param $token
+     * @param string|null $token
      * @return $this|null
      */
-    protected function setToken($token)
+    protected function setToken(?string $token)
     {
         if (!$this->session) {
             return null;
@@ -134,7 +138,10 @@ class Rebill
         return $result['authToken'] ?? null;
     }
 
-
+    /**
+     * @param string $customerEmail
+     * @return mixed|null
+     */
     public function customerAuth(string $customerEmail)
     {
         $authParams = [
@@ -161,7 +168,7 @@ class Rebill
     }
 
     /**
-     * @param $endpoint
+     * @param string $endpoint
      * @param string $method
      * @param array $urlData
      * @param array $data
@@ -170,12 +177,12 @@ class Rebill
      * @return mixed|null
      */
     protected function request(
-        $endpoint,
+        string $endpoint,
         string $method = 'GET',
-        array $urlData = [],
-        array $data = [],
-        array $options = [],
-        bool $needToken = true
+        array  $urlData = [],
+        array  $data = [],
+        array  $options = [],
+        bool   $needToken = true
     ) {
         $token = '';
         if ($endpoint != 'auth' && $needToken) {

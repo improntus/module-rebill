@@ -17,9 +17,12 @@ use Magento\Framework\Pricing\Helper\Data;
 
 /** @var Data $currencyHelper */
 $currencyHelper = $this->helper(Data::class);
-$subscriptions = $block->getSubscriptions() ?? [];
+$subscriptions = $block->getSubscriptions();
 ?>
 <?php if ($subscriptions) : ?>
+    <?php
+    $cards = $block->getCustomerCards($subscriptions->getFirstItem()->getRebillId());
+    ?>
     <div class="subscription-grid-wrapper table-wrapper">
         <table class="data table">
             <thead>
@@ -29,7 +32,7 @@ $subscriptions = $block->getSubscriptions() ?? [];
                 <th><?= $escaper->escapeHtml(__('Status')) ?></th>
                 <th><?= $escaper->escapeHtml(__('Total')) ?></th>
                 <th><?= $escaper->escapeHtml(__('Payment Method')) ?></th>
-                <th><?= $escaper->escapeHtml(__('Created at')) ?></th>
+                <th><?= $escaper->escapeHtml(__('Next Scheduled Payment')) ?></th>
                 <th></th>
             </tr>
             </thead>
@@ -38,17 +41,19 @@ $subscriptions = $block->getSubscriptions() ?? [];
             <?php foreach ($subscriptions as $subscription) : ?>
                 <?php $details = $subscription->getDetails() ?>
                 <tr>
-                    <td><?= $escaper->escapeHtml($details['title']) ?></td>
+                    <td><?= $escaper->escapeHtml($subscription->getData('title') . ($subscription->getData('shipment') ? ' + SHIPMENT' : '')) ?></td>
                     <td><?= $escaper->escapeHtml($details['quantity']) ?></td>
-                    <td><?= $escaper->escapeHtml($details['status']) ?></td>
-                    <td><?= $currencyHelper->currencyByStore((float)$details['price']['amount']) ?></td>
-                    <td><?= $escaper->escapeHtml($block->getPaymentMethod($subscription)) ?></td>
-                    <td><?= $escaper->escapeHtml(date('Y-m-d', strtotime($details['createdAt']))) ?></td>
+                    <td><?= $escaper->escapeHtml($subscription->getStatus()) ?></td>
+                    <td><?= $currencyHelper->currencyByStore((float)$subscription->getData('price')) ?></td>
+                    <td><?= $escaper->escapeHtml($block->getPaymentMethod($details, $cards)) ?></td>
+                    <td><?= $escaper->escapeHtml(date('Y-m-d', strtotime($details['nextChargeDate']))) ?></td>
                     <td class="col actions">
-                        <a class="action edit" href="<?= $escaper->escapeUrl($block->getUrl('rebill/customer/edit', ['id' => $details['id']])) ?>">
+                        <a class="action edit"
+                           href="<?= $escaper->escapeUrl($block->getUrl('rebill/customer/edit', ['id' => $details['id']])) ?>">
                             <span><?= $escaper->escapeHtml(__('Update')) ?></span>
                         </a>
-                        <a class="action delete" href="<?= $escaper->escapeUrl($block->getUrl('rebill/customer/cancel', ['id' => $details['id']])) ?>">
+                        <a class="action delete"
+                           href="<?= $escaper->escapeUrl($block->getUrl('rebill/customer/cancel', ['id' => $details['id']])) ?>">
                             <span><?= $escaper->escapeHtml(__('Cancel')) ?></span>
                         </a>
                     </td>
@@ -68,7 +73,7 @@ $subscriptions = $block->getSubscriptions() ?? [];
                         title: $.mage.__('Cancel Subscription'),
                         content: $.mage.__('You are about to cancel a subscription. Are you sure?'),
                         actions: {
-                            confirm: function() {
+                            confirm: function () {
                                 window.location = element.attr('href');
                             },
                         },
@@ -92,7 +97,8 @@ $subscriptions = $block->getSubscriptions() ?? [];
         });
     </script>
 <?php else : ?>
-<div class="subscription-grid-wrapper table-wrapper">
-    <span class="no-subscriptions"><?= /** @noEscape */__('You have no active subscriptions') ?></span>
-</div>
+    <div class="subscription-grid-wrapper table-wrapper">
+        <span class="no-subscriptions"><?= /** @noEscape */
+            __('You have no active subscriptions') ?></span>
+    </div>
 <?php endif; ?>

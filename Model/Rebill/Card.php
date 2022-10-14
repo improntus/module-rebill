@@ -13,13 +13,28 @@ use Improntus\Rebill\Model\Rebill;
 class Card extends Rebill
 {
     /**
-     * @param $cardId
+     * @param string $cardId
+     * @param string $customerEmail
      * @return mixed|null
      */
-    public function getCard($cardId, $customerEmail)
+    public function getCard(string $cardId, string $customerEmail)
     {
         try {
             return $this->request('card', 'GET', [$cardId], ['customerEmail' => $customerEmail]);
+        } catch (Exception $exception) {
+            $this->configHelper->logError($exception->getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * @param string $id
+     * @return mixed|null
+     */
+    public function getCards(string $id)
+    {
+        try {
+            return $this->request('subscription_cards', 'GET', [$id]);
         } catch (Exception $exception) {
             $this->configHelper->logError($exception->getMessage());
         }

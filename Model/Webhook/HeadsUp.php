@@ -8,6 +8,7 @@ use Improntus\Rebill\Model\Entity\Price\Model;
 use Improntus\Rebill\Model\Entity\Price\Repository as PriceRepository;
 use Improntus\Rebill\Model\Entity\Subscription\Repository as SubscriptionRepository;
 use Improntus\Rebill\Model\Entity\SubscriptionShipment\Repository as ShipmentRepository;
+use Improntus\Rebill\Model\Rebill\Subscription;
 use Improntus\Rebill\Model\Sales\Reorder;
 use Magento\Quote\Model\QuoteRepository;
 use Magento\Sales\Model\Order;
@@ -52,6 +53,11 @@ class HeadsUp extends WebhookAbstract
     protected $quoteRepository;
 
     /**
+     * @var Subscription
+     */
+    protected $rebillSubscription;
+
+    /**
      * @param Config $configHelper
      * @param OrderRepository $orderRepository
      * @param SubscriptionRepository $subscriptionRepository
@@ -59,6 +65,7 @@ class HeadsUp extends WebhookAbstract
      * @param PriceRepository $priceRepository
      * @param QuoteRepository $quoteRepository
      * @param Reorder $reorder
+     * @param Subscription $rebillSubscription
      * @param array $parameters
      */
     public function __construct(
@@ -69,8 +76,10 @@ class HeadsUp extends WebhookAbstract
         PriceRepository        $priceRepository,
         QuoteRepository        $quoteRepository,
         Reorder                $reorder,
+        Subscription           $rebillSubscription,
         array                  $parameters = []
     ) {
+        $this->rebillSubscription = $rebillSubscription;
         $this->quoteRepository = $quoteRepository;
         $this->reorder = $reorder;
         $this->configHelper = $configHelper;
@@ -119,19 +128,21 @@ class HeadsUp extends WebhookAbstract
                 if ($subscription->getShipmentId()) {
                     $shipment = $this->shipmentRepository->getById($subscription->getShipmentId());
                     if ($shipment->getId()) {
-                        $shipmentPrice = $this->priceRepository->getByRebillId($shipment->getRebillPriceId());
                         $shippingPrice = array_sum([
                             $order->getShippingAmount(),
                             $order->getShippingTaxAmount(),
                             -$order->getShippingDiscountAmount(),
                             -$order->getShippingDiscountTaxCompensationAmount(),
                         ]);
-                        $shipmentDetails = $shipmentPrice->getDetails();
-                        $shipmentDetails['price'] = $shippingPrice;
-                        $shipmentDetails['frequency']['recurring_payments']
-                            = $rebillSubscription['remainingIterations'];
-                        $shipmentPrice->setDetails($shipmentDetails);
-                        $this->priceRepository->save($shipmentPrice);
+                        $this->rebillSubscription->updateSubscription(
+                            $rebillSubscription['id'],
+                            [
+                                'amount'         => $shippingPrice,
+                                'card'           => $rebillSubscription['card'],
+                                'nextChargeDate' => $rebillSubscription['nextChargeDate'],
+                                'status'         => $rebillSubscription['status'],
+                            ]
+                        );
                         $shipment->setPayed(0);
                         $shipment->setOrderId($order->getId());
                         $this->shipmentRepository->save($shipment);
@@ -168,12 +179,15 @@ class HeadsUp extends WebhookAbstract
                         ]);
                         $itemQty = $orderItem->getQtyOrdered();
                         $price = $rowTotal / $itemQty;
-                        $subPrice = $this->priceRepository->getByRebillId($sub->getRebillPriceId());
-                        $subDetails = $subPrice->getDetails();
-                        $subDetails['price'] = $price;
-                        $subDetails['frequency']['recurring_payments'] = $rebillSubscription['remainingIterations'];
-                        $subPrice->setDetails($subDetails);
-                        $this->priceRepository->save($subPrice);
+                        $this->rebillSubscription->updateSubscription(
+                            $rebillSubscription['id'],
+                            [
+                                'amount'         => $price,
+                                'card'           => $rebillSubscription['card'],
+                                'nextChargeDate' => $rebillSubscription['nextChargeDate'],
+                                'status'         => $rebillSubscription['status'],
+                            ]
+                        );
                         $sub->setNextSchedule($rebillSubscription['nextChargeDate']);
                         $sub->setOrderId($order->getId());
                         $sub->setPayed(0);

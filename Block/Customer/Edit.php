@@ -100,6 +100,15 @@ class Edit extends Template
     }
 
     /**
+     * @return string
+     */
+    public function getSdkUrl()
+    {
+        $integratorMode = $this->configHelper->getIntegrationMode();
+        return $integratorMode == 'sandbox' ? 'https://api.rebill.dev/v2' : 'https://api.rebill.to/v2';
+    }
+
+    /**
      * @return array|mixed|null
      * @description return array of active subscriptions
      */

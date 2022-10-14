@@ -15,6 +15,7 @@ use Magento\Customer\Model\Session;
 use Improntus\Rebill\Model\Rebill\Card;
 use Magento\Framework\View\Element\Template;
 use Improntus\Rebill\Model\Rebill\Subscription;
+use Zend_Db_Expr;
 
 class Subscriptions extends Template
 {
@@ -82,16 +83,23 @@ class Subscriptions extends Template
                 'so.entity_id = main_table.order_id',
                 []
             );
+            $subscriptions->getSelect()->joinLeft(
+                ['rss' => 'rebill_subscription_shipment'],
+                'rss.entity_id = main_table.shipment_id',
+                []
+            );
+            //phpcs:disable
+            $subscriptions->getSelect()->reset('columns');
+            $subscriptions->getSelect()->columns([
+                '*',
+                'title'    => new Zend_Db_Expr("GROUP_CONCAT(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.title')) SEPARATOR ', ')"),
+                'shipment' => new Zend_Db_Expr("JSON_UNQUOTE(JSON_EXTRACT(rss.details, '$.title'))"),
+                'price'    => new Zend_Db_Expr("SUM(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.amount')) + JSON_UNQUOTE(JSON_EXTRACT(rss.details, '$.price.amount')))"),
+            ]);
+            //phpcs:enable
             $subscriptions->addFieldToFilter('so.customer_id', $this->session->getCustomerId());
+            $subscriptions->getSelect()->group('package_hash');
             return $subscriptions;
-//            $customerEmail = $this->session->getCustomer()->getEmail();
-//            $subscriptions = $this->subscription->getSubscriptionFromClient($customerEmail);
-//            foreach ($subscriptions as $index => $subscription) {
-//                if ($subscription['status'] != 'ACTIVE') {
-//                    unset($subscriptions[$index]);
-//                }
-//            }
-//            return $subscriptions;
         } catch (Exception $exception) {
             $this->configHelper->logError($exception->getMessage());
         }
@@ -100,14 +108,26 @@ class Subscriptions extends Template
 
     /**
      * @param array $subscription
+     * @param array $cards
      * @return string
-     * @description return the credit card information
      */
-    public function getPaymentMethod(array $subscription)
+    public function getPaymentMethod(array $subscription, array $cards)
     {
-        $customerEmail = $this->session->getCustomer()->getEmail();
-        $card = $this->card->getCard($subscription["card"], $customerEmail);
-        return "**** **** **** " . $card['last4'] . ' ' . $this->getCardDate($card);
+        foreach ($cards as $card) {
+            if ($card['id'] == $subscription['card']) {
+                return "**** **** **** " . $card['last4'] . ' ' . $this->getCardDate($card);
+            }
+        }
+        return '';
+    }
+
+    /**
+     * @param string $id
+     * @return mixed|null
+     */
+    public function getCustomerCards(string $id)
+    {
+        return $this->card->getCards($id);
     }
 
     /**

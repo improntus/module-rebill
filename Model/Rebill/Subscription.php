@@ -73,6 +73,22 @@ class Subscription extends Rebill
     }
 
     /**
+     * @param string $id
+     * @param array $data
+     * @return mixed|null
+     * @throws Exception
+     */
+    public function updateSubscription(string $id, array $data)
+    {
+        try {
+            return $this->request('update_subscription', 'PUT', [$id], $data);
+        } catch (Exception $exception) {
+            $this->configHelper->logError($exception->getMessage());
+            throw $exception;
+        }
+    }
+
+    /**
      * @param string $customerEmail
      * @return mixed|null
      * @throws Exception
