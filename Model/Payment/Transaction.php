@@ -88,8 +88,8 @@ class Transaction
      */
     public function prepareTransaction()
     {
+        $order = $this->session->getLastRealOrder();
         try {
-            $order = $this->session->getLastRealOrder();
             if (!$order->getId() || $order->getPayment()->getMethod() !== RebillPayment::CODE) {
                 throw new LocalizedException(__('Can\'t find any order to pay with rebill.'));
             }
@@ -103,6 +103,9 @@ class Transaction
                 'rebill_details' => $rebillDetails,
             ];
         } catch (Exception $exception) {
+            if ($order->getId()) {
+                $order->cancel();
+            }
             $this->session->restoreQuote();
             $this->configHelper->logError($exception->getMessage());
             throw new LocalizedException(__('There was an error creating the payment, please try againt.'));
@@ -122,14 +125,22 @@ class Transaction
         $compiledItems = [];
         $frequenciesQty = count($items);
         foreach ($items as $hash => $_items) {
-            if ($hash == $defaultFrequencyHash && $frequenciesQty == 1) {
+            if ($hash == $defaultFrequencyHash) {
+                if ($frequenciesQty == 1) {
+                    $total = $order->getGrandTotal();
+                } else {
+                    $total = 0;
+                    foreach ($_items as $item) {
+                        $total += $item['price'] * $item['quantity'];
+                    }
+                }
                 $compiledItems[] = [
                     'type'           => 'order',
                     'frequency_hash' => $defaultFrequencyHash,
                     'frequency'      => $this->defaultFrequency,
                     'sku'            => "order-{$order->getIncrementId()}",
                     'product_name'   => "Order #{$order->getIncrementId()}",
-                    'price'          => $order->getGrandTotal(),
+                    'price'          => $total,
                     'quantity'       => 1,
                     'gateway'        => $gateway,
                     'currency'       => $this->configHelper->getCurrency(),
@@ -177,7 +188,7 @@ class Transaction
                     'type'     => $item['frequency']['frequency_type'],
                     'quantity' => (int)$item['frequency']['frequency'],
                 ];
-                $details['repetitions'] = $item['frequency']['recurring_payments'];
+                $details['repetitions'] = $item['frequency']['recurring_payments'] ?? null;
             }
             $rebillPrice->setType($item['type']);
             $rebillPrice->setDetails($item);
@@ -202,10 +213,10 @@ class Transaction
         $items = $order->getAllVisibleItems();
         $gateway = $this->configHelper->getGatewayId();
         $preparedItems = [];
-        $frequency = $this->defaultFrequency;
         /** @var Item $item */
         foreach ($items as $item) {
             $_item = $item;
+            $frequency = $this->defaultFrequency;
             if ($item->getParentItemId()) {
                 $_item = $item->getParentItem();
             }
@@ -222,11 +233,14 @@ class Transaction
                 ->getOptionByCode('rebill_subscription');
             if ($frequencyOption) {
                 $frequencyOption = json_decode($frequencyOption->getValue(), true);
+                $_frequencyQty = $frequencyOption['frequency'] ?? 0;
                 $frequency = [
-                    'frequency'          => $frequencyOption['frequency'] ?? 0,
-                    'frequency_type'     => $frequencyOption['frequencyType'] ?? 'months',
-                    'recurring_payments' => $frequencyOption['recurringPayments'] ?? 1,
+                    'frequency'      => $_frequencyQty ?? 0,
+                    'frequency_type' => $frequencyOption['frequencyType'] ?? 'months',
                 ];
+                if (isset($frequencyOption['recurringPayments']) && $frequencyOption['recurringPayments'] > 0) {
+                    $frequency['recurring_payments'] = (int)$frequencyOption['recurringPayments'];
+                }
             }
             $frequencyHash = $this->createHashFromArray($frequency);
             $this->frequencyHashes[$frequencyHash] = $frequency;
@@ -255,14 +269,24 @@ class Transaction
     {
         $defaultFrequencyHash = $this->createHashFromArray($this->defaultFrequency);
         $gateway = $this->configHelper->getGatewayId();
+        $itemsTotals = [];
+        foreach ($order->getAllVisibleItems() as $item) {
+            $discount = $item->getDiscountAmount();
+            $rowTotal = array_sum([
+                $item->getRowTotal(),
+                $discount > 0 ? $discount * -1 : $discount,
+                $item->getTaxAmount(),
+                $item->getDiscountTaxCompensationAmount(),
+            ]);
+            $itemsTotals[] = $rowTotal * -1;
+        }
         $total = array_sum([
             $order->getGrandTotal(),
             $order->getShippingAmount() * -1,
             $order->getShippingTaxAmount() * -1,
-            array_sum(array_map(function ($item) {
-                /** @var Item $item */
-                return $item->getRowTotal() * -1;
-            }, $order->getAllVisibleItems())),
+            $order->getShippingDiscountAmount(),
+            $order->getShippingDiscountTaxCompensationAmount(),
+            array_sum($itemsTotals),
         ]);
         $additionalItem = [
             'type'           => 'additional',
@@ -278,9 +302,21 @@ class Transaction
         if (isset($items[$defaultFrequencyHash]) && count($items) == 1) {
             $additionalItem['price'] += $order->getShippingAmount() + $order->getShippingTaxAmount();
         } else {
-            $shipmentPrice = ($order->getShippingAmount() + $order->getShippingTaxAmount()) / count($items);
+            $itemsQty = count($items);
+            if (isset($items[$defaultFrequencyHash])) {
+                $itemsQty--;
+            }
+            $shipmentPrice = array_sum([
+                    $order->getShippingAmount(),
+                    $order->getShippingTaxAmount(),
+                    -$order->getShippingDiscountAmount(),
+                    -$order->getShippingDiscountTaxCompensationAmount()
+                ]) / $itemsQty;
             $_items = $items;
             foreach ($_items as $hash => $item) {
+                if ($hash == $defaultFrequencyHash) {
+                    continue;
+                }
                 $frequency = $this->frequencyHashes[$hash];
                 $itemsSkus = array_map(function ($item) {
                     return $item['sku'];
@@ -288,8 +324,8 @@ class Transaction
                 $itemsNames = array_map(function ($item) {
                     return "({$item['product_name']})";
                 }, $item);
-                $sku = 'shipment-' . implode('-', $itemsSkus);
                 $orderId = $order->getIncrementId();
+                $sku = "shipment-$orderId-" . implode('-', $itemsSkus);
                 $name = "Order #{$orderId} Shipment " . implode(' ', $itemsNames);
                 $items[$hash][] = [
                     'type'           => 'shipment',

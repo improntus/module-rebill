@@ -9,6 +9,7 @@ namespace Improntus\Rebill\Model\Entity\Payment;
 
 use Improntus\Rebill\Api\Payment\DataInterface;
 use Improntus\Rebill\Model\ResourceModel\Payment;
+use Improntus\Rebill\Model\ResourceModel\Payment\Collection;
 use Magento\Framework\Model\AbstractModel;
 
 class Model extends AbstractModel implements DataInterface
@@ -17,6 +18,11 @@ class Model extends AbstractModel implements DataInterface
      * @var string
      */
     protected $_resourceName = Payment::class;
+
+    /**
+     * @var string
+     */
+    protected $_collectionName = Collection::class;
 
     /**
      * @var string

@@ -10,6 +10,7 @@ namespace Improntus\Rebill\Model\Entity\Price;
 use Improntus\Rebill\Api\Price\DataInterface;
 use Improntus\Rebill\Api\Price\RepositoryInterface;
 use Improntus\Rebill\Api\Price\SearchResultInterface;
+use Improntus\Rebill\Helper\Config;
 use Improntus\Rebill\Model\Entity\RepositoryAbstract;
 use Improntus\Rebill\Model\Rebill\Item as RebillItem;
 use Improntus\Rebill\Model\ResourceModel\Price;
@@ -34,6 +35,12 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
     protected $itemRepository;
 
     /**
+     * @var Config
+     */
+    protected $configHelper;
+
+    /**
+     * @param Config $configHelper
      * @param RebillItem $rebillItem
      * @param ItemRepository $itemRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
@@ -41,12 +48,14 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
      * @param HydratorInterface|null $hydrator
      */
     public function __construct(
+        Config                       $configHelper,
         RebillItem                   $rebillItem,
         ItemRepository               $itemRepository,
         SearchCriteriaBuilder        $searchCriteriaBuilder,
         CollectionProcessorInterface $collectionProcessor = null,
         ?HydratorInterface           $hydrator = null
     ) {
+        $this->configHelper = $configHelper;
         $this->rebillItem = $rebillItem;
         $this->itemRepository = $itemRepository;
         parent::__construct(
@@ -113,11 +122,12 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
 
     /**
      * @param array $filters
+     * @param int|null $pageSize
      * @return SearchResultInterface
      */
-    public function getEzList(array $filters = [])
+    public function getEzList(array $filters = [], ?int $pageSize = null)
     {
-        $result = parent::getEzList($filters);
+        $result = parent::getEzList($filters, $pageSize);
         return $result instanceof SearchResultInterface ? $result : null;
     }
 
@@ -167,6 +177,17 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
                 } else {
                     return $item;
                 }
+            } else {
+                $this->rebillItem->updatePrice(
+                    $item->getRebillPriceId(),
+                    [
+                        'amount'      => (string)$item->getDetails()['price'],
+                        'type'        => 'fixed',
+                        'repetitions' => $item->getDetails()['frequency']['recurring_payments'],
+                        'currency'    => (string)$item->getDetails()['currency'],
+                        'gatewayId'   => (string)$item->getDetails()['gateway'],
+                    ]
+                );
             }
             return parent::save($item);
         }

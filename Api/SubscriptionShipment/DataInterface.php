@@ -85,4 +85,15 @@ interface DataInterface
      * @return DataInterface
      */
     public function setDetails(array $details): DataInterface;
+
+    /**
+     * @return int|null
+     */
+    public function getPayed(): ?int;
+
+    /**
+     * @param int $payed
+     * @return DataInterface
+     */
+    public function setPayed(int $payed): DataInterface;
 }

@@ -9,6 +9,7 @@ namespace Improntus\Rebill\Model\Entity\Subscription;
 
 use Improntus\Rebill\Api\Subscription\DataInterface;
 use Improntus\Rebill\Model\ResourceModel\Subscription;
+use Improntus\Rebill\Model\ResourceModel\Subscription\Collection;
 use Magento\Framework\Model\AbstractModel;
 
 class Model extends AbstractModel implements DataInterface
@@ -17,6 +18,11 @@ class Model extends AbstractModel implements DataInterface
      * @var string
      */
     protected $_resourceName = Subscription::class;
+
+    /**
+     * @var string
+     */
+    protected $_collectionName = Collection::class;
 
     /**
      * @var string
@@ -146,6 +152,60 @@ class Model extends AbstractModel implements DataInterface
     public function setDetails(array $details): DataInterface
     {
         $this->setData('details', json_encode($details));
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPackageHash(): ?string
+    {
+        return $this->getData('package_hash');
+    }
+
+    /**
+     * @param string $packageHash
+     * @return DataInterface
+     */
+    public function setPackageHash(string $packageHash): DataInterface
+    {
+        $this->setData('package_hash', $packageHash);
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getNextSchedule(): ?string
+    {
+        return $this->getData('next_schedule');
+    }
+
+    /**
+     * @param string $nextSchedule
+     * @return DataInterface
+     */
+    public function setNextSchedule(string $nextSchedule): DataInterface
+    {
+        $this->setData('next_schedule', $nextSchedule);
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getPayed(): ?int
+    {
+        return $this->getData('payed');
+    }
+
+    /**
+     * @param int $payed
+     * @return DataInterface
+     */
+    public function setPayed(int $payed): DataInterface
+    {
+        $this->setData('payed', $payed);
         return $this;
     }
 }

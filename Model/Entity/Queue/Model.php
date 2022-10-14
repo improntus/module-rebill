@@ -9,6 +9,7 @@ namespace Improntus\Rebill\Model\Entity\Queue;
 
 use Improntus\Rebill\Api\Queue\DataInterface;
 use Improntus\Rebill\Model\ResourceModel\Price;
+use Improntus\Rebill\Model\ResourceModel\Queue\Collection;
 use Magento\Framework\Model\AbstractModel;
 
 class Model extends AbstractModel implements DataInterface
@@ -17,6 +18,11 @@ class Model extends AbstractModel implements DataInterface
      * @var string
      */
     protected $_resourceName = Price::class;
+
+    /**
+     * @var string
+     */
+    protected $_collectionName = Collection::class;
 
     /**
      * @var string
@@ -64,7 +70,7 @@ class Model extends AbstractModel implements DataInterface
      */
     public function getParameters(): ?array
     {
-        return json_decode($this->getData('paremeters'), true);
+        return json_decode($this->getData('parameters'), true);
     }
 
     /**
@@ -73,7 +79,7 @@ class Model extends AbstractModel implements DataInterface
      */
     public function setParameters(array $parameters): DataInterface
     {
-        $this->setData('paremeters', json_encode($parameters));
+        $this->setData('parameters', json_encode($parameters));
         return $this;
     }
 }

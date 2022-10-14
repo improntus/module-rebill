@@ -4,17 +4,12 @@ namespace Improntus\Rebill\Model;
 
 use Improntus\Rebill\Helper\Config;
 use Improntus\Rebill\Model\Entity\Queue\Repository as QueueRepository;
-use Improntus\Rebill\Model\Webhook\Confirmation;
 use Improntus\Rebill\Model\Webhook\WebhookAbstract;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\CouldNotSaveException;
 
 class Webhook
 {
-    private const WEBHOOKS = [
-        'confirmation' => Confirmation::class,
-    ];
-
     /**
      * @var QueueRepository
      */
@@ -26,13 +21,21 @@ class Webhook
     protected $configHelper;
 
     /**
+     * @var array
+     */
+    protected $webhooks = [];
+
+    /**
      * @param QueueRepository $queueRepository
      * @param Config $configHelper
+     * @param array $webhooks
      */
     public function __construct(
         QueueRepository $queueRepository,
-        Config          $configHelper
+        Config          $configHelper,
+        array           $webhooks = []
     ) {
+        $this->webhooks = $webhooks;
         $this->queueRepository = $queueRepository;
         $this->configHelper = $configHelper;
     }
@@ -63,8 +66,11 @@ class Webhook
      */
     public function execute(string $type, array $parameters)
     {
+        if (!isset($this->webhooks[$type]) || !class_exists($this->webhooks[$type])) {
+            return;
+        }
         /** @var WebhookAbstract $webhook */
-        $webhook = ObjectManager::getInstance()->create(self::WEBHOOKS[$type], ['parameters' => $parameters]);
+        $webhook = ObjectManager::getInstance()->create($this->webhooks[$type], ['parameters' => $parameters]);
         $webhook->execute();
     }
 }

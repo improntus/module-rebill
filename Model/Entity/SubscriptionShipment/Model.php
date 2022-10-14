@@ -9,6 +9,7 @@ namespace Improntus\Rebill\Model\Entity\SubscriptionShipment;
 
 use Improntus\Rebill\Api\SubscriptionShipment\DataInterface;
 use Improntus\Rebill\Model\ResourceModel\SubscriptionShipment;
+use Improntus\Rebill\Model\ResourceModel\SubscriptionShipment\Collection;
 use Magento\Framework\Model\AbstractModel;
 
 class Model extends AbstractModel implements DataInterface
@@ -17,6 +18,11 @@ class Model extends AbstractModel implements DataInterface
      * @var string
      */
     protected $_resourceName = SubscriptionShipment::class;
+
+    /**
+     * @var string
+     */
+    protected $_collectionName = Collection::class;
 
     /**
      * @var string
@@ -128,6 +134,24 @@ class Model extends AbstractModel implements DataInterface
     public function setDetails(array $details): DataInterface
     {
         $this->setData('details', json_encode($details));
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getPayed(): ?int
+    {
+        return $this->getData('payed');
+    }
+
+    /**
+     * @param int $payed
+     * @return DataInterface
+     */
+    public function setPayed(int $payed): DataInterface
+    {
+        $this->setData('payed', $payed);
         return $this;
     }
 }

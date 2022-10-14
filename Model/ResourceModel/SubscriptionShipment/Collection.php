@@ -22,4 +22,9 @@ class Collection extends AbstractCollection
      * @var string
      */
     protected $_resourceModel = ResourceModel::class;
+
+    /**
+     * @var string
+     */
+    protected $_itemObjectClass = Model::class;
 }

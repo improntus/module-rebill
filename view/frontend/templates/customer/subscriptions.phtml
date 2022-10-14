@@ -10,6 +10,7 @@
  * @var $escaper Escaper
  */
 
+use Improntus\Rebill\Model\Entity\Subscription\Model;
 use Magento\Framework\Escaper;
 use Improntus\Rebill\Block\Customer\Subscriptions;
 use Magento\Framework\Pricing\Helper\Data;
@@ -33,19 +34,21 @@ $subscriptions = $block->getSubscriptions() ?? [];
             </tr>
             </thead>
             <tbody>
+            <?php /** @var $subscription Model */ ?>
             <?php foreach ($subscriptions as $subscription) : ?>
+                <?php $details = $subscription->getDetails() ?>
                 <tr>
-                    <td><?= $escaper->escapeHtml($subscription['title']) ?></td>
-                    <td><?= $escaper->escapeHtml($subscription['quantity']) ?></td>
-                    <td><?= $escaper->escapeHtml($subscription['status']) ?></td>
-                    <td><?= $currencyHelper->currencyByStore((float)$subscription['price']['amount']) ?></td>
+                    <td><?= $escaper->escapeHtml($details['title']) ?></td>
+                    <td><?= $escaper->escapeHtml($details['quantity']) ?></td>
+                    <td><?= $escaper->escapeHtml($details['status']) ?></td>
+                    <td><?= $currencyHelper->currencyByStore((float)$details['price']['amount']) ?></td>
                     <td><?= $escaper->escapeHtml($block->getPaymentMethod($subscription)) ?></td>
-                    <td><?= $escaper->escapeHtml(date('Y-m-d', strtotime($subscription['createdAt']))) ?></td>
+                    <td><?= $escaper->escapeHtml(date('Y-m-d', strtotime($details['createdAt']))) ?></td>
                     <td class="col actions">
-                        <a class="action edit" href="<?= $escaper->escapeUrl($block->getUrl('rebill/customer/edit', ['id' => $subscription['id']])) ?>">
+                        <a class="action edit" href="<?= $escaper->escapeUrl($block->getUrl('rebill/customer/edit', ['id' => $details['id']])) ?>">
                             <span><?= $escaper->escapeHtml(__('Update')) ?></span>
                         </a>
-                        <a class="action delete" href="<?= $escaper->escapeUrl($block->getUrl('rebill/customer/cancel', ['id' => $subscription['id']])) ?>">
+                        <a class="action delete" href="<?= $escaper->escapeUrl($block->getUrl('rebill/customer/cancel', ['id' => $details['id']])) ?>">
                             <span><?= $escaper->escapeHtml(__('Cancel')) ?></span>
                         </a>
                     </td>

@@ -9,6 +9,7 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SearchResults;
 use Magento\Framework\App\ObjectManager;
+use Magento\Framework\EntityManager\Hydrator;
 use Magento\Framework\EntityManager\HydratorInterface;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
@@ -69,7 +70,7 @@ class RepositoryAbstract
         string                       $searchResultsClass,
         SearchCriteriaBuilder        $searchCriteriaBuilder,
         CollectionProcessorInterface $collectionProcessor = null,
-        ?HydratorInterface           $hydrator = null
+        HydratorInterface            $hydrator = null
     ) {
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->modelClass = $modelClass;
@@ -77,6 +78,7 @@ class RepositoryAbstract
         $this->collectionClass = $collectionClass;
         $this->searchResultsClass = $searchResultsClass;
         $this->hydrator = $hydrator;
+        $this->hydrator = $hydrator ?: $this->getHydrator();
         $this->collectionProcessor = $collectionProcessor ?: $this->getCollectionProcessor();
     }
 
@@ -87,12 +89,6 @@ class RepositoryAbstract
      */
     public function save($item)
     {
-        if ($item->getId() && $item instanceof $this->modelClass && !$item->getOrigData()) {
-            $item = $this->hydrator->hydrate(
-                $this->getById($item->getId()),
-                $this->hydrator->extract($item)
-            );
-        }
         try {
             $this->getResourceModel()->save($item);
         } catch (Exception $exception) {
@@ -109,7 +105,7 @@ class RepositoryAbstract
     {
         $item = $this->create();
         if ($id) {
-            $item->load($id);
+            $this->getResourceModel()->load($item, $id);
         }
         return $item;
     }
@@ -142,9 +138,10 @@ class RepositoryAbstract
 
     /**
      * @param array $filters
-     * @return mixed
+     * @param int|null $pageSize
+     * @return SearchResults|mixed
      */
-    public function getEzList(array $filters = [])
+    public function getEzList(array $filters = [], ?int $pageSize = null)
     {
         foreach ($filters as $field => $condition) {
             if (is_array($condition)) {
@@ -154,6 +151,9 @@ class RepositoryAbstract
             } else {
                 $this->searchCriteriaBuilder->addFilter($field, $condition);
             }
+        }
+        if ($pageSize) {
+            $this->searchCriteriaBuilder->setPageSize($pageSize);
         }
         return $this->getList($this->searchCriteriaBuilder->create());
     }
@@ -231,5 +231,13 @@ class RepositoryAbstract
     private function getCollectionProcessor(): CollectionProcessor
     {
         return ObjectManager::getInstance()->get(CollectionProcessor::class);
+    }
+
+    /**
+     * @return Hydrator
+     */
+    private function getHydrator(): Hydrator
+    {
+        return ObjectManager::getInstance()->get(Hydrator::class);
     }
 }

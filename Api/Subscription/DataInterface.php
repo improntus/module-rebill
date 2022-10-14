@@ -96,4 +96,37 @@ interface DataInterface
      * @return DataInterface
      */
     public function setDetails(array $details): DataInterface;
+
+    /**
+     * @return string|null
+     */
+    public function getPackageHash(): ?string;
+
+    /**
+     * @param string $packageHash
+     * @return DataInterface
+     */
+    public function setPackageHash(string $packageHash): DataInterface;
+
+    /**
+     * @return string|null
+     */
+    public function getNextSchedule(): ?string;
+
+    /**
+     * @param string $nextSchedule
+     * @return DataInterface
+     */
+    public function setNextSchedule(string $nextSchedule): DataInterface;
+
+    /**
+     * @return int|null
+     */
+    public function getPayed(): ?int;
+
+    /**
+     * @param int $payed
+     * @return DataInterface
+     */
+    public function setPayed(int $payed): DataInterface;
 }

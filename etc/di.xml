@@ -95,4 +95,14 @@
     <preference for="Improntus\Rebill\Api\Queue\SearchResultInterface" type="Improntus\Rebill\Model\Entity\Queue\SearchResults" />
     <preference for="Improntus\Rebill\Api\Subscription\SearchResultInterface" type="Improntus\Rebill\Model\Entity\Subscription\SearchResults" />
     <preference for="Improntus\Rebill\Api\SubscriptionShipment\SearchResultInterface" type="Improntus\Rebill\Model\Entity\SubscriptionShipment\SearchResults" />
+
+    <type name="Improntus\Rebill\Model\Webhook">
+        <arguments>
+            <argument name="webhooks" xsi:type="array">
+                <item name="confirmation" xsi:type="string">Improntus\Rebill\Model\Webhook\Confirmation</item>
+                <item name="heads_up" xsi:type="string">Improntus\Rebill\Model\Webhook\HeadsUp</item>
+                <item name="new_payment" xsi:type="string">Improntus\Rebill\Model\Webhook\Payment</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

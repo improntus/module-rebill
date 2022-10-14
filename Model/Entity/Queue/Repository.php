@@ -102,11 +102,12 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
 
     /**
      * @param array $filters
+     * @param int|null $pageSize
      * @return SearchResultInterface
      */
-    public function getEzList(array $filters = [])
+    public function getEzList(array $filters = [], ?int $pageSize = null)
     {
-        $result = parent::getEzList($filters);
+        $result = parent::getEzList($filters, $pageSize);
         return $result instanceof SearchResultInterface ? $result : null;
     }
 

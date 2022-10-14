@@ -4,6 +4,8 @@ namespace Improntus\Rebill\Cron;
 
 use Improntus\Rebill\Model\Entity\Queue\Repository;
 use Improntus\Rebill\Model\Webhook;
+use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\CouldNotSaveException;
 
 class Queue
 {
@@ -31,6 +33,8 @@ class Queue
 
     /**
      * @return void
+     * @throws CouldNotDeleteException
+     * @throws CouldNotSaveException
      */
     public function execute()
     {
@@ -39,7 +43,10 @@ class Queue
         ]);
         foreach ($queues->getItems() as $queue) {
             if ($this->queueRepository->validateStatus($queue->getId(), 'pending')) {
-                $this->webhook->execute($queue->getId(), $queue->getParameters());
+//                $queue->setStatus('processing');
+//                $this->queueRepository->save($queue);
+                $this->webhook->execute($queue->getType(), $queue->getParameters());
+//                $this->queueRepository->delete($queue);
             }
         }
     }

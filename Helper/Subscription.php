@@ -133,9 +133,9 @@ class Subscription extends Data
     public function getProductRebillSubscriptionDetails(Product $product)
     {
         return [
-            'enable_subscription'   => (bool)$product->getData('rebill_subscription_type'),
-            'subscription_type'     => $product->getData('rebill_subscription_type'),
-            'frequency'             => json_decode($product->getData('rebill_frequency') ?? '[]', true),
+            'enable_subscription' => (bool)$product->getData('rebill_subscription_type'),
+            'subscription_type'   => $product->getData('rebill_subscription_type'),
+            'frequency'           => json_decode($product->getData('rebill_frequency') ?? '[]', true),
         ];
     }
 
@@ -207,7 +207,7 @@ class Subscription extends Data
             $initialCost = $frequencyArray['initialCost'];
             if (!$price) {
                 $price = $this->currencyHelper->currencyByStore($frequencyArray['price'], null, true, false);
-                $price = ($frequencyArray['price'] > 0 ? '+' : ' ').$price;
+                $price = ($frequencyArray['price'] > 0 ? '+' : ' ') . $price;
             } else {
                 $price = $this->currencyHelper->currencyByStore($price, null, true, false);
             }
@@ -349,11 +349,12 @@ class Subscription extends Data
      * @param $price
      * @return string|void
      */
-    public function getFrequencyPriceFormat($price = null){
+    public function getFrequencyPriceFormat($price = null)
+    {
         try {
             if (!$price) {
                 $price = $this->currencyHelper->currencyByStore($price, null, true, false);
-                $price = ($price > 0 ? '+' : ' ').$price;
+                $price = ($price > 0 ? '+' : ' ') . $price;
             } else {
                 $price = $this->currencyHelper->currencyByStore($price, null, true, false);
             }

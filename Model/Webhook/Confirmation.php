@@ -9,6 +9,7 @@ namespace Improntus\Rebill\Model\Webhook;
 
 use Exception;
 use Improntus\Rebill\Helper\Config;
+use Improntus\Rebill\Model\Entity\Price\Model;
 use Improntus\Rebill\Model\Entity\Price\Repository as PriceRepository;
 use Improntus\Rebill\Model\Entity\Subscription\Repository as SubscriptionRepository;
 use Improntus\Rebill\Model\Entity\SubscriptionShipment\Repository as ShipmentRepository;
@@ -126,6 +127,7 @@ class Confirmation extends WebhookAbstract
                             continue;
                         }
                         $shipment = $_subscriptions['shipment'][0];
+                        /** @var Model $price */
                         $price = $prices[$shipment['price']['id']];
                         $shipmentModel = $this->shipmentRepository->getByRebillId($shipment['id']);
                         $shipmentModel->setStatus($shipment['status']);
@@ -134,8 +136,10 @@ class Confirmation extends WebhookAbstract
                         $shipmentModel->setOrderId($orderId);
                         $shipmentModel->setQuantity(1);
                         $shipmentModel->setDetails($shipment);
+                        $shipmentModel->setPayed(1);
                         $this->shipmentRepository->save($shipmentModel);
                         foreach ($_subscriptions['product'] as $subscription) {
+                            /** @var Model $price */
                             $price = $prices[$subscription['price']['id']];
                             $model = $this->subscriptionRepository->getByRebillId($subscription['id']);
                             $model->setShipmentId($shipmentModel->getId());
@@ -145,6 +149,9 @@ class Confirmation extends WebhookAbstract
                             $model->setOrderId($orderId);
                             $model->setQuantity(1);
                             $model->setDetails($subscription);
+                            $packageHash = hash('md5', "$orderId-{$price->getFrequencyHash()}");
+                            $model->setPackageHash($packageHash);
+                            $model->setPayed(1);
                             $this->subscriptionRepository->save($model);
                         }
                     }

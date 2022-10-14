@@ -9,6 +9,7 @@ namespace Improntus\Rebill\Model\Entity\Price;
 
 use Improntus\Rebill\Api\Price\DataInterface;
 use Improntus\Rebill\Model\ResourceModel\Price;
+use Improntus\Rebill\Model\ResourceModel\Price\Collection;
 use Magento\Framework\Model\AbstractModel;
 
 class Model extends AbstractModel implements DataInterface
@@ -17,6 +18,11 @@ class Model extends AbstractModel implements DataInterface
      * @var string
      */
     protected $_resourceName = Price::class;
+
+    /**
+     * @var string
+     */
+    protected $_collectionName = Collection::class;
 
     /**
      * @var string

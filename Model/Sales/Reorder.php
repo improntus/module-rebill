@@ -53,27 +53,84 @@ class Reorder
 
     /**
      * @param Order $order
+     * @param array $frequencies
      * @return OrderInterface|null
      * @throws CouldNotSaveException
      * @throws InputException
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    public function execute(Order $order)
+    public function execute(Order $order, array $frequencies = [])
     {
         $oldQuote = $this->quoteRepository->get($order->getQuoteId());
+        $shippingAddress = $oldQuote->getShippingAddress();
+        $payment = $oldQuote->getPayment();
         $result = $this->reorder->execute($order->getIncrementId(), $order->getStoreId());
         /** @var Quote $cart */
         $cart = $result->getCart();
-        $cart->setBillingAddress($oldQuote->getBillingAddress());
-        $shippingAddress = $oldQuote->getShippingAddress()
-            ->setShippingMethod($oldQuote->getShippingAddress()->getShippingMethod())
+        $cart->setShippingAddress($shippingAddress);
+        if ($frequencies) {
+            /** @var Quote\Item $item */
+            foreach ($cart->getAllVisibleItems() as $item) {
+                $frequencyOption = $item->getOptionByCode('rebill_subscription');
+                if (!$frequencyOption) {
+                    if ($children = $item->getChildren()) {
+                        foreach ($children as $child) {
+                            $cart->removeItem($child->getId());
+                        }
+                    }
+                    $cart->removeItem($item->getId());
+                    continue;
+                }
+                $frequencyOption = json_decode($frequencyOption->getValue(), true);
+                $_frequencyQty = $frequencyOption['frequency'] ?? 0;
+                $frequency = [
+                    'frequency'          => $_frequencyQty ?? 0,
+                    'frequency_type'     => $frequencyOption['frequencyType'] ?? 'months',
+                    'recurring_payments' => 1
+                ];
+                if (isset($frequencyOption['recurringPayments']) && $frequencyOption['recurringPayments'] > 0) {
+                    $frequency['recurring_payments'] = (int)$frequencyOption['recurringPayments'];
+                }
+                $frequencyHash = hash('md5', implode('-', $frequency));
+                $remove = true;
+                foreach ($frequencies as $sku => $_frequency) {
+                    if ($_frequency == $frequencyHash && $item->getSku() == $sku) {
+                        $remove = false;
+                        break;
+                    }
+                }
+                if ($remove) {
+                    if ($children = $item->getChildren()) {
+                        foreach ($children as $child) {
+                            $cart->removeItem($child->getId());
+                        }
+                    }
+                    $cart->removeItem($item->getId());
+                    continue;
+                }
+                $productPrice = $item->getPrice();
+                if ($product = $item->getProduct()) {
+                    $productPrice = $frequencyOption['price'] + $product->getFinalPrice();
+                }
+                $item->setCustomPrice($productPrice);
+                $item->setOriginalCustomPrice($productPrice);
+                $item->getProduct()->setIsSuperMode(true);
+            }
+        }
+        $shippingAddress = $shippingAddress
+            ->setShippingMethod($order->getShippingMethod())
             ->setCollectShippingRates(true)
             ->collectShippingRates();
         $cart->setShippingAddress($shippingAddress);
-        $cart->setPayment($oldQuote->getPayment());
+        $cart->setBillingAddress($oldQuote->getBillingAddress());
+        $cart->setPayment($payment);
         $cart->collectTotals();
         $this->quoteRepository->save($cart);
+        $cart->getShippingAddress()
+            ->setCollectShippingRates(true)
+            ->collectShippingRates();
+        $cart->getPayment()->setMethod($payment->getMethod());
         return $this->cartManagement->submit($cart);
     }
 }

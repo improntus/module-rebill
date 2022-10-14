@@ -32,7 +32,7 @@ class Quote
     /**
      * @param Subject $subject
      * @param Product $product
-     * @param $request
+     * @param mixed $request
      * @return array
      */
     public function beforeAddProduct(Subject $subject, Product $product, $request = null)
@@ -40,7 +40,8 @@ class Quote
         try {
             if ($request instanceof DataObject) {
                 $info = $request->getData();
-                if (isset($info['frequency']) && $info['frequency'] && isset($info['use_subscription']) && $info['use_subscription'] == 1) {
+                if (isset($info['frequency']) && $info['frequency']
+                    && isset($info['use_subscription']) && $info['use_subscription'] == 1) {
                     $this->configHelper->setCurrentSubscription($info['frequency']);
                     $frequencies = $this->configHelper->getProductRebillSubscriptionDetails($product)['frequency'];
                     $frequency = [];

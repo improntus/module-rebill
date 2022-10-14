@@ -13,6 +13,23 @@ use Improntus\Rebill\Api\Payment\DataInterface;
 class SearchResults extends \Magento\Framework\Api\SearchResults implements SearchResultInterface
 {
     /**
+     * @var ModelFactory
+     */
+    protected $modelFactory;
+
+    /**
+     * @param ModelFactory $modelFactory
+     * @param array $data
+     */
+    public function __construct(
+        ModelFactory $modelFactory,
+        array        $data = []
+    ) {
+        $this->modelFactory = $modelFactory;
+        parent::__construct($data);
+    }
+
+    /**
      * @return DataInterface[]
      */
     public function getItems()
@@ -37,6 +54,10 @@ class SearchResults extends \Magento\Framework\Api\SearchResults implements Sear
      */
     public function setItems(array $items)
     {
-        return $this->setData(self::KEY_ITEMS, $items);
+        $_items = [];
+        foreach ($items as $item) {
+            $_items[] = $this->modelFactory->create()->setData($item->getData());
+        }
+        return $this->setData(self::KEY_ITEMS, $_items);
     }
 }
