@@ -75,7 +75,6 @@ class Payment extends SearchResult
             "card_brand" => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.card.brand')),'')",
             "entity_id" => "main_table.entity_id",
             "status" => "main_table.status",
-            "subscription_id" => "main_table.subscription_id",
             "rebill_id" => "main_table.rebill_id",
             /**
              * Order Columns
