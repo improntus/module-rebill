@@ -40,30 +40,35 @@
         <column name="rebill_id">
             <settings>
                 <filter>text</filter>
+                <sortable>false</sortable>
                 <label translate="true">Rebill Id</label>
             </settings>
         </column>
         <column name="status">
             <settings>
                 <filter>false</filter>
+                <sortable>false</sortable>
                 <label translate="true">Status</label>
             </settings>
         </column>
         <column name="quantity">
             <settings>
                 <filter>false</filter>
+                <sortable>false</sortable>
                 <label translate="true">Quantity</label>
             </settings>
         </column>
         <column name="user_email">
             <settings>
                 <filter>text</filter>
+                <sortable>false</sortable>
                 <label translate="true">User Email</label>
             </settings>
         </column>
         <column name="title">
             <settings>
                 <filter>text</filter>
+                <sortable>false</sortable>
                 <label translate="true">Title</label>
             </settings>
         </column>
@@ -79,12 +84,14 @@
         <column name="gateway_type">
             <settings>
                 <filter>text</filter>
+                <sortable>false</sortable>
                 <label translate="true">Gateway Type</label>
             </settings>
         </column>
         <column name="gateway_description">
             <settings>
                 <filter>text</filter>
+                <sortable>false</sortable>
                 <label translate="true">Gateway Description</label>
             </settings>
         </column>
@@ -100,6 +107,7 @@
                 <filter>dateRange</filter>
                 <dataType>date</dataType>
                 <dateFormat>yyyy-MM-dd</dateFormat>
+                <sortable>false</sortable>
                 <label translate="true">Last Charge Date</label>
             </settings>
         </column>
@@ -108,6 +116,7 @@
                 <filter>dateRange</filter>
                 <dataType>date</dataType>
                 <dateFormat>yyyy-MM-dd</dateFormat>
+                <sortable>false</sortable>
                 <label translate="true">Next Charge Date</label>
             </settings>
         </column>

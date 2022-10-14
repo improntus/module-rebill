@@ -40,42 +40,49 @@
         <column name="rebill_id">
             <settings>
                 <filter>text</filter>
+                <sortable>false</sortable>
                 <label translate="true">Rebill Id</label>
             </settings>
         </column>
         <column name="paymentId" sortOrder="2">
             <settings>
                 <filter>text</filter>
+                <sortable>false</sortable>
                 <label translate="true">Payment Id</label>
             </settings>
         </column>
         <column name="status" sortOrder="3">
             <settings>
                 <filter>false</filter>
+                <sortable>false</sortable>
                 <label translate="true">status</label>
             </settings>
         </column>
         <column name="amount" class="Magento\Sales\Ui\Component\Listing\Column\Price">
             <settings>
                 <filter>textRange</filter>
+                <sortable>false</sortable>
                 <label translate="true">Amount</label>
             </settings>
         </column>
         <column name="currency">
             <settings>
                 <filter>false</filter>
+                <sortable>false</sortable>
                 <label translate="true">Currency</label>
             </settings>
         </column>
         <column name="card_last_number">
             <settings>
                 <filter>text</filter>
+                <sortable>false</sortable>
                 <label translate="true">Card Last Numbers</label>
             </settings>
         </column>
         <column name="card_brand">
             <settings>
                 <filter>text</filter>
+                <sortable>false</sortable>
                 <label translate="true">Card Brand</label>
             </settings>
         </column>
@@ -84,36 +91,42 @@
                 <dataType>text</dataType>
                 <filter>false</filter>
                 <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <sortable>false</sortable>
                 <label translate="true">Order Id</label>
             </settings>
         </column>
         <column name="customer_firstname">
             <settings>
                 <filter>text</filter>
+                <sortable>false</sortable>
                 <label translate="true">Customer Firstname</label>
             </settings>
         </column>
         <column name="customer_lastname">
             <settings>
                 <filter>text</filter>
+                <sortable>false</sortable>
                 <label translate="true">Customer Lastname</label>
             </settings>
         </column>
         <column name="gateway_type">
             <settings>
                 <filter>text</filter>
+                <sortable>false</sortable>
                 <label translate="true">Gateway Type</label>
             </settings>
         </column>
         <column name="gateway_description">
             <settings>
                 <filter>text</filter>
+                <sortable>false</sortable>
                 <label translate="true">Gateway Description</label>
             </settings>
         </column>
         <column name="description">
             <settings>
                 <filter>text</filter>
+                <sortable>false</sortable>
                 <label translate="true">Description</label>
             </settings>
         </column>
@@ -123,7 +136,7 @@
                 <dataType>date</dataType>
                 <dateFormat>yyyy-MM-dd</dateFormat>
                 <label translate="true">Created At</label>
-                <sorting>desc</sorting>
+                <sortable>false</sortable>
             </settings>
         </column>
     </columns>

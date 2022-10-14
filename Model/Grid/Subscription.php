@@ -56,6 +56,7 @@ class Subscription extends SearchResult
 
     /**
      * @return $this|Subscription|void
+     * phpcs:disable
      */
     protected function _initSelect()
     {
@@ -95,6 +96,11 @@ class Subscription extends SearchResult
         return $this;
     }
 
+    /**
+     * @param $field
+     * @param $condition
+     * @return $this|Subscription
+     */
     public function addFieldToFilter($field, $condition = null)
     {
         $aliasFilters = [
