@@ -46,10 +46,10 @@ class Cancel extends Action
      */
     public function execute()
     {
-        $cancelId = $this->getRequest()->getParam('cancel_id');
+        $rebillId = $this->getRequest()->getParam('rebill_id');
+        $userEmail = $this->getRequest()->getParam('user_email');
         try {
-            list($subscriptionId, $email) = explode('|', $cancelId);
-            $this->subscription->cancelSubscription($subscriptionId, $email);
+            $this->subscription->cancelSubscription($rebillId, $userEmail);
             $this->messageManager->addSuccessMessage(__('The subscription was cancelled.'));
         } catch (Exception $exception) {
             $this->messageManager->addErrorMessage(__('There was an error cancelling the subscription. Error: %1', $exception->getMessage()));

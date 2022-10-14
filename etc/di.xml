@@ -36,17 +36,11 @@
         </arguments>
     </type>
 
-    <virtualType name="Improntus\Rebill\Model\ResourceModel\Gateway\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
-        <arguments>
-            <argument name="mainTable" xsi:type="string">rebill_gateway</argument>
-            <argument name="resourceModel" xsi:type="string">Improntus\Rebill\Model\ResourceModel\Gateway</argument>
-        </arguments>
-    </virtualType>
-
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">
-                <item name="rebill_gateway_grid_data_source" xsi:type="string">Improntus\Rebill\Model\ResourceModel\Gateway\Grid\Collection</item>
+                <item name="rebill_payment_grid_data_source" xsi:type="string">Improntus\Rebill\Model\Grid\Payment</item>
+                <item name="rebill_subscription_grid_data_source" xsi:type="string">Improntus\Rebill\Model\Grid\Subscription</item>
             </argument>
         </arguments>
     </type>

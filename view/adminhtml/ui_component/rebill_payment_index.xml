@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">rebill_payment_index.rebill_payment_grid_data_source</item>
+            <item name="deps" xsi:type="string">rebill_payment_index.rebill_payment_grid_data_source</item>
+        </item>
+        <item name="spinner" xsi:type="string">rebill_payment_grid_table_columns</item>
+    </argument>
+
+    <dataSource name="rebill_payment_grid_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>Improntus_Rebill::main</aclResource>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="rebill_payment_grid_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>main_table.entity_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="rebill_payment_grid_table_columns">
+        <column name="rebill_id">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Rebill Id</label>
+            </settings>
+        </column>
+        <column name="paymentId" sortOrder="2">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Payment Id</label>
+            </settings>
+        </column>
+        <column name="status" sortOrder="3">
+            <settings>
+                <filter>false</filter>
+                <label translate="true">status</label>
+            </settings>
+        </column>
+        <column name="amount" class="Magento\Sales\Ui\Component\Listing\Column\Price">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Amount</label>
+            </settings>
+        </column>
+        <column name="currency">
+            <settings>
+                <filter>false</filter>
+                <label translate="true">Currency</label>
+            </settings>
+        </column>
+        <column name="card_last_number">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Card Last Numbers</label>
+            </settings>
+        </column>
+        <column name="card_brand">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Card Brand</label>
+            </settings>
+        </column>
+        <column name="orderLink" class="Improntus\Rebill\Ui\Component\Listing\Column\OrderLink">
+            <settings>
+                <dataType>text</dataType>
+                <filter>false</filter>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <label translate="true">Order Id</label>
+            </settings>
+        </column>
+        <column name="customer_firstname">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Customer Firstname</label>
+            </settings>
+        </column>
+        <column name="customer_lastname">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Customer Lastname</label>
+            </settings>
+        </column>
+        <column name="gateway_type">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Gateway Type</label>
+            </settings>
+        </column>
+        <column name="gateway_description">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Gateway Description</label>
+            </settings>
+        </column>
+        <column name="description">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Description</label>
+            </settings>
+        </column>
+        <column name="createdAt" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <dateFormat>yyyy-MM-dd</dateFormat>
+                <label translate="true">Created At</label>
+                <sorting>desc</sorting>
+            </settings>
+        </column>
+    </columns>
+</listing>

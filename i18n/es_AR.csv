@@ -54,3 +54,31 @@ UUID,UUID
 "Quantity of payments in a subscription that the coupon/rule will be applied to","Cantidad de pagos a los que una regla/cupón aplicará a una suscripción"
 "Rebill Payment","Pagar con Rebill"
 "If it is 0 the subscription will be cyclical", "Si es 0 la suscripción será cíclica"
+"Rebill Id","Rebill ID"
+"Payment Id","ID del Pago"
+status,Estado
+Amount,Monto
+Currency,Moneda
+"Card Last Numbers","Últimos dígitos de la Tarjeta"
+"Card Brand","Marca de la tarjeta"
+"Order Id","ID de la Orden"
+"Customer Firstname","Nombre"
+"Customer Lastname","Apellido"
+"Gateway Type","Pasarela de Pago"
+"Gateway Description","Descripción de Pasarela de Pago"
+Description,Descripción
+"Created At","Creación"
+"User Email","Email"
+"Last Charge Date","Fecha de Último Pago"
+"Next Charge Date","Próxima Fecha de Pago"
+"Apply to Subscriptions","Aplicar a suscripciones"
+Subscriptions,Suscripciones
+"Subscription Update","Actualizar Suscripción"
+"Rebill Payments","Pagos Rebill"
+"Payments","Pagos"
+"Rebill Subscriptions", "Suscripciones Rebill"
+"Status","Estado"
+"Quantity", "Cantidad"
+"Action", "Acciones"
+"Frequency", "Frecuencia"
+"Cancel", "Cancelar"

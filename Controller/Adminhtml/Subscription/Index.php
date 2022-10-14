@@ -8,17 +8,34 @@
 namespace Improntus\Rebill\Controller\Adminhtml\Subscription;
 
 use Magento\Backend\App\Action;
-use Magento\Framework\App\ResponseInterface;
-use Magento\Framework\Controller\ResultInterface;
+use Magento\Backend\App\Action\Context;
+use Magento\Framework\View\Result\PageFactory;
 
 class Index extends Action
 {
+    const ADMIN_RESOURCE = 'Improntus_Rebill::main';
+
     /**
-     * @return ResponseInterface|ResultInterface|void
+     * @var PageFactory
      */
+    protected PageFactory $resultPageFactory;
+
+    /**
+     * @param Context $context
+     * @param PageFactory $resultPageFactory
+     */
+    public function __construct(
+        Context     $context,
+        PageFactory $resultPageFactory
+    ) {
+        $this->resultPageFactory = $resultPageFactory;
+        parent::__construct($context);
+    }
+
     public function execute()
     {
-        $this->_view->loadLayout();
-        $this->_view->renderLayout();
+        $resultPage = $this->resultPageFactory->create();
+        $resultPage->getConfig()->getTitle()->prepend(__('Rebill Subscriptions'));
+        return $resultPage;
     }
 }
