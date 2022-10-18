@@ -110,7 +110,11 @@ class Confirmation extends WebhookAbstract
                     $order = $this->orderRepository->get($orderId);
                     $this->rebillInvoice->execute($order);
                     $order->setStatus($this->configHelper->getApprovedStatus());
-                    $this->orderSender->send($order);
+                    try {
+                        $this->orderSender->send($order);
+                    } catch (Exception $exception) {
+                        $this->configHelper->logError($exception->getMessage());
+                    }
                     $order->setIsCustomerNotified(true);
                     $this->orderRepository->save($order);
                     foreach ($invoice['paidBags'] as $_payment) {

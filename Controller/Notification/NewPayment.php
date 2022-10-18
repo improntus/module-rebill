@@ -12,13 +12,14 @@ use Improntus\Rebill\Model\Webhook;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
 
 /**
  * @description Webhook for new payment
  */
-class NewPayment extends Action implements HttpGetActionInterface
+class NewPayment extends Action implements HttpGetActionInterface, HttpPostActionInterface
 {
     /**
      * @var Webhook

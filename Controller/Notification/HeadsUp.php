@@ -12,13 +12,14 @@ use Improntus\Rebill\Model\Webhook;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
 
 /**
  * @description Webhook for 24 hours heads up before new payment in a recurrent or cycling subscription
  */
-class HeadsUp extends Action implements HttpGetActionInterface
+class HeadsUp extends Action implements HttpGetActionInterface, HttpPostActionInterface
 {
     /**
      * @var Webhook
