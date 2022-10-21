@@ -181,6 +181,7 @@ class Transaction
                 'repetitions' => 1,
                 'currency'    => $item['currency'],
                 'gatewayId'   => $item['gateway'],
+                'description' => $item['price_name'] ?? $item['product_name'],
                 'enabled'     => true,
             ];
             if ($item['frequency']['frequency'] > 0) {
@@ -310,7 +311,7 @@ class Transaction
                     $order->getShippingAmount(),
                     $order->getShippingTaxAmount(),
                     -$order->getShippingDiscountAmount(),
-                    -$order->getShippingDiscountTaxCompensationAmount()
+                    -$order->getShippingDiscountTaxCompensationAmount(),
                 ]) / $itemsQty;
             $_items = $items;
             foreach ($_items as $hash => $item) {
@@ -325,14 +326,15 @@ class Transaction
                     return "({$item['product_name']})";
                 }, $item);
                 $orderId = $order->getIncrementId();
-                $sku = "shipment-$orderId-" . implode('-', $itemsSkus);
+                $sku = "shipment-$orderId";
                 $name = "Order #{$orderId} Shipment " . implode(' ', $itemsNames);
                 $items[$hash][] = [
                     'type'           => 'shipment',
                     'frequency_hash' => $hash,
                     'frequency'      => $frequency,
                     'sku'            => $sku,
-                    'product_name'   => $name,
+                    'product_name'   => $sku,
+                    'price_name'     => $name,
                     'price'          => $shipmentPrice,
                     'quantity'       => 1,
                     'gateway'        => $gateway,
