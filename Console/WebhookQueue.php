@@ -7,6 +7,7 @@
 
 namespace Improntus\Rebill\Console;
 
+use Exception;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\State;
 use Magento\Framework\Exception\CouldNotDeleteException;
@@ -45,9 +46,6 @@ class WebhookQueue extends Command
     ) {
         $this->state = $state;
         $this->cronAction = $cronAction;
-        if (!$this->state->getAreaCode()) {
-            $this->state->setAreaCode(Area::AREA_GLOBAL);
-        }
         parent::__construct($name);
     }
 
@@ -70,6 +68,13 @@ class WebhookQueue extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        //phpcs:disable
+        try {
+            $this->state->setAreaCode(Area::AREA_GLOBAL);
+        } catch (Exception $exception) {
+            //do nothing
+        }
+        //phpcs:enable
         $this->cronAction->execute();
     }
 }
