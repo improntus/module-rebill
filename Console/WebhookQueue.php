@@ -7,6 +7,11 @@
 
 namespace Improntus\Rebill\Console;
 
+use Magento\Framework\App\Area;
+use Magento\Framework\App\State;
+use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\LocalizedException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,13 +28,21 @@ class WebhookQueue extends Command
     protected $cronAction;
 
     /**
+     * @var State
+     */
+    protected $state;
+
+    /**
      * @param CronAction $cronAction
+     * @param State $state
      * @param string|null $name
      */
     public function __construct(
         CronAction $cronAction,
+        State      $state,
         string     $name = null
     ) {
+        $this->state = $state;
         $this->cronAction = $cronAction;
         parent::__construct($name);
     }
@@ -47,10 +60,16 @@ class WebhookQueue extends Command
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @return void
+     * @return int|void
+     * @throws CouldNotDeleteException
+     * @throws CouldNotSaveException
+     * @throws LocalizedException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (!$this->state->getAreaCode()) {
+            $this->state->setAreaCode(Area::AREA_GLOBAL);
+        }
         $this->cronAction->execute();
     }
 }
