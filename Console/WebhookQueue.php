@@ -36,6 +36,7 @@ class WebhookQueue extends Command
      * @param CronAction $cronAction
      * @param State $state
      * @param string|null $name
+     * @throws LocalizedException
      */
     public function __construct(
         CronAction $cronAction,
@@ -44,6 +45,9 @@ class WebhookQueue extends Command
     ) {
         $this->state = $state;
         $this->cronAction = $cronAction;
+        if (!$this->state->getAreaCode()) {
+            $this->state->setAreaCode(Area::AREA_GLOBAL);
+        }
         parent::__construct($name);
     }
 
@@ -63,13 +67,9 @@ class WebhookQueue extends Command
      * @return int|void
      * @throws CouldNotDeleteException
      * @throws CouldNotSaveException
-     * @throws LocalizedException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!$this->state->getAreaCode()) {
-            $this->state->setAreaCode(Area::AREA_GLOBAL);
-        }
         $this->cronAction->execute();
     }
 }
