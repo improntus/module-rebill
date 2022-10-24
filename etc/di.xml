@@ -6,7 +6,8 @@
  * @package Improntus_Rebill
  */
 -->
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <virtualType name="Improntus\Rebill\Model\Payment\ConfigProvider">
         <arguments>
             <argument name="methodCodes" xsi:type="array">
@@ -17,7 +18,9 @@
     <type name="Magento\Checkout\Model\CompositeConfigProvider">
         <arguments>
             <argument name="configProviders" xsi:type="array">
-                <item name="improntus_rebill_config_provider" xsi:type="object">Improntus\Rebill\Model\Payment\ConfigProvider</item>
+                <item name="improntus_rebill_config_provider" xsi:type="object">
+                    Improntus\Rebill\Model\Payment\ConfigProvider
+                </item>
             </argument>
         </arguments>
     </type>
@@ -30,7 +33,7 @@
     <type name="Improntus\Rebill\Logger\Logger">
         <arguments>
             <argument name="name" xsi:type="string">rebillLogger</argument>
-            <argument name="handlers"  xsi:type="array">
+            <argument name="handlers" xsi:type="array">
                 <item name="system" xsi:type="object">Improntus\Rebill\Logger\Handler</item>
             </argument>
         </arguments>
@@ -39,8 +42,11 @@
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">
-                <item name="rebill_payment_grid_data_source" xsi:type="string">Improntus\Rebill\Model\Grid\Payment</item>
-                <item name="rebill_subscription_grid_data_source" xsi:type="string">Improntus\Rebill\Model\Grid\Subscription</item>
+                <item name="rebill_payment_grid_data_source" xsi:type="string">Improntus\Rebill\Model\Grid\Payment
+                </item>
+                <item name="rebill_subscription_grid_data_source" xsi:type="string">
+                    Improntus\Rebill\Model\Grid\Subscription
+                </item>
             </argument>
         </arguments>
     </type>
@@ -58,37 +64,53 @@
     </type>
 
     <type name="Magento\Customer\Helper\Address">
-        <plugin name="Improntus_Rebill::isVatAttributeVisible" type="Improntus\Rebill\Plugin\Helper\Address" sortOrder="10"/>
+        <plugin name="Improntus_Rebill::isVatAttributeVisible" type="Improntus\Rebill\Plugin\Helper\Address"
+                sortOrder="10"/>
     </type>
 
     <type name="Magento\Checkout\Helper\Data">
-        <plugin name="Improntus_Rebill::checkPaymentMethodsAvailability" type="Improntus\Rebill\Plugin\Helper\CheckoutData" sortOrder="10"/>
+        <plugin name="Improntus_Rebill::checkPaymentMethodsAvailability"
+                type="Improntus\Rebill\Plugin\Helper\CheckoutData" sortOrder="10"/>
     </type>
 
     <type name="Magento\Catalog\Model\Product">
         <plugin name="Improntus_Rebill::afterIsSalable" type="Improntus\Rebill\Plugin\Catalog\Product" sortOrder="10"/>
     </type>
 
-    <preference for="Improntus\Rebill\Api\Item\DataInterface" type="Improntus\Rebill\Model\Entity\Item\Model" />
-    <preference for="Improntus\Rebill\Api\Price\DataInterface" type="Improntus\Rebill\Model\Entity\Price\Model" />
-    <preference for="Improntus\Rebill\Api\Payment\DataInterface" type="Improntus\Rebill\Model\Entity\Payment\Model" />
-    <preference for="Improntus\Rebill\Api\Queue\DataInterface" type="Improntus\Rebill\Model\Entity\Queue\Model" />
-    <preference for="Improntus\Rebill\Api\Subscription\DataInterface" type="Improntus\Rebill\Model\Entity\Subscription\Model" />
-    <preference for="Improntus\Rebill\Api\SubscriptionShipment\DataInterface" type="Improntus\Rebill\Model\Entity\SubscriptionShipment\Model" />
+    <preference for="Improntus\Rebill\Api\Item\DataInterface" type="Improntus\Rebill\Model\Entity\Item\Model"/>
+    <preference for="Improntus\Rebill\Api\Price\DataInterface" type="Improntus\Rebill\Model\Entity\Price\Model"/>
+    <preference for="Improntus\Rebill\Api\Payment\DataInterface" type="Improntus\Rebill\Model\Entity\Payment\Model"/>
+    <preference for="Improntus\Rebill\Api\Queue\DataInterface" type="Improntus\Rebill\Model\Entity\Queue\Model"/>
+    <preference for="Improntus\Rebill\Api\Subscription\DataInterface"
+                type="Improntus\Rebill\Model\Entity\Subscription\Model"/>
+    <preference for="Improntus\Rebill\Api\SubscriptionShipment\DataInterface"
+                type="Improntus\Rebill\Model\Entity\SubscriptionShipment\Model"/>
 
-    <preference for="Improntus\Rebill\Api\Item\RepositoryInterface" type="Improntus\Rebill\Model\Entity\Item\Repository" />
-    <preference for="Improntus\Rebill\Api\Price\RepositoryInterface" type="Improntus\Rebill\Model\Entity\Price\Repository" />
-    <preference for="Improntus\Rebill\Api\Payment\RepositoryInterface" type="Improntus\Rebill\Model\Entity\Payment\Repository" />
-    <preference for="Improntus\Rebill\Api\Queue\RepositoryInterface" type="Improntus\Rebill\Model\Entity\Queue\Repository" />
-    <preference for="Improntus\Rebill\Api\Subscription\RepositoryInterface" type="Improntus\Rebill\Model\Entity\Subscription\Repository" />
-    <preference for="Improntus\Rebill\Api\SubscriptionShipment\RepositoryInterface" type="Improntus\Rebill\Model\Entity\SubscriptionShipment\Repository" />
+    <preference for="Improntus\Rebill\Api\Item\RepositoryInterface"
+                type="Improntus\Rebill\Model\Entity\Item\Repository"/>
+    <preference for="Improntus\Rebill\Api\Price\RepositoryInterface"
+                type="Improntus\Rebill\Model\Entity\Price\Repository"/>
+    <preference for="Improntus\Rebill\Api\Payment\RepositoryInterface"
+                type="Improntus\Rebill\Model\Entity\Payment\Repository"/>
+    <preference for="Improntus\Rebill\Api\Queue\RepositoryInterface"
+                type="Improntus\Rebill\Model\Entity\Queue\Repository"/>
+    <preference for="Improntus\Rebill\Api\Subscription\RepositoryInterface"
+                type="Improntus\Rebill\Model\Entity\Subscription\Repository"/>
+    <preference for="Improntus\Rebill\Api\SubscriptionShipment\RepositoryInterface"
+                type="Improntus\Rebill\Model\Entity\SubscriptionShipment\Repository"/>
 
-    <preference for="Improntus\Rebill\Api\Item\SearchResultInterface" type="Improntus\Rebill\Model\Entity\Item\SearchResults" />
-    <preference for="Improntus\Rebill\Api\Price\SearchResultInterface" type="Improntus\Rebill\Model\Entity\Price\SearchResults" />
-    <preference for="Improntus\Rebill\Api\Payment\SearchResultInterface" type="Improntus\Rebill\Model\Entity\Payment\SearchResults" />
-    <preference for="Improntus\Rebill\Api\Queue\SearchResultInterface" type="Improntus\Rebill\Model\Entity\Queue\SearchResults" />
-    <preference for="Improntus\Rebill\Api\Subscription\SearchResultInterface" type="Improntus\Rebill\Model\Entity\Subscription\SearchResults" />
-    <preference for="Improntus\Rebill\Api\SubscriptionShipment\SearchResultInterface" type="Improntus\Rebill\Model\Entity\SubscriptionShipment\SearchResults" />
+    <preference for="Improntus\Rebill\Api\Item\SearchResultInterface"
+                type="Improntus\Rebill\Model\Entity\Item\SearchResults"/>
+    <preference for="Improntus\Rebill\Api\Price\SearchResultInterface"
+                type="Improntus\Rebill\Model\Entity\Price\SearchResults"/>
+    <preference for="Improntus\Rebill\Api\Payment\SearchResultInterface"
+                type="Improntus\Rebill\Model\Entity\Payment\SearchResults"/>
+    <preference for="Improntus\Rebill\Api\Queue\SearchResultInterface"
+                type="Improntus\Rebill\Model\Entity\Queue\SearchResults"/>
+    <preference for="Improntus\Rebill\Api\Subscription\SearchResultInterface"
+                type="Improntus\Rebill\Model\Entity\Subscription\SearchResults"/>
+    <preference for="Improntus\Rebill\Api\SubscriptionShipment\SearchResultInterface"
+                type="Improntus\Rebill\Model\Entity\SubscriptionShipment\SearchResults"/>
 
     <type name="Improntus\Rebill\Model\Webhook">
         <arguments>
@@ -96,6 +118,9 @@
                 <item name="confirmation" xsi:type="string">Improntus\Rebill\Model\Webhook\Confirmation</item>
                 <item name="heads_up" xsi:type="string">Improntus\Rebill\Model\Webhook\HeadsUp</item>
                 <item name="new_payment" xsi:type="string">Improntus\Rebill\Model\Webhook\Payment</item>
+                <item name="subscription_change_status" xsi:type="string">Improntus\Rebill\Model\Webhook\SubscriptionChangeStatus</item>
+                <item name="payment_change_status" xsi:type="string">Improntus\Rebill\Model\Webhook\PaymentChangeStatus</item>
+
             </argument>
         </arguments>
     </type>
