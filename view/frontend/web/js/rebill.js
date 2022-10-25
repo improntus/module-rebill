@@ -75,6 +75,10 @@ define([
         changeDocumentNumber: function (event) {
             this.rebillOptions.cardHolder.identification.value = event.target.value;
             this.rebillCheckout.setCardHolder(this.rebillOptions.cardHolder);
+        },
+        changeCardHolderName: function (event) {
+            this.rebillOptions.cardHolder.name = event.target.value;
+            this.rebillCheckout.setCardHolder(this.rebillOptions.cardHolder);
         }
     });
 });
