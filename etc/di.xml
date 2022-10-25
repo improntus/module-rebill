@@ -118,7 +118,6 @@
                 <item name="new_payment" xsi:type="string">Improntus\Rebill\Model\Webhook\Payment</item>
                 <item name="subscription_change_status" xsi:type="string">Improntus\Rebill\Model\Webhook\SubscriptionChangeStatus</item>
                 <item name="payment_change_status" xsi:type="string">Improntus\Rebill\Model\Webhook\PaymentChangeStatus</item>
-
             </argument>
         </arguments>
     </type>

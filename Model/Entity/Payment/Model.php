@@ -88,7 +88,7 @@ class Model extends AbstractModel implements DataInterface
      */
     public function getOrderId(): ?string
     {
-        return $this->getData('orderId');
+        return $this->getData('order_id');
     }
 
     /**
@@ -97,7 +97,7 @@ class Model extends AbstractModel implements DataInterface
      */
     public function setOrderId(int $orderId): DataInterface
     {
-        $this->setData('orderId', $orderId);
+        $this->setData('order_id', $orderId);
         return $this;
     }
 }
