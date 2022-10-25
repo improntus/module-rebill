@@ -110,6 +110,8 @@
     <preference for="Improntus\Rebill\Api\SubscriptionShipment\SearchResultInterface"
                 type="Improntus\Rebill\Model\Entity\SubscriptionShipment\SearchResults"/>
 
+    <preference for="Improntus\Rebill\Api\WebhookInterface" type="Improntus\Rebill\Model\Api\Webhook"/>
+
     <type name="Improntus\Rebill\Model\Webhook">
         <arguments>
             <argument name="webhooks" xsi:type="array">

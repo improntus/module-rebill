@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+  ~ @author Improntus Dev Team
+  ~ @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+  ~ @package Improntus_Rebill
+  -->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/V1/rebill/notification/:type" method="POST">
+        <service class="Improntus\Rebill\Api\WebhookInterface" method="execute" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+</routes>
