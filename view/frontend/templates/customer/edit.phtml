@@ -57,15 +57,22 @@ $documentTypes = $block->getDocumentTypes($subscription['price']['gateway']['typ
     </div>
 </div>
 
+<div class="rebill-cardholder-field">
+    <div class="value">
+        <label for="cardholder-name"><?= /** @noEscape */__('Card Holder') ?></label>
+        <input type="text" id="cardholder-name" name="cardholder_name">
+    </div>
+</div>
+
 <?php if ($documentTypes) : ?>
     <div class="rebill-identification-field">
         <div class="type">
-            <label for="identification-type"><?= /** @noEscape */
-                __('Document Type') ?></label>
+            <label for="identification-type"><?= /** @noEscape */__('Document Type') ?></label>
             <select name="identification_type" id="identification-type">
                 <?php foreach ($documentTypes as $documentType) : ?>
-                    <option
-                        value="<?= $escaper->escapeHtmlAttr($documentType['value']) ?>"><?= $escaper->escapeHtml($documentType['value']) ?></option>
+                    <option value="<?= $escaper->escapeHtmlAttr($documentType['value']) ?>">
+                        <?= $escaper->escapeHtml($documentType['value']) ?>
+                    </option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -129,6 +136,10 @@ $documentTypes = $block->getDocumentTypes($subscription['price']['gateway']['typ
         });
         $('#identification-value').keyup(function () {
             cardHolder.identification.value = $(this).val();
+            checkout.setCardHolder(cardHolder);
+        });
+        $('#cardholder-name').keyup(function () {
+            cardHolder.name = $(this).val();
             checkout.setCardHolder(cardHolder);
         });
     });

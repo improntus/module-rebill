@@ -10,6 +10,15 @@ $rebillTransaction = $block->getRebillTransaction();
 <div id="rebill-transaction-wrapper">
     <div class="rebill-transaction-container" data-bind="scope: 'rebill'">
         <h2 class="rebill.payment.transaction.title"><!-- ko i18n: 'Pay with rebill' --><!-- /ko --></h2>
+
+        <div class="rebill-cardholder-field">
+            <div class="value">
+                <label for="cardholder-name"><!-- ko i18n: 'Card Holder' --><!-- /ko --></label>
+                <input type="text" id="cardholder-name" name="cardholder_name"
+                       data-bind="event: {keyup: function (data, event) {changeCardHolderName(event)}}">
+            </div>
+        </div>
+
         <!-- ko if: needCardHolderIdentification() -->
         <div class="rebill-identification-field">
             <div class="type">
