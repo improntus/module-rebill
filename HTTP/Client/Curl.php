@@ -9,6 +9,7 @@ namespace Improntus\Rebill\HTTP\Client;
 
 use Exception;
 
+//phpcs:disable
 class Curl extends \Magento\Framework\HTTP\Client\Curl
 {
     /**

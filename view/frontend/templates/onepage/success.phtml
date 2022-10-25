@@ -18,7 +18,7 @@ $order = $block->getOrder();
 $payment = $order->getPayment();
 $additionalInformation = $payment->getAdditionalInformation();
 ?>
-<?php if($payment->getMethod()  == Rebill::CODE):?>
+<?php if($payment->getMethod()  == 'improntus_rebill'):?>
     <img style="width: 100px;margin-bottom: 20px;" src="" alt="">
     <p><a onclick="this.target='_blank'" href=""><?= /** @noEscape */__('Print Payment')?></a></p>
 <?php endif; ?>

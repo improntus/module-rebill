@@ -90,7 +90,7 @@ class Transaction
     {
         $order = $this->session->getLastRealOrder();
         try {
-            if (!$order->getId() || $order->getPayment()->getMethod() !== RebillPayment::CODE) {
+            if (!$order->getId() || $order->getPayment()->getMethod() !== 'improntus_rebill') {
                 throw new LocalizedException(__('Can\'t find any order to pay with rebill.'));
             }
             $this->registry->register('current_order', $order);
@@ -103,10 +103,10 @@ class Transaction
                 'rebill_details' => $rebillDetails,
             ];
         } catch (Exception $exception) {
-            if ($order->getId()) {
-                $order->cancel();
-            }
-            $this->session->restoreQuote();
+//            if ($order->getId()) {
+//                $order->cancel();
+//            }
+//            $this->session->restoreQuote();
             $this->configHelper->logError($exception->getMessage());
             throw new LocalizedException(__('There was an error creating the payment, please try againt.'));
         }

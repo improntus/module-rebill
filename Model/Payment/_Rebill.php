@@ -28,7 +28,7 @@ use Magento\Payment\Model\Method\Online\GatewayInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Framework\UrlInterface;
 
-class Rebill extends Cc implements GatewayInterface
+class _Rebill extends Cc implements GatewayInterface
 {
     const CODE = 'improntus_rebill';
 
@@ -52,7 +52,7 @@ class Rebill extends Cc implements GatewayInterface
     /**
      * @var string
      */
-    protected $_code = self::CODE;
+    protected $_code = 'improntus_rebill';
 
     /**
      * @var bool

@@ -11,16 +11,14 @@
     <virtualType name="Improntus\Rebill\Model\Payment\ConfigProvider">
         <arguments>
             <argument name="methodCodes" xsi:type="array">
-                <item name="improntus_rebill" xsi:type="const">Improntus\Rebill\Model\Payment\Rebill::CODE</item>
+                <item name="improntus_rebill" xsi:type="string">improntus_rebill</item>
             </argument>
         </arguments>
     </virtualType>
     <type name="Magento\Checkout\Model\CompositeConfigProvider">
         <arguments>
             <argument name="configProviders" xsi:type="array">
-                <item name="improntus_rebill_config_provider" xsi:type="object">
-                    Improntus\Rebill\Model\Payment\ConfigProvider
-                </item>
+                <item name="improntus_rebill_config_provider" xsi:type="object">Improntus\Rebill\Model\Payment\ConfigProvider</item>
             </argument>
         </arguments>
     </type>
@@ -124,4 +122,58 @@
             </argument>
         </arguments>
     </type>
+
+
+    <virtualType name="Improntus\Rebill\Model\Payment\Rebill" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="string">improntus_rebill</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Improntus\Rebill\Block\Sales\Order\Rebill</argument>
+            <argument name="valueHandlerPool" xsi:type="object">Improntus\Rebill\Gateway\Config\ValueHandlerPool</argument>
+            <argument name="validatorPool" xsi:type="object">Improntus\Rebill\Gateway\Validator\ValidatorPool</argument>
+            <argument name="commandPool" xsi:type="object">Improntus\Rebill\Gateway\Command\CommandPool</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Improntus\Rebill\Gateway\Command\CommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="refund" xsi:type="string">Improntus\Rebill\Gateway\Command\Refund</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Improntus\Rebill\Gateway\Validator\ValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">Improntus\Rebill\Gateway\Validator\CountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Improntus\Rebill\Gateway\Validator\CountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Improntus\Rebill\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Improntus\Rebill\Gateway\Config\ValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">Improntus\Rebill\Gateway\Config\ConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Improntus\Rebill\Gateway\Config\ConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">Improntus\Rebill\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Improntus\Rebill\Gateway\Config\Config" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="string">improntus_rebill</argument>
+        </arguments>
+    </virtualType>
 </config>

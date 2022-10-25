@@ -24,7 +24,7 @@ class ConfigProvider implements ConfigProviderInterface
     /**
      * @var string
      */
-    protected $methodCode = Rebill::CODE;
+    protected $methodCode = 'improntus_rebill';
 
     /**
      * @var Rebill

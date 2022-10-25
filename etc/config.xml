@@ -14,6 +14,23 @@
                 <active>0</active>
                 <title>Pay with Rebill</title>
                 <sort_order>0</sort_order>
+                <allowspecific>0</allowspecific>
+                <can_initialize>0</can_initialize>
+                <can_use_internal>1</can_use_internal>
+                <can_use_checkout>1</can_use_checkout>
+                <can_fetch_transaction_info>1</can_fetch_transaction_info>
+                <is_offline>1</is_offline>
+                <is_gateway>0</is_gateway>
+                <can_order>0</can_order>
+                <can_authorize>0</can_authorize>
+                <can_capture>0</can_capture>
+                <can_capture_partial>0</can_capture_partial>
+                <can_capture_once>0</can_capture_once>
+                <can_refund>1</can_refund>
+                <can_refund_partial_per_invoice>0</can_refund_partial_per_invoice>
+                <can_void>0</can_void>
+                <can_edit>0</can_edit>
+                <can_review_payment>0</can_review_payment>
                 <general>
                     <customer_document_type>DNI</customer_document_type>
                     <customer_document_attribute>vat_id</customer_document_attribute>

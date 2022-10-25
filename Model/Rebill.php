@@ -199,6 +199,7 @@ class Rebill
         $curl = $this->curl;
         try {
             $headers = ["Content-Type" => "application/json", 'Accept' => 'application/json'];
+            $headers['Cache-Control'] = 'no-cache';
             if ($token && $needToken) {
                 $headers['Authorization'] = "Bearer $token";
             }
