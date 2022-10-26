@@ -55,7 +55,8 @@ class SubscriptionChangeStatus extends WebhookAbstract
 
         $newStatus = strtoupper($newStatus);
         $subscription = $this->subscriptionRepository->getByRebillId($billingScheduleId);
-        if (!$subscription) {
+        if (!$subscription->getId()) {
+            $this->updateByShipment($billingScheduleId, $newStatus);
             return;
         }
 
@@ -109,5 +110,34 @@ class SubscriptionChangeStatus extends WebhookAbstract
                 ]
             );
         }
+    }
+
+    /**
+     * @param $billingScheduleId
+     * @param $newStatus
+     * @return void
+     * @throws \Exception
+     */
+    private function updateByShipment($billingScheduleId, $newStatus)
+    {
+        $shipment = $this->shipmentRepository->getByRebillId($billingScheduleId);
+        if (!$shipment->getId()) {
+            return;
+        }
+        $filterShipment[] = $this->filterBuilder
+            ->setField('rebill_id')
+            ->setConditionType('eq')
+            ->setValue($shipment->getRebillId())
+            ->create();
+
+        $this->updateStatus($filterShipment, $newStatus, $this->searchCriteriaBuilder, $this->shipmentRepository);
+
+        $filter[] = $this->filterBuilder
+            ->setField('shipment_id')
+            ->setConditionType('eq')
+            ->setValue($shipment->getId())
+            ->create();
+
+        $this->updateStatus($filter, $newStatus, $this->searchCriteriaBuilder, $this->subscriptionRepository);
     }
 }
