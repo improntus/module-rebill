@@ -76,9 +76,13 @@ Subscriptions,Suscripciones
 "Subscription Update","Actualizar Suscripción"
 "Rebill Payments","Pagos Rebill"
 "Payments","Pagos"
+"The payment can't be processed, try again with another card.", "No se puede realizar el pago, intente de nuevo con otra tarjeta."
 "Rebill Subscriptions", "Suscripciones Rebill"
 "Status","Estado"
 "Quantity", "Cantidad"
 "Action", "Acciones"
 "Frequency", "Frecuencia"
 "Cancel", "Cancelar"
+every, cada
+months, meses
+"monthly for %1","mensualmente por %1"
