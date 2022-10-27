@@ -19,6 +19,26 @@ class SubscriptionChangeStatus extends WebhookAbstract
         'RETRYING',
         'WAITING_FOR_GATEWAY'
     ];
+    /**
+     * @var SubscriptionRepository
+     */
+    private SubscriptionRepository $subscriptionRepository;
+    /**
+     * @var ShipmentRepository
+     */
+    private ShipmentRepository $shipmentRepository;
+    /**
+     * @var SearchCriteriaBuilder
+     */
+    private SearchCriteriaBuilder $searchCriteriaBuilder;
+    /**
+     * @var FilterBuilder
+     */
+    private FilterBuilder $filterBuilder;
+    /**
+     * @var Subscription
+     */
+    private Subscription $rebillSubscription;
 
     /**
      * @param SubscriptionRepository $subscriptionRepository
@@ -29,14 +49,19 @@ class SubscriptionChangeStatus extends WebhookAbstract
      * @param array $parameters
      */
     public function __construct(
-        private SubscriptionRepository $subscriptionRepository,
-        private ShipmentRepository     $shipmentRepository,
-        private SearchCriteriaBuilder  $searchCriteriaBuilder,
-        private FilterBuilder          $filterBuilder,
-        private Subscription           $rebillSubscription,
-        array                          $parameters = []
+        SubscriptionRepository $subscriptionRepository,
+        ShipmentRepository     $shipmentRepository,
+        SearchCriteriaBuilder  $searchCriteriaBuilder,
+        FilterBuilder          $filterBuilder,
+        Subscription           $rebillSubscription,
+        array                  $parameters = []
     )
     {
+        $this->subscriptionRepository = $subscriptionRepository;
+        $this->shipmentRepository = $shipmentRepository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->filterBuilder = $filterBuilder;
+        $this->rebillSubscription = $rebillSubscription;
         parent::__construct($parameters);
     }
 

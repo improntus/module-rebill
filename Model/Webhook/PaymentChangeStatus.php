@@ -14,17 +14,17 @@ class PaymentChangeStatus extends WebhookAbstract
         'CANCELLED' => 'canceled'
     ];
 
-    /**
-     * @param OrderRepository $orderRepository
-     * @param PaymentRepository $paymentRepository
-     * @param array $parameters
-     */
+    private OrderRepository $orderRepository;
+    private PaymentRepository $paymentRepository;
+
     public function __construct(
-        private OrderRepository   $orderRepository,
-        private PaymentRepository $paymentRepository,
+        OrderRepository   $orderRepository,
+        PaymentRepository $paymentRepository,
         array                     $parameters = []
     )
     {
+        $this->orderRepository = $orderRepository;
+        $this->paymentRepository = $paymentRepository;
         parent::__construct($parameters);
     }
 
