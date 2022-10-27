@@ -40,4 +40,19 @@ class Payment extends Rebill
             throw $exception;
         }
     }
+
+    /**
+     * @param string $id
+     * @return mixed|null
+     * @throws Exception
+     */
+    public function refundPaymentById(string $id)
+    {
+        try {
+            return $this->request('refund', 'POST', [], ['paymentId' => $id]);
+        } catch (Exception $exception) {
+            $this->configHelper->logError($exception->getMessage());
+            throw $exception;
+        }
+    }
 }

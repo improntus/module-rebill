@@ -61,6 +61,7 @@ class Rebill
         'subscription_list'         => '/v2/subscriptions/%s/all',
         'subscription_change_price' => '/v2/subscriptions/%s/change-plan',
         'invoice'                   => '/v2/receipts/%s',
+        'refund'                    => '/v2/refund',
     ];
     /**
      * @var string[]
