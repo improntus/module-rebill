@@ -3,10 +3,7 @@
 namespace Improntus\Rebill\Model\Webhook;
 
 use Improntus\Rebill\Model\Entity\Subscription\Repository as SubscriptionRepository;
-use Improntus\Rebill\Model\Entity\SubscriptionShipment\Repository as ShipmentRepository;
 use Improntus\Rebill\Model\Rebill\Subscription;
-use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\Api\FilterBuilder;
 
 class SubscriptionChangeStatus extends WebhookAbstract
 {
@@ -24,43 +21,22 @@ class SubscriptionChangeStatus extends WebhookAbstract
      */
     private SubscriptionRepository $subscriptionRepository;
     /**
-     * @var ShipmentRepository
-     */
-    private ShipmentRepository $shipmentRepository;
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    private SearchCriteriaBuilder $searchCriteriaBuilder;
-    /**
-     * @var FilterBuilder
-     */
-    private FilterBuilder $filterBuilder;
-    /**
      * @var Subscription
      */
     private Subscription $rebillSubscription;
 
     /**
      * @param SubscriptionRepository $subscriptionRepository
-     * @param ShipmentRepository $shipmentRepository
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param FilterBuilder $filterBuilder
      * @param Subscription $rebillSubscription
      * @param array $parameters
      */
     public function __construct(
         SubscriptionRepository $subscriptionRepository,
-        ShipmentRepository     $shipmentRepository,
-        SearchCriteriaBuilder  $searchCriteriaBuilder,
-        FilterBuilder          $filterBuilder,
         Subscription           $rebillSubscription,
         array                  $parameters = []
     )
     {
         $this->subscriptionRepository = $subscriptionRepository;
-        $this->shipmentRepository = $shipmentRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->filterBuilder = $filterBuilder;
         $this->rebillSubscription = $rebillSubscription;
         parent::__construct($parameters);
     }
@@ -79,90 +55,29 @@ class SubscriptionChangeStatus extends WebhookAbstract
         }
 
         $newStatus = strtoupper($newStatus);
-        $subscription = $this->subscriptionRepository->getByRebillId($billingScheduleId);
-        if (!$subscription->getId()) {
-            $this->updateByShipment($billingScheduleId, $newStatus);
-            return;
+
+        $shipmentPackage = $this->subscriptionRepository->getSubscriptionPackage($billingScheduleId);
+
+        foreach ($shipmentPackage["subscription_list"] as $subscription) {
+            $this->updateStatus($subscription, $newStatus);
         }
 
-        /*$isCyclic = !$subscription->getDetails()['price']['repetitions'];
-
-        if ($newStatus === "FINISHED" && !$isCyclic) {
-            return;
-        }*/
-
-        $filter[] = $this->filterBuilder
-            ->setField('package_hash')
-            ->setConditionType('eq')
-            ->setValue($subscription->getPackageHash())
-            ->create();
-
-        $this->updateStatus($filter, $newStatus, $this->searchCriteriaBuilder, $this->subscriptionRepository);
-
-        $filterShipment[] = $this->filterBuilder
-            ->setField('entity_id')
-            ->setConditionType('eq')
-            ->setValue($subscription->getShipmentId())
-            ->create();
-
-        $this->updateStatus($filterShipment, $newStatus, $this->searchCriteriaBuilder, $this->shipmentRepository);
+        $this->updateStatus($shipmentPackage["shipment"], $newStatus);
     }
 
-    /**
-     * @param array $filterShipment
-     * @param string $newStatus
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param $repository
-     * @return void
-     * @throws \Exception
-     */
-    private function updateStatus(array $filterShipment, string $newStatus, SearchCriteriaBuilder $searchCriteriaBuilder, $repository)
+    private function updateStatus($item, $newStatus)
     {
-        $searchCriteria = $searchCriteriaBuilder->addFilters($filterShipment);
-        $items = $repository->getList($searchCriteria->create());
-
-        foreach ($items->getItems() as $item) {
-            $item->setStatus($newStatus);
-            $item->save();
-            $details = $item->getDetails();
-            $this->rebillSubscription->updateSubscription(
-                $item->getRebillId(),
-                [
-                    'amount' => $details["price"]["amount"],
-                    'card' => $details['card'],
-                    'nextChargeDate' => $details['nextChargeDate'],
-                    'status' => $newStatus,
-                ]
-            );
-        }
-    }
-
-    /**
-     * @param $billingScheduleId
-     * @param $newStatus
-     * @return void
-     * @throws \Exception
-     */
-    private function updateByShipment($billingScheduleId, $newStatus)
-    {
-        $shipment = $this->shipmentRepository->getByRebillId($billingScheduleId);
-        if (!$shipment->getId()) {
-            return;
-        }
-        $filterShipment[] = $this->filterBuilder
-            ->setField('rebill_id')
-            ->setConditionType('eq')
-            ->setValue($shipment->getRebillId())
-            ->create();
-
-        $this->updateStatus($filterShipment, $newStatus, $this->searchCriteriaBuilder, $this->shipmentRepository);
-
-        $filter[] = $this->filterBuilder
-            ->setField('shipment_id')
-            ->setConditionType('eq')
-            ->setValue($shipment->getId())
-            ->create();
-
-        $this->updateStatus($filter, $newStatus, $this->searchCriteriaBuilder, $this->subscriptionRepository);
+        $item->setStatus($newStatus);
+        $item->save();
+        $details = $item->getDetails();
+        $this->rebillSubscription->updateSubscription(
+            $item->getRebillId(),
+            [
+                'amount' => $details["price"]["amount"],
+                'card' => $details['card'],
+                'nextChargeDate' => $details['nextChargeDate'],
+                'status' => $newStatus,
+            ]
+        );
     }
 }
