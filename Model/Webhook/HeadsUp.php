@@ -140,7 +140,7 @@ class HeadsUp extends WebhookAbstract
         foreach ($package['subscription_list'] as $sub) {
             /** @var Model $price */
             $price = $sub->getData('price');
-            $details = json_decode($price->getDetails(), true);
+            $details = $price->getDetails();
             $hashes[$details['sku']] = $price->getFrequencyHash();
         }
         /** @var Order $order */
