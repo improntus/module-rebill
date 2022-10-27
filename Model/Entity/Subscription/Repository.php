@@ -21,6 +21,7 @@ use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Improntus\Rebill\Model\Rebill\Subscription as RebillSubscription;
 use Improntus\Rebill\Model\Entity\SubscriptionShipment\Repository as SubscriptionShipmentRepository;
+use Improntus\Rebill\Model\Entity\Price\Repository as PriceRepository;
 
 class Repository extends RepositoryAbstract implements RepositoryInterface
 {
@@ -35,7 +36,13 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
     protected $subscriptionShipmentRepository;
 
     /**
+     * @var PriceRepository
+     */
+    protected $priceRepository;
+
+    /**
      * @param SubscriptionShipmentRepository $subscriptionShipmentRepository
+     * @param PriceRepository $priceRepository
      * @param RebillSubscription $rebillSubscription
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param CollectionProcessorInterface|null $collectionProcessor
@@ -43,11 +50,13 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
      */
     public function __construct(
         SubscriptionShipmentRepository $subscriptionShipmentRepository,
+        PriceRepository                $priceRepository,
         RebillSubscription             $rebillSubscription,
         SearchCriteriaBuilder          $searchCriteriaBuilder,
         CollectionProcessorInterface   $collectionProcessor = null,
         ?HydratorInterface             $hydrator = null
     ) {
+        $this->priceRepository = $priceRepository;
         $this->subscriptionShipmentRepository = $subscriptionShipmentRepository;
         $this->rebillSubscription = $rebillSubscription;
         parent::__construct(
@@ -174,5 +183,39 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
     public function getRebillSubscription(string $id, string $email)
     {
         return $this->rebillSubscription->getSubscription($id, $email);
+    }
+
+    /**
+     * @param string $rebillId
+     * @return array
+     * @throws Exception
+     */
+    public function getSubscriptionPackage(string $rebillId)
+    {
+        $subscription = $this->getByRebillId($rebillId);
+        $filters = [];
+        if (!$subscription->getId()) {
+            $shipment = $this->subscriptionShipmentRepository->getByRebillId($rebillId);
+            if (!$shipment->getId()) {
+                throw new Exception(__('No subscription found'));
+            }
+            $filters['shipment_id'] = $shipment->getId();
+        } else {
+            $filters['package_hash'] = $subscription->getPackageHash();
+            $shipment = $this->subscriptionShipmentRepository->getById($subscription->getShipmentId());
+        }
+        if (!$shipment->getId()) {
+            $shipment = null;
+        }
+        $subscriptionList = $this->getEzList($filters)->getItems();
+        foreach ($subscriptionList as &$item) {
+            $price = $this->priceRepository->getByRebillId($item->getRebillPriceId());
+            $item->setData('price', $price);
+        }
+        return [
+            'subscription'      => $subscription,
+            'subscription_list' => $subscriptionList,
+            'shipment'          => $shipment,
+        ];
     }
 }
