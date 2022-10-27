@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Model\Webhook;
 
@@ -57,6 +62,11 @@ class Payment extends WebhookAbstract
     protected $configHelper;
 
     /**
+     * @var HeadsUp
+     */
+    protected $webhookHeadsUp;
+
+    /**
      * @param Config $configHelper
      * @param Invoice $invoice
      * @param OrderRepository $orderRepository
@@ -65,6 +75,7 @@ class Payment extends WebhookAbstract
      * @param PriceRepository $priceRepository
      * @param PaymentRepository $paymentRepository
      * @param RebillPayment $rebillPayment
+     * @param HeadsUp $webhookHeadsUp
      * @param array $parameters
      */
     public function __construct(
@@ -76,8 +87,10 @@ class Payment extends WebhookAbstract
         PriceRepository        $priceRepository,
         PaymentRepository      $paymentRepository,
         RebillPayment          $rebillPayment,
+        HeadsUp                $webhookHeadsUp,
         array                  $parameters = []
     ) {
+        $this->webhookHeadsUp = $webhookHeadsUp;
         $this->configHelper = $configHelper;
         $this->paymentRepository = $paymentRepository;
         $this->rebillPayment = $rebillPayment;
@@ -98,7 +111,7 @@ class Payment extends WebhookAbstract
         try {
             if (isset($_payment['id'])) {
                 $rebillPayment = $this->rebillPayment->getPaymentById($_payment['id']);
-                if (!isset($rebillPayment['id']) && $rebillPayment['status'] !== 'SUCCEEDED') {
+                if (!isset($rebillPayment['id']) && !in_array($rebillPayment['status'], ['SUCCEEDED', 'PENDING'])) {
                     return;
                 }
                 $packagesHashes = [];
@@ -110,6 +123,9 @@ class Payment extends WebhookAbstract
                     }
                     if (!$subscription->getId()) {
                         continue;
+                    }
+                    if ($subscription->getPayed() == 0) {
+                        $this->webhookHeadsUp->executeHeadsUp($subscription->getRebillId());
                     }
                     $orderId = $subscription->getOrderId();
                     $subscription->setPayed(1);
@@ -126,23 +142,25 @@ class Payment extends WebhookAbstract
                 $payment->setStatus($rebillPayment['status']);
                 $payment->setDetails($rebillPayment);
                 $this->paymentRepository->save($payment);
-                foreach ($packagesHashes as $hash) {
-                    $packages = $this->subscriptionRepository->getCollection();
-                    $packages->addFieldToFilter('package_hash', $hash);
-                    $subscriptionsQty = $packages->getSize();
-                    $payed = 0;
-                    /** @var Model $_subscription */
-                    foreach ($packages as $_subscription) {
-                        $payed += $_subscription->getPayed();
-                    }
-                    if ($_subscription && $_subscription->getShipmentId()) {
-                        $shipment = $this->shipmentRepository->getById($_subscription->getShipmentId());
-                        $payed += $shipment->getPayed();
-                    }
-                    if ($payed == $subscriptionsQty && $_subscription) {
-                        /** @var Order $order */
-                        $order = $this->orderRepository->get($_subscription->getOrderId());
-                        $this->invoice->execute($order);
+                if ($rebillPayment['status'] == 'SUCCEEDED') {
+                    foreach ($packagesHashes as $hash) {
+                        $packages = $this->subscriptionRepository->getCollection();
+                        $packages->addFieldToFilter('package_hash', $hash);
+                        $subscriptionsQty = $packages->getSize();
+                        $payed = 0;
+                        /** @var Model $_subscription */
+                        foreach ($packages as $_subscription) {
+                            $payed += $_subscription->getPayed();
+                        }
+                        if ($_subscription && $_subscription->getShipmentId()) {
+                            $shipment = $this->shipmentRepository->getById($_subscription->getShipmentId());
+                            $payed += $shipment->getPayed();
+                        }
+                        if ($payed == $subscriptionsQty && $_subscription) {
+                            /** @var Order $order */
+                            $order = $this->orderRepository->get($_subscription->getOrderId());
+                            $this->invoice->execute($order);
+                        }
                     }
                 }
             }

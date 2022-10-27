@@ -8,13 +8,13 @@
 namespace Improntus\Rebill\Model\Rebill\Subscription;
 
 use Exception;
-use Magento\Framework\DataObject;
 use Improntus\Rebill\Helper\Config;
-use Improntus\Rebill\Model\Price;
+use Improntus\Rebill\Model\Entity\Price\Model as Price;
 use Improntus\Rebill\Model\Rebill\Item;
 use Improntus\Rebill\Model\Rebill\Subscription;
 use Improntus\Rebill\Model\ResourceModel\Price\CollectionFactory;
 use Magento\Framework\Data\Collection\EntityFactoryInterface;
+use Magento\Framework\DataObject;
 
 class Collection extends \Magento\Framework\Data\Collection
 {

@@ -108,7 +108,6 @@ class Confirmation extends WebhookAbstract
                     $orderId = $this->getParameter('order_id');
                     /** @var Order $order */
                     $order = $this->orderRepository->get($orderId);
-                    $this->rebillInvoice->execute($order);
                     $order->setStatus($this->configHelper->getApprovedStatus());
                     try {
                         $this->orderSender->send($order);
@@ -117,12 +116,26 @@ class Confirmation extends WebhookAbstract
                     }
                     $order->setIsCustomerNotified(true);
                     $this->orderRepository->save($order);
+                    $doInvoice = true;
+                    $doCancel = true;
                     foreach ($invoice['paidBags'] as $_payment) {
                         $payment = $this->paymentRepository->getByRebillId($_payment['payment']['id']);
                         $payment->setOrderId($orderId);
                         $payment->setRebillId($_payment['payment']['id']);
                         $payment->setStatus($_payment['payment']['status']);
                         $this->paymentRepository->save($payment);
+                        if ($doInvoice && $_payment['payment']['status'] !== 'SUCCEEDED') {
+                            $doInvoice = false;
+                        }
+                        if ($doCancel && $_payment['payment']['status'] !== 'CANCELLED') {
+                            $doCancel = false;
+                        }
+                    }
+                    if ($doInvoice) {
+                        $this->rebillInvoice->execute($order);
+                    }
+                    if ($doCancel && $order->canCancel()) {
+                        $order->cancel();
                     }
                     $subscriptions = [];
                     $prices = [];

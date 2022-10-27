@@ -209,7 +209,8 @@ class Config extends Subscription
     /**
      * @param string $message
      */
-    public function logInfo(string $message) {
+    public function logInfo(string $message)
+    {
         if ($this->isDebugLogsEnabled()) {
             parent::logInfo($message);
         }
@@ -218,7 +219,8 @@ class Config extends Subscription
     /**
      * @param string $message
      */
-    public function logError(string $message) {
+    public function logError(string $message)
+    {
         if ($this->isDebugLogsEnabled()) {
             parent::logError($message);
         }

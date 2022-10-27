@@ -7,16 +7,16 @@
 
 namespace Improntus\Rebill\Model\Grid;
 
-use Zend_Db_Expr;
-use Psr\Log\LoggerInterface as Logger;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Event\ManagerInterface as EventManager;
-use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
-use Magento\Framework\Api\ExtensionAttribute\JoinDataInterfaceFactory;
-use Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult;
 use Improntus\Rebill\Model\ResourceModel\Subscription as SubscriptionModel;
-use Magento\Framework\Data\Collection\EntityFactoryInterface as EntityFactory;
+use Magento\Framework\Api\ExtensionAttribute\JoinDataInterfaceFactory;
+use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
 use Magento\Framework\Data\Collection\Db\FetchStrategyInterface as FetchStrategy;
+use Magento\Framework\Data\Collection\EntityFactoryInterface as EntityFactory;
+use Magento\Framework\Event\ManagerInterface as EventManager;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult;
+use Psr\Log\LoggerInterface as Logger;
+use Zend_Db_Expr;
 
 class Subscription extends SearchResult
 {
@@ -158,5 +158,4 @@ class Subscription extends SearchResult
         }
         return parent::addFieldToFilter($field, $condition);
     }
-
 }

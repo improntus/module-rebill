@@ -77,6 +77,7 @@
         <column xsi:type="int" name="quantity" unsigned="true" nullable="true" comment="Quantity"/>
         <column xsi:type="int" name="order_id" unsigned="true" nullable="true" comment="Order ID"/>
         <column xsi:type="int" name="payed" unsigned="true" default="0" comment="Payed"/>
+        <column xsi:type="text" name="next_schedule" nullable="true" comment="Next Schedule"/>
         <column xsi:type="text" name="details" nullable="true" comment="Details"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>

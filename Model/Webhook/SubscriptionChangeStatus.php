@@ -1,20 +1,29 @@
 <?php
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
 
 namespace Improntus\Rebill\Model\Webhook;
 
+use Exception;
+use Improntus\Rebill\Model\Entity\Subscription\Model as SubscriptionModel;
 use Improntus\Rebill\Model\Entity\Subscription\Repository as SubscriptionRepository;
+use Improntus\Rebill\Model\Entity\SubscriptionShipment\Model as ShipmentModel;
 use Improntus\Rebill\Model\Rebill\Subscription;
+use Magento\Framework\Exception\CouldNotSaveException;
 
 class SubscriptionChangeStatus extends WebhookAbstract
 {
-    const ENABLED_STATES = [
+    private const ENABLED_STATES = [
         'ACTIVE',
         'PAUSED',
         'DEFAULT',
         'CANCELLED',
         'FINISHED',
         'RETRYING',
-        'WAITING_FOR_GATEWAY'
+        'WAITING_FOR_GATEWAY',
     ];
     /**
      * @var SubscriptionRepository
@@ -34,8 +43,7 @@ class SubscriptionChangeStatus extends WebhookAbstract
         SubscriptionRepository $subscriptionRepository,
         Subscription           $rebillSubscription,
         array                  $parameters = []
-    )
-    {
+    ) {
         $this->subscriptionRepository = $subscriptionRepository;
         $this->rebillSubscription = $rebillSubscription;
         parent::__construct($parameters);
@@ -43,40 +51,45 @@ class SubscriptionChangeStatus extends WebhookAbstract
 
     /**
      * @return mixed|void
-     * @throws \Exception
+     * @throws Exception
      */
     public function execute()
     {
         $billingScheduleId = $this->getParameter('billingScheduleId');
         $newStatus = $this->getParameter('newStatus');
-
         if (empty($newStatus) || empty($billingScheduleId) || !in_array(strtoupper($newStatus), self::ENABLED_STATES)) {
             return;
         }
-
         $newStatus = strtoupper($newStatus);
-
         $shipmentPackage = $this->subscriptionRepository->getSubscriptionPackage($billingScheduleId);
-
         foreach ($shipmentPackage["subscription_list"] as $subscription) {
             $this->updateStatus($subscription, $newStatus);
         }
-
         $this->updateStatus($shipmentPackage["shipment"], $newStatus);
     }
 
-    private function updateStatus($item, $newStatus)
+    /**
+     * @param SubscriptionModel|ShipmentModel $item
+     * @param string $newStatus
+     * @return void
+     * @throws CouldNotSaveException
+     */
+    private function updateStatus($item, string $newStatus)
     {
         $item->setStatus($newStatus);
-        $item->save();
+        if ($item instanceof SubscriptionModel) {
+            $this->subscriptionRepository->save($item);
+        } else {
+            $this->subscriptionRepository->getSubscriptionShipmentRepository()->save($item);
+        }
         $details = $item->getDetails();
         $this->rebillSubscription->updateSubscription(
             $item->getRebillId(),
             [
-                'amount' => $details["price"]["amount"],
-                'card' => $details['card'],
+                'amount'         => $details["price"]["amount"],
+                'card'           => $details['card'],
                 'nextChargeDate' => $details['nextChargeDate'],
-                'status' => $newStatus,
+                'status'         => $newStatus,
             ]
         );
     }

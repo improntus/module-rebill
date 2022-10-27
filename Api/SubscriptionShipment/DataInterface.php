@@ -96,4 +96,15 @@ interface DataInterface
      * @return DataInterface
      */
     public function setPayed(int $payed): DataInterface;
+
+    /**
+     * @return string|null
+     */
+    public function getNextSchedule(): ?string;
+
+    /**
+     * @param string $nextSchedule
+     * @return DataInterface
+     */
+    public function setNextSchedule(string $nextSchedule): DataInterface;
 }

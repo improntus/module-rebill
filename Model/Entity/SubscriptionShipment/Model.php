@@ -154,4 +154,22 @@ class Model extends AbstractModel implements DataInterface
         $this->setData('payed', $payed);
         return $this;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getNextSchedule(): ?string
+    {
+        return $this->getData('next_schedule');
+    }
+
+    /**
+     * @param string $nextSchedule
+     * @return DataInterface
+     */
+    public function setNextSchedule(string $nextSchedule): DataInterface
+    {
+        $this->setData('next_schedule', $nextSchedule);
+        return $this;
+    }
 }

@@ -10,6 +10,7 @@ namespace Improntus\Rebill\Model;
 use Exception;
 use Improntus\Rebill\Helper\Config;
 use Improntus\Rebill\HTTP\Client\Curl;
+use Magento\Framework\App\CacheInterface;
 use Magento\Framework\Session\SessionManagerInterface;
 
 class Rebill
@@ -17,7 +18,7 @@ class Rebill
     /**
      * @var Curl
      */
-    protected $curl;
+    private $curl;
 
     /**
      * @var Config
@@ -27,17 +28,17 @@ class Rebill
     /**
      * @var SessionManagerInterface
      */
-    protected $session;
+    private $session;
 
     /**
      * @var string
      */
-    protected $baseUrl = '';
+    private $baseUrl = '';
 
     /**
      * @var string[]
      */
-    protected $endpoints = [
+    private $endpoints = [
         'auth'                      => '/v2/auth/login/%s',
         'customer_auth'             => '/v2/organization/customer-token',
         'create_item'               => '/v2/item',
@@ -66,7 +67,7 @@ class Rebill
     /**
      * @var string[]
      */
-    protected $customerEndpoints = [
+    private $customerEndpoints = [
         'client_subscription_list',
         'client_subscription',
         'card',
@@ -74,15 +75,23 @@ class Rebill
     ];
 
     /**
+     * @var CacheInterface
+     */
+    private $cacheManager;
+
+    /**
      * @param Curl $curl
      * @param Config $configHelper
+     * @param CacheInterface $cacheManager
      */
     public function __construct(
-        Curl   $curl,
-        Config $configHelper
+        Curl           $curl,
+        Config         $configHelper,
+        CacheInterface $cacheManager
     ) {
         $this->curl = $curl;
         $this->configHelper = $configHelper;
+        $this->cacheManager = $cacheManager;
 
         if ($configHelper->getIntegrationMode() == 'sandbox') {
             $this->baseUrl = 'https://api.rebill.dev';
@@ -130,13 +139,22 @@ class Rebill
      */
     protected function auth()
     {
-        $authParams = [
-            'email'    => $this->configHelper->getApiUser(),
-            'password' => $this->configHelper->getApiPassword(),
-        ];
-        $result = $this->request('auth', 'POST', [$this->configHelper->getApiAlias()], $authParams);
-        $this->setToken($result['authToken'] ?? null);
-        return $result['authToken'] ?? null;
+        $token = $this->cacheManager->load('rebill_token');
+        if (!$token) {
+            $authParams = [
+                'email'    => $this->configHelper->getApiUser(),
+                'password' => $this->configHelper->getApiPassword(),
+            ];
+            $result = $this->request('auth', 'POST', [$this->configHelper->getApiAlias()], $authParams);
+            $this->setToken($result['authToken'] ?? null);
+            $this->cacheManager->save(
+                $result['authToken'] ?? null,
+                'rebill_token',
+                [],
+                72000 //20 hours in seconds
+            );
+        }
+        return $token;
     }
 
     /**
@@ -175,6 +193,7 @@ class Rebill
      * @param array $data
      * @param array $options
      * @param bool $needToken
+     * @param bool $repeat
      * @return mixed|null
      */
     protected function request(
@@ -183,8 +202,17 @@ class Rebill
         array  $urlData = [],
         array  $data = [],
         array  $options = [],
-        bool   $needToken = true
+        bool   $needToken = true,
+        bool   $repeat = true
     ) {
+        $origParams = [
+            'endpoint'  => $endpoint,
+            'method'    => $method,
+            'urlData'   => $urlData,
+            'data'      => $data,
+            'options'   => $options,
+            'needToken' => $needToken,
+        ];
         $token = '';
         if ($endpoint != 'auth' && $needToken) {
             $token = $this->getToken() ?: $this->auth();
@@ -234,6 +262,19 @@ class Rebill
             $result = $curl->getBody();
             $this->configHelper->logInfo(json_encode($data));
             $this->configHelper->logInfo($result);
+            if (stristr($result, 'Invalid or expired') !== false
+                || stristr($result, 'Unauthorized') !== false && $repeat) {
+                $this->cacheManager->remove('rebill_token');
+                return $this->request(
+                    $origParams['endpoint'],
+                    $origParams['method'],
+                    $origParams['urlData'],
+                    $origParams['data'],
+                    $origParams['options'],
+                    $origParams['needToken'],
+                    false
+                );
+            }
             return json_decode($result, true);
         } catch (Exception $e) {
             $this->configHelper->logError($e->getMessage());
