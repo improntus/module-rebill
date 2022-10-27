@@ -11,6 +11,7 @@ use Exception;
 use Improntus\Rebill\Helper\Config;
 use Improntus\Rebill\HTTP\Client\Curl;
 use Improntus\Rebill\Model\Rebill;
+use Magento\Framework\App\CacheInterface;
 
 class Data extends Rebill
 {
@@ -23,14 +24,16 @@ class Data extends Rebill
      * @param Curl $curl
      * @param Config $configHelper
      * @param Gateway $gateway
+     * @param CacheInterface $cacheManager
      */
     public function __construct(
         Curl    $curl,
         Config  $configHelper,
-        Gateway $gateway
+        Gateway $gateway,
+        CacheInterface $cacheManager
     ) {
         $this->gateway = $gateway;
-        parent::__construct($curl, $configHelper);
+        parent::__construct($curl, $configHelper, $cacheManager);
     }
 
     /**

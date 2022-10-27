@@ -28,6 +28,7 @@ class CustomerDocumentType implements ArrayInterface
     }
 
     /**
+     * @param $gateway
      * @return array
      */
     public function toOptionArray($gateway = null)
