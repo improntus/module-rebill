@@ -213,7 +213,7 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
             $item->setData('price', $price);
         }
         return [
-            'subscription'      => $subscription,
+            'subscription'      => $subscription->getId() ? $subscription : $shipment,
             'subscription_list' => $subscriptionList,
             'shipment'          => $shipment,
         ];
