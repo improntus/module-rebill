@@ -73,9 +73,18 @@ $frequencies = $configHelper->getProductRebillSubscriptionDetails($block->getPro
                 })
 
                 function addFrequencyPrice(el){
-                    var frequencyPrice = $(el).find('option:selected').data('price');
-                    var frequencyOperator = frequencyPrice.indexOf("-") === -1 ? " +" : " ";
-                    $("span.price").html(productOriginalPrice + frequencyOperator + frequencyPrice);
+                    let frequencyPrice = $(el).find('option:selected').data('price');
+                    let frequencyOperator = frequencyPrice.indexOf("-") === -1 ? " +" : " ";
+
+                    if (containsZeroPrice(frequencyPrice)) {
+                        $("span.price").html(productOriginalPrice);
+                    } else {
+                        $("span.price").html(productOriginalPrice + frequencyOperator + frequencyPrice);
+                    }
+                }
+
+                function containsZeroPrice(price) {
+                    return parseFloat(price.replace(/\D/g, '')) === 0;
                 }
             });
         });

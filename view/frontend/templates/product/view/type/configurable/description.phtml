@@ -23,27 +23,34 @@ $frequencies = $configHelper->getProductRebillSubscriptionDetails($block->getPro
         <div class="check-subscription">
             <input type="radio" name="use_subscription" value="0" id="one-time-purchase" checked="checked">
             <label for="one-time-purchase">
-                <?= /** @noEscape */__('One time purchase') ?>
+                <?= /** @noEscape */
+                __('One time purchase') ?>
             </label>
         </div>
         <div class="check-subscription">
             <input type="radio" name="use_subscription" value="1" id="use-subscription">
             <label for="use-subscription">
                 <?php if ($count === 1) : ?>
-                    <?= /** @noEscape */ __('Subscribe to this product %1', $configHelper->getFrequencyDescription($block->getProduct(), array_first($frequencies))) ?>
+                    <?= /** @noEscape */
+                    __('Subscribe to this product %1', $configHelper->getFrequencyDescription($block->getProduct(), array_first($frequencies))) ?>
                 <?php else : ?>
-                    <?= /** @noEscape */ __('Subscribe to this product') ?>
+                    <?= /** @noEscape */
+                    __('Subscribe to this product') ?>
                 <?php endif ?>
             </label>
         </div>
         <div class="description" style="display: none">
             <?php if ($count === 1) : ?>
-                <input type="hidden" name="frequency" value="<?= /** @noEscape */array_first($frequencies)['id'] ?>">
+                <input type="hidden" name="frequency" value="<?= /** @noEscape */
+                array_first($frequencies)['id'] ?>">
             <?php else : ?>
                 <span class="option">
                     <select name="frequency" id="frequency">
                         <?php foreach ($frequencies as $frequency) : ?>
-                            <option value="<?= /** @noEscape */ $frequency['id'] ?>" data-price="<?= /** @noEscape */ $configHelper->getFrequencyPriceFormat($frequency['price']);?>"><?= /** @noEscape */ $configHelper->getFrequencyDescription($block->getProduct(), $frequency) ?></option>
+                            <option value="<?= /** @noEscape */
+                            $frequency['id'] ?>" data-price="<?= /** @noEscape */
+                            $configHelper->getFrequencyPriceFormat($frequency['price']); ?>"><?= /** @noEscape */
+                                $configHelper->getFrequencyDescription($block->getProduct(), $frequency) ?></option>
                         <?php endforeach; ?>
                     </select>
                 </span>
@@ -68,15 +75,29 @@ $frequencies = $configHelper->getProductRebillSubscriptionDetails($block->getPro
                     $(".rebill-subscription .description").hide();
                     cartButton.text(cartText);
                 });
-                $("#frequency").change(function (){
+                $("#frequency").change(function () {
                     addFrequencyPrice(this);
                 })
 
-                function addFrequencyPrice(el){
-                    var frequencyPrice = $(el).find('option:selected').data('price');
-                    var frequencyOperator = frequencyPrice.indexOf("-") === -1 ? " +" : " ";
-                    $("span.price").html(productOriginalPrice + frequencyOperator + frequencyPrice);
+                function addFrequencyPrice(el) {
+                    let frequencyPrice = $(el).find('option:selected').data('price');
+                    let frequencyOperator = frequencyPrice.indexOf("-") === -1 ? " +" : " ";
+
+                    if (containsZeroPrice(frequencyPrice)) {
+                        $("span.price").html(productOriginalPrice);
+                    } else {
+                        $("span.price").html(productOriginalPrice + frequencyOperator + frequencyPrice);
+                    }
                 }
+
+                //[Mau2] Como se quejaban que el precio se veia con + 0,00, la unic forma de
+                // validar que encontre fue sacar los caracteres que no son numericos
+                // si son todos ceros el parseFloat deberia dar "0".
+                function containsZeroPrice(price) {
+                    return parseFloat(price.replace(/\D/g, '')) === 0;
+                }
+
+
             });
         });
     </script>
