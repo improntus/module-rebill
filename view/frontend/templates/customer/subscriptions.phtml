@@ -48,14 +48,16 @@ $subscriptions = $block->getSubscriptions();
                     <td><?= $escaper->escapeHtml($block->getPaymentMethod($details, $cards)) ?></td>
                     <td><?= $escaper->escapeHtml(date('Y-m-d', strtotime($details['nextChargeDate']))) ?></td>
                     <td class="col actions">
-                        <a class="action edit"
-                           href="<?= $escaper->escapeUrl($block->getUrl('rebill/customer/edit', ['id' => $details['id']])) ?>">
-                            <span><?= $escaper->escapeHtml(__('Update')) ?></span>
-                        </a>
-                        <a class="action delete"
-                           href="<?= $escaper->escapeUrl($block->getUrl('rebill/customer/cancel', ['id' => $details['id']])) ?>">
-                            <span><?= $escaper->escapeHtml(__('Cancel')) ?></span>
-                        </a>
+                        <?php if ($subscription->getStatus() != "CANCELLED" && $subscription->getStatus() != "FINISHED"): ?>
+                            <a class="action edit"
+                               href="<?= $escaper->escapeUrl($block->getUrl('rebill/customer/edit', ['id' => $details['id']])) ?>">
+                                <span><?= $escaper->escapeHtml(__('Update')) ?></span>
+                            </a>
+                            <a class="action delete"
+                               href="<?= $escaper->escapeUrl($block->getUrl('rebill/customer/cancel', ['id' => $details['id']])) ?>">
+                                <span><?= $escaper->escapeHtml(__('Cancel')) ?></span>
+                            </a>
+                        <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
