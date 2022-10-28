@@ -7,6 +7,7 @@
 
 namespace Improntus\Rebill\Model\Sales;
 
+use Magento\Framework\DB\TransactionFactory;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Api\Data\TransactionInterface;
 use Magento\Framework\Exception\LocalizedException;
@@ -20,20 +21,37 @@ class Invoice
     protected $transactionBuilder;
 
     /**
+     * @var TransactionFactory
+     */
+    protected $transactionFactory;
+
+    /**
+     * @var Order\Payment\Repository
+     */
+    protected $paymentRepository;
+
+    /**
      * @param BuilderInterface $transactionBuilder
+     * @param TransactionFactory $transactionFactory
+     * @param Order\Payment\Repository $paymentRepository
      */
     public function __construct(
-        BuilderInterface $transactionBuilder
+        BuilderInterface         $transactionBuilder,
+        TransactionFactory       $transactionFactory,
+        Order\Payment\Repository $paymentRepository
     ) {
+        $this->paymentRepository = $paymentRepository;
         $this->transactionBuilder = $transactionBuilder;
+        $this->transactionFactory = $transactionFactory;
     }
 
     /**
      * @param Order $order
      * @return Order\Invoice|null
      * @throws LocalizedException
+     * @throws \Exception
      */
-    public function execute(Order $order)
+    public function execute(Order &$order)
     {
         if ($order->canInvoice()) {
             $payment = $order->getPayment();
@@ -49,6 +67,12 @@ class Invoice
                 $invoice->capture();
             }
             $payment->getOrder()->addRelatedObject($invoice);
+            $this->paymentRepository->save($payment);
+            $invoice->getOrder()->setIsInProcess(true);
+            $transactionSave = $this->transactionFactory->create()
+                ->addObject($invoice)
+                ->addObject($invoice->getOrder());
+            $transactionSave->save();
             return $invoice;
         }
         return null;

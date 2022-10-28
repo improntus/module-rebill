@@ -187,33 +187,41 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
 
     /**
      * @param string $rebillId
+     * @param bool $isHash
      * @return array
      * @throws Exception
      */
-    public function getSubscriptionPackage(string $rebillId)
+    public function getSubscriptionPackage(string $rebillId, bool $isHash = false)
     {
-        $subscription = $this->getByRebillId($rebillId);
         $filters = [];
-        if (!$subscription->getId()) {
-            $shipment = $this->subscriptionShipmentRepository->getByRebillId($rebillId);
-            if (!$shipment->getId()) {
-                throw new Exception(__('No subscription found'));
+        if (!$isHash) {
+            $subscription = $this->getByRebillId($rebillId);
+            if (!$subscription->getId()) {
+                $shipment = $this->subscriptionShipmentRepository->getByRebillId($rebillId);
+                if (!$shipment->getId()) {
+                    throw new Exception(__('No subscription found'));
+                }
+                $filters['shipment_id'] = $shipment->getId();
+            } else {
+                $filters['package_hash'] = $subscription->getPackageHash();
+                $shipment = $this->subscriptionShipmentRepository->getById($subscription->getShipmentId());
             }
-            $filters['shipment_id'] = $shipment->getId();
         } else {
-            $filters['package_hash'] = $subscription->getPackageHash();
-            $shipment = $this->subscriptionShipmentRepository->getById($subscription->getShipmentId());
-        }
-        if (!$shipment->getId()) {
-            $shipment = null;
+            $filters['package_hash'] = $rebillId;
         }
         $subscriptionList = $this->getEzList($filters)->getItems();
         foreach ($subscriptionList as &$item) {
             $price = $this->priceRepository->getByRebillId($item->getRebillPriceId());
             $item->setData('price', $price);
+            if (!isset($shipment)) {
+                $shipment = $this->subscriptionShipmentRepository->getById($item->getShipmentId());
+            }
+        }
+        if (!isset($shipment) || !$shipment->getId()) {
+            $shipment = null;
         }
         return [
-            'subscription'      => $subscription->getId() ? $subscription : $shipment,
+            'subscription'      => isset($subscription) ? ($subscription->getId() ? $subscription : $shipment) : null,
             'subscription_list' => $subscriptionList,
             'shipment'          => $shipment,
         ];

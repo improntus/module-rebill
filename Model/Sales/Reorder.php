@@ -45,7 +45,8 @@ class Reorder
         MagentoReorder          $reorder,
         QuoteRepository         $quoteRepository,
         CartManagementInterface $cartManagement
-    ) {
+    )
+    {
         $this->reorder = $reorder;
         $this->quoteRepository = $quoteRepository;
         $this->cartManagement = $cartManagement;
@@ -68,6 +69,7 @@ class Reorder
         $result = $this->reorder->execute($order->getIncrementId(), $order->getStoreId());
         /** @var Quote $cart */
         $cart = $result->getCart();
+        $cart->setStore($oldQuote->getStore());
         $cart->setShippingAddress($shippingAddress);
         if ($frequencies) {
             /** @var Quote\Item $item */
@@ -85,11 +87,10 @@ class Reorder
                 $frequencyOption = json_decode($frequencyOption->getValue(), true);
                 $_frequencyQty = $frequencyOption['frequency'] ?? 0;
                 $frequency = [
-                    'frequency'          => $_frequencyQty ?? 0,
-                    'frequency_type'     => $frequencyOption['frequencyType'] ?? 'months',
-                    'recurring_payments' => 1
+                    'frequency' => $_frequencyQty ?? 0,
+                    'frequency_type' => $frequencyOption['frequencyType'] ?? 'months'
                 ];
-                if (isset($frequencyOption['recurringPayments']) && $frequencyOption['recurringPayments'] > 0) {
+                if (isset($frequencyOption['recurringPayments']) && $frequencyOption['recurringPayments']) {
                     $frequency['recurring_payments'] = (int)$frequencyOption['recurringPayments'];
                 }
                 $frequencyHash = hash('md5', implode('-', $frequency));

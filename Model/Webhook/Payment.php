@@ -116,6 +116,7 @@ class Payment extends WebhookAbstract
                 }
                 $packagesHashes = [];
                 $orderId = 0;
+                $reordered = false;
                 foreach ($rebillPayment['billingSchedulesId'] as $subscriptionId) {
                     $subscription = $this->subscriptionRepository->getByRebillId($subscriptionId);
                     if (!$subscription->getId()) {
@@ -124,16 +125,23 @@ class Payment extends WebhookAbstract
                     if (!$subscription->getId()) {
                         continue;
                     }
-                    if ($subscription->getPayed() == 0) {
-                        $this->webhookHeadsUp->executeHeadsUp($subscription->getRebillId());
+                    if ($subscription->getPayed() == 1 && !$reordered) {
+                        $this->webhookHeadsUp->executeHeadsUp($subscription->getRebillId(), true);
+                        $reordered = true;
+                        if ($subscription instanceof Model) {
+                            $subscription = $this->subscriptionRepository->getByRebillId($subscriptionId);
+                        } else {
+                            $subscription = $this->shipmentRepository->getByRebillId($subscriptionId);
+                        }
                     }
                     $orderId = $subscription->getOrderId();
                     $subscription->setPayed(1);
                     if ($subscription instanceof Model) {
-                        $packagesHashes[$subscription->getPackageHash()] = $subscription->getPackageHash();
+                        $packagesHashes[$subscription->getPackageHash()] = $subscription->getRebillId();
                         $this->subscriptionRepository->save($subscription);
                     } else {
                         $this->shipmentRepository->save($subscription);
+                        $packagesHashes[$subscription->getId()] = $subscription->getRebillId();
                     }
                 }
                 $payment = $this->paymentRepository->getByRebillId($rebillPayment['id']);
@@ -144,27 +152,27 @@ class Payment extends WebhookAbstract
                 $this->paymentRepository->save($payment);
                 if ($rebillPayment['status'] == 'SUCCEEDED') {
                     foreach ($packagesHashes as $hash) {
-                        $packages = $this->subscriptionRepository->getCollection();
-                        $packages->addFieldToFilter('package_hash', $hash);
-                        $subscriptionsQty = $packages->getSize();
+                        $package = $this->subscriptionRepository->getSubscriptionPackage($hash);
+                        $subscriptionsQty = count($package['subscription_list']) + ($package['shipment'] ? 1 : 0);
                         $payed = 0;
                         /** @var Model $_subscription */
-                        foreach ($packages as $_subscription) {
+                        foreach ($package['subscription_list'] as $_subscription) {
                             $payed += $_subscription->getPayed();
                         }
-                        if ($_subscription && $_subscription->getShipmentId()) {
-                            $shipment = $this->shipmentRepository->getById($_subscription->getShipmentId());
+                        if ($shipment = $package['shipment']) {
                             $payed += $shipment->getPayed();
                         }
-                        if ($payed == $subscriptionsQty && $_subscription) {
+                        if ($payed == $subscriptionsQty) {
                             /** @var Order $order */
-                            $order = $this->orderRepository->get($_subscription->getOrderId());
+                            $order = $this->orderRepository->get($package['subscription']->getOrderId());
                             $this->invoice->execute($order);
+                            $this->orderRepository->save($order);
                         }
                     }
                 }
             }
         } catch (Exception $exception) {
+            echo $exception->getMessage();
             $this->configHelper->logError($exception->getMessage());
         }
     }

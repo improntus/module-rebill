@@ -114,25 +114,26 @@ class HeadsUp extends WebhookAbstract
 
     /**
      * @param string $rebillSubscriptionId
+     * @param bool $force
      * @return void
      * @throws CouldNotSaveException
      * @throws InputException
      * @throws LocalizedException
      * @throws NoSuchEntityException
-     * @throws Exception
      */
-    public function executeHeadsUp(string $rebillSubscriptionId)
+    public function executeHeadsUp(string $rebillSubscriptionId, bool $force = false)
     {
         $package = $this->subscriptionRepository->getSubscriptionPackage($rebillSubscriptionId);
         /** @var \Improntus\Rebill\Model\Entity\Subscription\Model $subscription */
         $subscription = $package['subscription'];
-        $order = $this->orderRepository->get($subscription->getOrderId());
+        $_order = $this->orderRepository->get($subscription->getOrderId());
         $rebillSubscription = $this->subscriptionRepository->getRebillSubscription(
             $rebillSubscriptionId,
-            $order->getCustomerEmail()
+            $_order->getCustomerEmail()
         );
-        if ($rebillSubscription['status'] !== 'ACTIVE'
-            || $rebillSubscription['nextChargeDate'] == $subscription->getNextSchedule()) {
+        if (($rebillSubscription['status'] !== 'ACTIVE'
+                || $rebillSubscription['nextChargeDate'] == $subscription->getNextSchedule())
+            && !$force) {
             return;
         }
         $hashes = [];
@@ -143,8 +144,8 @@ class HeadsUp extends WebhookAbstract
             $details = $price->getDetails();
             $hashes[$details['sku']] = $price->getFrequencyHash();
         }
-        /** @var Order $order */
-        $order = $this->reorder->execute($order, $hashes);
+        /** @var Order $_order */
+        $order = $this->reorder->execute($_order, $hashes);
         /** @var \Improntus\Rebill\Model\Entity\SubscriptionShipment\Model $shipment */
         if ($shipment = $package['shipment']) {
             if ($shipment->getId()) {
@@ -180,11 +181,10 @@ class HeadsUp extends WebhookAbstract
             $frequencyOption = json_decode($frequencyOption->getValue(), true);
             $_frequencyQty = $frequencyOption['frequency'] ?? 0;
             $frequency = [
-                'frequency'          => $_frequencyQty ?? 0,
-                'frequency_type'     => $frequencyOption['frequencyType'] ?? 'months',
-                'recurring_payments' => 1,
+                'frequency'      => $_frequencyQty ?? 0,
+                'frequency_type' => $frequencyOption['frequencyType'] ?? 'months',
             ];
-            if (isset($frequencyOption['recurringPayments']) && $frequencyOption['recurringPayments'] > 0) {
+            if (isset($frequencyOption['recurringPayments']) && $frequencyOption['recurringPayments']) {
                 $frequency['recurring_payments'] = (int)$frequencyOption['recurringPayments'];
             }
             $frequencyHash = hash('md5', implode('-', $frequency));
@@ -192,8 +192,9 @@ class HeadsUp extends WebhookAbstract
             foreach ($package['subscription_list'] as $sub) {
                 /** @var Model $price */
                 $price = $sub->getData('price');
+                $options = $price->getDetails();
                 if ($price->getData('frequency_hash') != $frequencyHash
-                    || $orderItem->getSku() != $price->getData('sku')) {
+                    || $orderItem->getSku() != $options['sku']) {
                     continue;
                 }
                 $discount = $orderItem->getDiscountAmount();
