@@ -158,10 +158,10 @@ class HeadsUp extends WebhookAbstract
                 $this->rebillSubscription->updateSubscription(
                     $shipment->getRebillId(),
                     [
-                        'amount'         => $shippingPrice,
-                        'card'           => $rebillSubscription['card'],
+                        'amount' => $shippingPrice,
+                        'card' => $rebillSubscription['card'],
                         'nextChargeDate' => $rebillSubscription['nextChargeDate'],
-                        'status'         => $rebillSubscription['status'],
+                        'status' => $rebillSubscription['status'],
                     ]
                 );
                 $shipment->setPayed(0);
@@ -209,10 +209,10 @@ class HeadsUp extends WebhookAbstract
                 $this->rebillSubscription->updateSubscription(
                     $sub->getRebillId(),
                     [
-                        'amount'         => $price,
-                        'card'           => $rebillSubscription['card'],
+                        'amount' => $price,
+                        'card' => $rebillSubscription['card'],
                         'nextChargeDate' => $rebillSubscription['nextChargeDate'],
-                        'status'         => $rebillSubscription['status'],
+                        'status' => $rebillSubscription['status'],
                     ]
                 );
                 $sub->setNextSchedule($rebillSubscription['nextChargeDate']);

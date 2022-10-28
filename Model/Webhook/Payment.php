@@ -172,7 +172,6 @@ class Payment extends WebhookAbstract
                 }
             }
         } catch (Exception $exception) {
-            echo $exception->getMessage();
             $this->configHelper->logError($exception->getMessage());
         }
     }
