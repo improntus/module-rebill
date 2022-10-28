@@ -90,9 +90,6 @@ $frequencies = $configHelper->getProductRebillSubscriptionDetails($block->getPro
                     }
                 }
 
-                //[Mau2] Como se quejaban que el precio se veia con + 0,00, la unic forma de
-                // validar que encontre fue sacar los caracteres que no son numericos
-                // si son todos ceros el parseFloat deberia dar "0".
                 function containsZeroPrice(price) {
                     return parseFloat(price.replace(/\D/g, '')) === 0;
                 }

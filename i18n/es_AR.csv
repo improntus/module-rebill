@@ -88,13 +88,20 @@ Subscriptions,Suscripciones
 months,meses
 year,año
 years,años
+monthly, mensual
+yearly, anual
+"%1 for %2", "%1 por %2"
+"%1 for %2 %3", ""%1 por %2 %3"
+"every %1 %2 for %3", "cada %1 %2 por %3"
+"%1 with a sign-up fee of %2", "%1 con una tarifa de %2"
+"%1 for %2 %3 with a sign-up fee of %4", "%1 por %2 %3 con una tarifa de %4"
 "monthly for %1 for %2 %3","mensual para %1 para %2 %3"
 "monthly for %1 for %2 %3 with a sign-up fee of %4","mensual para %1 para %2 %3 con una tarifa de registro de %4"
 "yearly for %1","anual para %1"
 "yearly for %1 with a sign-up fee of %2","anual para %1 con una tarifa de registro de %2"
 "yearly for %1 for %2 %3","anual para %1 para %2 %3"
 "yearly for %1 for %2 %3 with a sign-up fee of %4","anual para %1 para %2 %3 con una tarifa de registro de %4"
-"every %1 months for %2","cada %1 meses durante %2"
+"every %1 months for %2","cada %1 meses por %2"
 "every %1 months for %2 with a sign-up fee of %3","cada %1 meses para %2 con una tarifa de registro de %3"
 "every %1 months for %2 for %3 %4","cada %1 meses para %2 para %3 %4"
 "every %1 months for %2 for %3 %4 with a sign-up fee of %5","cada %1 meses para %2 para %3 %4 con una tarifa de registro de %5"

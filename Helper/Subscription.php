@@ -134,8 +134,8 @@ class Subscription extends Data
     {
         return [
             'enable_subscription' => (bool)$product->getData('rebill_subscription_type'),
-            'subscription_type'   => $product->getData('rebill_subscription_type'),
-            'frequency'           => json_decode($product->getData('rebill_frequency') ?? '[]', true),
+            'subscription_type' => $product->getData('rebill_subscription_type'),
+            'frequency' => json_decode($product->getData('rebill_frequency') ?? '[]', true),
         ];
     }
 
@@ -205,141 +205,40 @@ class Subscription extends Data
             $frequencyType = $frequencyArray['frequencyType'];
             $recurringPayments = $frequencyArray['recurringPayments'];
             $initialCost = $frequencyArray['initialCost'];
-            if (!$price) {
-                $price = $this->currencyHelper->currencyByStore($frequencyArray['price'], null, true, false);
-                $price = ($frequencyArray['price'] > 0 ? '+' : ' ') . $price;
-            } else {
-                $price = $this->currencyHelper->currencyByStore($price, null, true, false);
-            }
-            if ($frequency == 1) {
-                if ($frequencyType == 'months') {
-                    if ($recurringPayments == 0) {
-                        if ($initialCost == 0) {
-                            return __('monthly for %1', $price);
-                        } else {
-                            return __('monthly for %1 with a sign-up fee of %2', $price, $this->currencyHelper->currencyByStore($initialCost, null, true, false));
-                        }
-                    } else {
-                        $recurringPaymentPeriod = __('months');
-                        if ($recurringPayments == 12) {
-                            $recurringPaymentPeriod = __('year');
-                        } elseif ($recurringPayments > 12 && $recurringPayments % 12 == 0) {
-                            $recurringPaymentPeriod = __('years');
-                        }
-                        if ($initialCost == 0) {
-                            return __('monthly for %1 for %2 %3', $price, $recurringPayments, $recurringPaymentPeriod);
-                        } else {
-                            return __(
-                                'monthly for %1 for %2 %3 with a sign-up fee of %4',
-                                $price,
-                                $recurringPayments,
-                                $recurringPaymentPeriod,
-                                $this->currencyHelper->currencyByStore($initialCost, null, true, false)
-                            );
-                        }
-                    }
+            $price = $this->getFrequencyPrice($price, $frequencyArray, $product);
+
+            $description = $this->getFirstPartDesc($frequencyType, $frequency, $price);
+
+            if ($recurringPayments == 0) {
+                if ($initialCost == 0) {
+                    return $description;
                 } else {
-                    if ($recurringPayments == 0) {
-                        if ($initialCost == 0) {
-                            return __('yearly for %1', $price);
-                        } else {
-                            return __('yearly for %1 with a sign-up fee of %2', $price, $this->currencyHelper->currencyByStore($initialCost, null, true, false));
-                        }
-                    } else {
-                        $recurringPaymentPeriod = __('years');
-                        if ($recurringPayments == 1) {
-                            $recurringPaymentPeriod = __('year');
-                        }
-                        if ($initialCost == 0) {
-                            return __('yearly for %1 for %2 %3', $price, $recurringPayments, $recurringPaymentPeriod);
-                        } else {
-                            return __(
-                                'yearly for %1 for %2 %3 with a sign-up fee of %4',
-                                $price,
-                                $recurringPayments,
-                                $recurringPaymentPeriod,
-                                $this->currencyHelper->currencyByStore($initialCost, null, true, false)
-                            );
-                        }
-                    }
+                    return __(
+                        '%1 with a sign-up fee of %2',
+                        $description,
+                        $this->currencyHelper->currencyByStore($initialCost, null, true, false)
+                    );
                 }
             } else {
-                if ($frequencyType == 'months') {
-                    if ($recurringPayments == 0) {
-                        if ($initialCost == 0) {
-                            return __('every %1 months for %2', $frequency, $price);
-                        } else {
-                            return __(
-                                'every %1 months for %2 with a sign-up fee of %3',
-                                $frequency,
-                                $price,
-                                $this->currencyHelper->currencyByStore($initialCost, null, true, false)
-                            );
-                        }
-                    } else {
-                        $recurringPaymentPeriod = __('months');
-                        if ($recurringPayments * $frequency == 12) {
-                            $recurringPaymentPeriod = __('year');
-                        } elseif ($recurringPayments * $frequency > 12 && ($recurringPayments * $frequency) % 12 == 0) {
-                            $recurringPaymentPeriod = __('years');
-                        }
-                        if ($initialCost == 0) {
-                            return __(
-                                'every %1 months for %2 for %3 %4',
-                                $frequency,
-                                $price,
-                                $recurringPayments * $frequency,
-                                $recurringPaymentPeriod
-                            );
-                        } else {
-                            return __(
-                                'every %1 months for %2 for %3 %4 with a sign-up fee of %5',
-                                $frequency,
-                                $price,
-                                $recurringPayments * $frequency,
-                                $recurringPaymentPeriod,
-                                $this->currencyHelper->currencyByStore($initialCost, null, true, false)
-                            );
-                        }
-                    }
+                $recurringPaymentPeriod = $this->getRecurringPaymentPeriod($recurringPayments * $frequency, $frequencyType);
+                if ($initialCost == 0) {
+                    return __(
+                        '%1 for %2 %3',
+                        $description,
+                        $recurringPayments * $frequency,
+                        $recurringPaymentPeriod
+                    );
                 } else {
-                    if ($recurringPayments == 0) {
-                        if ($initialCost == 0) {
-                            return __('every %1 years for %2', $frequency, $price);
-                        } else {
-                            return __(
-                                'every %1 years for %2 with a sign-up fee of %3',
-                                $frequency,
-                                $price,
-                                $this->currencyHelper->currencyByStore($initialCost, null, true, false)
-                            );
-                        }
-                    } else {
-                        $recurringPaymentPeriod = __('years');
-                        if ($recurringPayments * $frequency == 1) {
-                            $recurringPaymentPeriod = __('year');
-                        }
-                        if ($initialCost == 0) {
-                            return __(
-                                'every %1 years for %2 for %3 %4',
-                                $frequency,
-                                $price,
-                                $recurringPayments * $frequency,
-                                $recurringPaymentPeriod
-                            );
-                        } else {
-                            return __(
-                                'every %1 years for %2 for %3 %4 with a sign-up fee of %5',
-                                $frequency,
-                                $price,
-                                $recurringPayments * $frequency,
-                                $recurringPaymentPeriod,
-                                $this->currencyHelper->currencyByStore($initialCost, null, true, false)
-                            );
-                        }
-                    }
+                    return __(
+                        '%1 for %2 %3 with a sign-up fee of %4',
+                        $description,
+                        $recurringPayments * $frequency,
+                        $recurringPaymentPeriod,
+                        $this->currencyHelper->currencyByStore($initialCost, null, true, false)
+                    );
                 }
             }
+
         } catch (Exception $exception) {
             return '';
         }
@@ -362,5 +261,52 @@ class Subscription extends Data
         } catch (Exception $exception) {
             return '';
         }
+    }
+
+    private function getFrequencyPrice($price, $frequencyArray, Product $product)
+    {
+        if (!$price) {
+
+            $price = $this->currencyHelper->currencyByStore($frequencyArray['price'], null, false, false);
+            $price += $product->getFinalPrice();
+            $price = $this->currencyHelper->currencyByStore($price, null, true, false);
+            $price = ($frequencyArray['price'] > 0 ? '+' : ' ') . $price;
+        } else {
+            $price = $this->currencyHelper->currencyByStore($price, null, true, false);
+        }
+        return $price;
+    }
+
+    /**
+     * @param $recurringPayments
+     * @return Phrase
+     */
+    private function getRecurringPaymentPeriod($recurringPayments, $frequencyType)
+    {
+        if ($frequencyType == 'months') {
+            $recurringPaymentPeriod = __('months');
+            if ($recurringPayments == 12) {
+                $recurringPaymentPeriod = __('year');
+            } elseif ($recurringPayments > 12 && $recurringPayments % 12 == 0) {
+                $recurringPaymentPeriod = __('years');
+            }
+        } else {
+            $recurringPaymentPeriod = __($recurringPayments == 1 ? 'year' : 'years');
+        }
+
+        return $recurringPaymentPeriod;
+    }
+
+    private function getFirstPartDesc($frequencyType, $frequency, $price)
+    {
+        $description = "";
+        if ($frequency == 1) {
+            $period = __($frequencyType == 'months' ? 'monthly' : 'yearly');
+            $description = __('%1 for %2', $period, $price);
+        } else {
+            $period = __($frequencyType == 'months' ? 'months' : 'years');
+            $description = __('every %1 %2 for %3', $frequency, $period, $price);
+        }
+        return $description;
     }
 }
