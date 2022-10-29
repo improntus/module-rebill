@@ -48,14 +48,28 @@ $subscriptions = $block->getSubscriptions();
                     <td><?= $escaper->escapeHtml($block->getPaymentMethod($details, $cards)) ?></td>
                     <td><?= $escaper->escapeHtml(date('Y-m-d', strtotime($details['nextChargeDate']))) ?></td>
                     <td class="col actions">
-                        <?php if ($subscription->getStatus() != "CANCELLED" && $subscription->getStatus() != "FINISHED"): ?>
-                            <a class="action edit"
-                               href="<?= $escaper->escapeUrl($block->getUrl('rebill/customer/edit', ['id' => $details['id']])) ?>">
-                                <span><?= $escaper->escapeHtml(__('Update')) ?></span>
+                        <?php if ($subscription->canUpdateIt()): ?>
+                        <a class="action edit"
+                           href="<?= $escaper->escapeUrl($block->getUrl('rebill/customer/edit', ['id' => $details['id']])) ?>">
+                            <span><?= $escaper->escapeHtml(__('Update')) ?></span>
+                        </a>
+                        <?php endif; ?>
+                        <?php if ($subscription->canCancelIt()): ?>
+                        <a class="action delete"
+                           href="<?= $escaper->escapeUrl($block->getUrl('rebill/customer/cancel', ['id' => $details['id']])) ?>">
+                            <span><?= $escaper->escapeHtml(__('Cancel')) ?></span>
+                        </a>
+                        <?php endif; ?>
+                        <?php if ($subscription->canPauseIt()): ?>
+                            <a class="action pause"
+                               href="<?= $escaper->escapeUrl($block->getUrl('rebill/customer/pause', ['id' => $details['id']])) ?>">
+                                <span><?= $escaper->escapeHtml(__('Pause')) ?></span>
                             </a>
-                            <a class="action delete"
-                               href="<?= $escaper->escapeUrl($block->getUrl('rebill/customer/cancel', ['id' => $details['id']])) ?>">
-                                <span><?= $escaper->escapeHtml(__('Cancel')) ?></span>
+                        <?php endif; ?>
+                        <?php if ($subscription->canReactivateIt()): ?>
+                            <a class="action reactivate"
+                               href="<?= $escaper->escapeUrl($block->getUrl('rebill/customer/reactivate', ['id' => $details['id']])) ?>">
+                                <span><?= $escaper->escapeHtml(__('Reactivate')) ?></span>
                             </a>
                         <?php endif; ?>
                     </td>
@@ -94,7 +108,63 @@ $subscriptions = $block->getSubscriptions();
                         }]
                     });
                     confirmationPopup.open();
-                })
+                });
+
+                $('a.pause').click(function (event) {
+                    let element = $(this);
+                    event.preventDefault();
+                    let confirmationPopup = confirmation({
+                        title: $.mage.__('Pause Subscription'),
+                        content: $.mage.__('You are about to pause a subscription. Are you sure?'),
+                        actions: {
+                            confirm: function () {
+                                window.location = element.attr('href');
+                            },
+                        },
+                        buttons: [{
+                            text: $.mage.__('Cancel'),
+                            class: 'action-secondary action-dismiss',
+                            click: function (event) {
+                                this.closeModal(event);
+                            }
+                        }, {
+                            text: $.mage.__('Ok'),
+                            class: 'action primary action-accept',
+                            click: function (event) {
+                                this.closeModal(event, true);
+                            }
+                        }]
+                    });
+                    confirmationPopup.open();
+                });
+
+                $('a.reactivate').click(function (event) {
+                    let element = $(this);
+                    event.preventDefault();
+                    let confirmationPopup = confirmation({
+                        title: $.mage.__('Reactivate Subscription'),
+                        content: $.mage.__('You are about to reactivate this subscription. Are you sure?'),
+                        actions: {
+                            confirm: function () {
+                                window.location = element.attr('href');
+                            },
+                        },
+                        buttons: [{
+                            text: $.mage.__('Cancel'),
+                            class: 'action-secondary action-dismiss',
+                            click: function (event) {
+                                this.closeModal(event);
+                            }
+                        }, {
+                            text: $.mage.__('Ok'),
+                            class: 'action primary action-accept',
+                            click: function (event) {
+                                this.closeModal(event, true);
+                            }
+                        }]
+                    });
+                    confirmationPopup.open();
+                });
             });
         });
     </script>

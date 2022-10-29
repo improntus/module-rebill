@@ -5,7 +5,7 @@
  * @package Improntus_Rebill
  */
 
-namespace Improntus\Rebill\Controller\Adminhtml\Subscription;
+namespace Improntus\Rebill\Controller\Customer;
 
 use Exception;
 use Improntus\Rebill\Helper\Config;
@@ -13,14 +13,14 @@ use Improntus\Rebill\Model\Entity\Subscription\Model as EntitySubscription;
 use Improntus\Rebill\Model\Entity\Subscription\Repository as SubscriptionRepository;
 use Improntus\Rebill\Model\Entity\SubscriptionShipment\Model as EntityShipment;
 use Improntus\Rebill\Model\Entity\SubscriptionShipment\Repository as ShipmentRepository;
-use Improntus\Rebill\Model\Rebill\Subscription as RebillSubscription;
-use Magento\Backend\App\Action;
-use Magento\Backend\App\Action\Context;
 use Magento\Customer\Model\Session;
+use Improntus\Rebill\Model\Rebill\Subscription as RebillSubscription;
+use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Exception\CouldNotSaveException;
 
-class Cancel extends Action
+abstract class ChangeStatus extends Action
 {
     /**
      * @var RebillSubscription $rebillSubscription
@@ -74,26 +74,30 @@ class Cancel extends Action
         $this->configHelper = $configHelper;
         $this->rebillSubscription = $rebillSubscription;
 
-        $this->customerEmail = '';
+        $this->customerEmail = ($this->session->getCustomer())
+            ? $this->session->getCustomer()->getEmail()
+            : '';
 
         parent::__construct($context);
     }
 
     /**
-     * @return ResponseInterface
      * @throws Exception
      */
     public function execute()
     {
-        $this->customerEmail = $this->getRequest()->getParam('user_email');
+        if ( ! $this->configHelper->isLoggedIn()) {
+            $this->messageManager->addWarningMessage(__('To enter this section you need to be logged in'));
+            return $this->_redirect('customer/account/login');
+        }
 
-        $subscriptionPackage = $this->subscriptionRepository->getSubscriptionPackage($this->getRequest()->getParam('rebill_id'));
+        $subscriptionPackage = $this->subscriptionRepository->getSubscriptionPackage($this->getRequest()->getParam('id'));
 
         /** @var EntitySubscription $subscription */
         $subscription = $subscriptionPackage['subscription'];
         if (is_null($subscription) || ( ! $this->canExecuteChange($subscription))) {
             $this->messageManager->addErrorMessage($this->getCantExecuteChangeMessage());
-            return $this->_redirect('*/*/index');
+            return $this->_redirect('rebill/customer/subscriptions');
         }
 
         try {
@@ -102,37 +106,50 @@ class Cancel extends Action
             foreach ($subscriptionPackage['subscription_list'] as $_subscription) {
                 $this->changeStatus($this->subscriptionRepository,$_subscription);
             }
-            $this->messageManager->addSuccessMessage(__('The subscription was cancelled.'));
+            $this->messageManager->addSuccessMessage($this->getSuccessMessage());
         } catch (Exception $exception) {
-            $this->messageManager->addErrorMessage(__('There was an error cancelling the subscription. Error: %1', $exception->getMessage()));
+            $this->messageManager->addErrorMessage($this->getExceptionMessage());
         }
-        return $this->_redirect('*/*/index');
+
+        return $this->_redirect('rebill/customer/subscriptions');
     }
 
     /**
      * @param SubscriptionRepository|ShipmentRepository $repository
      * @param EntitySubscription|EntityShipment|null $subscription
-     * @throws CouldNotSaveException
-     * @throws Exception
      */
-    protected function changeStatus(
+    abstract protected function changeStatus(
         SubscriptionRepository|ShipmentRepository $repository,
         EntitySubscription|EntityShipment|null $subscription = null
-    ) {
-        if (is_null($subscription)) {
-            return;
-        }
-        $this->rebillSubscription->cancelSubscription($subscription->getRebillId(), $this->customerEmail);
-        $subscription->setStatus(EntitySubscription::STATUS_CANCELLED);
-        $repository->save($subscription);
-    }
+    );
 
     /**
      * @param EntitySubscription $subscription
      * @return bool
      */
-    protected function canExecuteChange( EntitySubscription $subscription): bool
+    abstract protected function canExecuteChange( EntitySubscription $subscription): bool;
+
+    /**
+     * @return string
+     */
+    protected function getCantExecuteChangeMessage(): string
     {
-        return $subscription->canCancelIt();
+        return __('Change cannot be made due to subscription status. Contact the store owner to get more information.');
+    }
+
+    /**
+     * @return string
+     */
+    protected function getSuccessMessage(): string
+    {
+        return __('The subscription status was changed.');
+    }
+
+    /**
+     * @return string
+     */
+    protected function getExceptionMessage(): string
+    {
+        return __('There was an error changing your subscription status. Contact the store owner to get more information.');
     }
 }

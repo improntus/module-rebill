@@ -17,7 +17,7 @@ use Magento\Framework\Pricing\Helper\Data;
 /** @var Data $currencyHelper */
 $currencyHelper = $this->helper(Data::class);
 $subscription = $block->getSubscription() ?? [];
-$card = $block->getCard($subscription['card']);
+$card = $block->getCard($subscription['card'] ?? null);
 $documentTypes = $block->getDocumentTypes($subscription['price']['gateway']['type']);
 ?>
 <div class="rebill-subscription-data">

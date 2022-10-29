@@ -263,12 +263,11 @@ class Subscription extends Data
         }
     }
 
-    private function getFrequencyPrice($price, $frequencyArray, Product $product)
+    private function getFrequencyPrice($price, $frequencyArray, ?Product $product = null)
     {
         if (!$price) {
-
             $price = $this->currencyHelper->currencyByStore($frequencyArray['price'], null, false, false);
-            $price += $product->getFinalPrice();
+            $price += $product ? $product->getFinalPrice() : 0;
             $price = $this->currencyHelper->currencyByStore($price, null, true, false);
             $price = ($frequencyArray['price'] > 0 ? '+' : ' ') . $price;
         } else {

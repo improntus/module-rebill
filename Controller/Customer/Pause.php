@@ -13,23 +13,33 @@ use Improntus\Rebill\Model\Entity\SubscriptionShipment\Model as EntityShipment;
 use Improntus\Rebill\Model\Entity\SubscriptionShipment\Repository as ShipmentRepository;
 use Magento\Framework\Exception\CouldNotSaveException;
 
-class Cancel extends ChangeStatus
+class Pause extends ChangeStatus
 {
     /**
      * @param SubscriptionRepository|ShipmentRepository $repository
      * @param EntitySubscription|EntityShipment|null $subscription
      * @throws CouldNotSaveException
-     * @throws \Exception
      */
     protected function changeStatus(
         SubscriptionRepository|ShipmentRepository $repository,
         EntitySubscription|EntityShipment|null $subscription = null
-    ) {
+    )
+    {
         if (is_null($subscription)) {
             return;
         }
-        $this->rebillSubscription->cancelSubscription($subscription->getRebillId(), $this->customerEmail);
-        $subscription->setStatus(EntitySubscription::STATUS_CANCELLED);
+
+        $_details = $subscription->getDetails();
+        $this->rebillSubscription->updateSubscription(
+            $subscription->getRebillId(),
+            [
+                'amount'      => $_details['price']['amount'],
+                'repetitions' => $_details['remainingIterations'],
+                'status'      => EntitySubscription::STATUS_PAUSED,
+                'card'        => $_details['card'],
+            ]
+        );
+        $subscription->setStatus(EntitySubscription::STATUS_PAUSED);
         $repository->save($subscription);
     }
 
@@ -39,7 +49,7 @@ class Cancel extends ChangeStatus
      */
     protected function canExecuteChange( EntitySubscription $subscription): bool
     {
-        return $subscription->canCancelIt();
+        return $subscription->canPauseIt();
     }
 
     /**
@@ -47,7 +57,7 @@ class Cancel extends ChangeStatus
      */
     protected function getCantExecuteChangeMessage(): string
     {
-        return __('Subscription cannot be cancelled.') . ' ' . parent::getCantExecuteChangeMessage();
+        return __('Subscription cannot be paused.') . ' ' . parent::getCantExecuteChangeMessage();
     }
 
     /**
@@ -55,6 +65,6 @@ class Cancel extends ChangeStatus
      */
     protected function getSuccessMessage(): string
     {
-        return __('The subscription was cancelled.');
+        return __('The subscription was paused.');
     }
 }

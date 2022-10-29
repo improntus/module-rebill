@@ -14,6 +14,12 @@ use Magento\Framework\Model\AbstractModel;
 
 class Model extends AbstractModel implements DataInterface
 {
+    const STATUS_ACTIVE = 'ACTIVE';
+    const STATUS_PAUSED = 'PAUSED';
+    const STATUS_DEFAULT = 'DEFAULT';
+    const STATUS_CANCELLED = 'CANCELLED';
+    const STATUS_FINISHED = 'FINISHED';
+
     /**
      * @var string
      */
@@ -207,5 +213,33 @@ class Model extends AbstractModel implements DataInterface
     {
         $this->setData('payed', $payed);
         return $this;
+    }
+
+    public function canUpdateIt(): bool
+    {
+        return $this->getStatus() == static::STATUS_ACTIVE;
+    }
+
+    public function canReactivateIt(): bool
+    {
+        return $this->getStatus() == static::STATUS_PAUSED;
+    }
+
+    public function canPauseIt(): bool
+    {
+        return $this->getStatus() == static::STATUS_ACTIVE;
+    }
+
+    public function canCancelIt(): bool
+    {
+        return static::canCancelSubscription($this->getStatus());
+    }
+
+    public static function canCancelSubscription($currentStatus): bool
+    {
+        return in_array($currentStatus,[
+            static::STATUS_ACTIVE,
+            static::STATUS_PAUSED,
+        ]);
     }
 }

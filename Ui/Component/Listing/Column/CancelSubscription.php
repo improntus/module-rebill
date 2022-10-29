@@ -6,6 +6,7 @@
  */
 namespace Improntus\Rebill\Ui\Component\Listing\Column;
 
+use Improntus\Rebill\Model\Entity\Subscription\Model as EntitySubscription;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
@@ -58,30 +59,38 @@ class CancelSubscription extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
-                if (isset($item['rebill_id'])) {
-                    $title = $this->getEscaper()->escapeHtmlAttr($item['title']);
-                    $item[$this->getData('name')] = [
-                        'delete' => [
-                            'href' => $this->urlBuilder->getUrl(
-                                static::URL_PATH_DELETE,
-                                [
-                                    'user_email' => $item['user_email'],
-                                    'rebill_id' => $item['rebill_id']
-                                ]
-                            ),
-                            'label' => __('Cancel'),
-                            'confirm' => [
-                                'title' => __('Cancel'),
-                                'message' => __('Are you sure you want to cancel a subscription?')
-                            ],
-                            'post' => true
-                        ],
-                    ];
+                if (( ! isset($item['rebill_id'])) || ( ! $this->canCancel($item))) {
+                    /** La suscripción no tiene id, o no esta en condiciones de ser cancelado, lo salteo. */
+                    continue;
                 }
+
+                $title = $this->getEscaper()->escapeHtmlAttr($item['title']);
+                $item[$this->getData('name')] = [
+                    'delete' => [
+                        'href' => $this->urlBuilder->getUrl(
+                            static::URL_PATH_DELETE,
+                            [
+                                'user_email' => $item['user_email'],
+                                'rebill_id' => $item['rebill_id']
+                            ]
+                        ),
+                        'label' => __('Cancel'),
+                        'confirm' => [
+                            'title' => __('Cancel'),
+                            'message' => __('Are you sure you want to cancel a subscription?')
+                        ],
+                        'post' => true
+                    ],
+                ];
             }
         }
 
         return $dataSource;
+    }
+
+    public function canCancel($item): bool
+    {
+        return EntitySubscription::canCancelSubscription($item['status']);
     }
 
     /**

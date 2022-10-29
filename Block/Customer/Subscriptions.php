@@ -123,11 +123,13 @@ class Subscriptions extends Template
 
     /**
      * @param string $id
-     * @return mixed|null
+     * @return mixed
      */
-    public function getCustomerCards(string $id)
+    public function getCustomerCards(string $id): mixed
     {
-        return $this->card->getCards($id);
+        $cards = $this->card->getCards($id);
+
+        return $cards ? $cards : [];
     }
 
     /**
