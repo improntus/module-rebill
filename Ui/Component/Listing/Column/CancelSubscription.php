@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
  * @package Improntus_Rebill
  */
+
 namespace Improntus\Rebill\Ui\Component\Listing\Column;
 
 use Improntus\Rebill\Model\Entity\Subscription\Model as EntitySubscription;
@@ -42,11 +43,11 @@ class CancelSubscription extends Column
      * @param array $data
      */
     public function __construct(
-        ContextInterface $context,
+        ContextInterface   $context,
         UiComponentFactory $uiComponentFactory,
-        UrlInterface $urlBuilder,
-        array $components = [],
-        array $data = []
+        UrlInterface       $urlBuilder,
+        array              $components = [],
+        array              $data = []
     ) {
         $this->urlBuilder = $urlBuilder;
         parent::__construct($context, $uiComponentFactory, $components, $data);
@@ -59,27 +60,29 @@ class CancelSubscription extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
-                if (( ! isset($item['rebill_id'])) || ( ! $this->canCancel($item))) {
-                    /** La suscripción no tiene id, o no esta en condiciones de ser cancelado, lo salteo. */
+                if ((!isset($item['rebill_id'])) || (!$this->canCancel($item))) {
+                    /**
+                     * La suscripción no tiene id, o no esta en condiciones de ser cancelado, lo salteo.
+                     */
                     continue;
                 }
 
                 $title = $this->getEscaper()->escapeHtmlAttr($item['title']);
                 $item[$this->getData('name')] = [
                     'delete' => [
-                        'href' => $this->urlBuilder->getUrl(
+                        'href'    => $this->urlBuilder->getUrl(
                             static::URL_PATH_DELETE,
                             [
                                 'user_email' => $item['user_email'],
-                                'rebill_id' => $item['rebill_id']
+                                'rebill_id'  => $item['rebill_id'],
                             ]
                         ),
-                        'label' => __('Cancel'),
+                        'label'   => __('Cancel'),
                         'confirm' => [
-                            'title' => __('Cancel'),
-                            'message' => __('Are you sure you want to cancel a subscription?')
+                            'title'   => __('Cancel'),
+                            'message' => __('Are you sure you want to cancel a subscription?'),
                         ],
-                        'post' => true
+                        'post'    => true,
                     ],
                 ];
             }
@@ -88,16 +91,17 @@ class CancelSubscription extends Column
         return $dataSource;
     }
 
-    public function canCancel($item): bool
+    /**
+     * @param array $item
+     * @return bool
+     */
+    public function canCancel(array $item): bool
     {
         return EntitySubscription::canCancelSubscription($item['status']);
     }
 
     /**
-     * Get instance of escaper
-     *
-     * @return Escaper
-     * @deprecated 101.0.7
+     * @return Escaper|mixed
      */
     private function getEscaper()
     {

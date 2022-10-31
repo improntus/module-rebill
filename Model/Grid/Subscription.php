@@ -10,6 +10,7 @@ namespace Improntus\Rebill\Model\Grid;
 use Improntus\Rebill\Model\ResourceModel\Subscription as SubscriptionModel;
 use Magento\Framework\Api\ExtensionAttribute\JoinDataInterfaceFactory;
 use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
+use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Data\Collection\Db\FetchStrategyInterface as FetchStrategy;
 use Magento\Framework\Data\Collection\EntityFactoryInterface as EntityFactory;
 use Magento\Framework\Event\ManagerInterface as EventManager;
@@ -66,24 +67,25 @@ class Subscription extends SearchResult
             /**
              * Main Table Columns
              */
-            "rebill_id" => "main_table.rebill_id",
-            "status" => "main_table.status",
-            "quantity" => "main_table.quantity",
-            "order_id" => "main_table.order_id",
-            "last_charge_date" => "DATE_FORMAT(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.lastChargeDate')),'%Y-%m-%d')",
-            "next_charge_date" => "DATE_FORMAT(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.nextChargeDate')),'%Y-%m-%d')",
-            "user_email" => "JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.userEmail'))",
-            "title" => "JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.title'))",
-            "amount" => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.amount')),'')",
-            "frequency_type" => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.frequency.type')),'')",
-            "frequency" => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.frequency.quantity')),'')",
-            "repetitions" => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.repetitions')),'')",
-            "gateway_type" => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.gateway.type')),'')",
+            "entity_id"           => "main_table.entity_id",
+            "rebill_id"           => "main_table.rebill_id",
+            "status"              => "main_table.status",
+            "quantity"            => "main_table.quantity",
+            "order_id"            => "main_table.order_id",
+            "last_charge_date"    => "DATE_FORMAT(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.lastChargeDate')),'%Y-%m-%d')",
+            "next_charge_date"    => "DATE_FORMAT(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.nextChargeDate')),'%Y-%m-%d')",
+            "user_email"          => "JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.userEmail'))",
+            "title"               => "JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.title'))",
+            "amount"              => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.amount')),'')",
+            "frequency_type"      => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.frequency.type')),'')",
+            "frequency"           => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.frequency.quantity')),'')",
+            "repetitions"         => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.repetitions')),'')",
+            "gateway_type"        => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.gateway.type')),'')",
             "gateway_description" => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.gateway.description')),'')",
             /**
              * Order Columns
              */
-            "increment_id" => "o.increment_id",
+            "increment_id"  => "o.increment_id",
         ];
 
         // o => Sales Order
@@ -96,6 +98,27 @@ class Subscription extends SearchResult
         return $this;
     }
 
+    public function setOrder($field, $direction = self::SORT_ORDER_DESC)
+    {
+        $jsonFields = [
+            "last_charge_date"    => "DATE_FORMAT(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.lastChargeDate')),'%Y-%m-%d')",
+            "next_charge_date"    => "DATE_FORMAT(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.nextChargeDate')),'%Y-%m-%d')",
+            "user_email"          => "JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.userEmail'))",
+            "title"               => "JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.title'))",
+            "amount"              => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.amount')),'')",
+            "frequency_type"      => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.frequency.type')),'')",
+            "frequency"           => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.frequency.quantity')),'')",
+            "repetitions"         => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.repetitions')),'')",
+            "gateway_type"        => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.gateway.type')),'')",
+            "gateway_description" => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.gateway.description')),'')",
+        ];
+        if (in_array($field, array_keys($jsonFields))) {
+            $this->getSelect()->order("{$jsonFields[$field]} $direction");
+            return $this;
+        }
+        return parent::setOrder($field, $direction);
+    }
+
     /**
      * @param $field
      * @param $condition
@@ -105,9 +128,9 @@ class Subscription extends SearchResult
     {
         $aliasFilters = [
             'rebill_id' => 'main_table.rebill_id',
-            'status' => 'main_table.status',
-            'quantity' => 'main_table.quantity',
-            'order_id' => 'main_table.order_id',
+            'status'    => 'main_table.status',
+            'quantity'  => 'main_table.quantity',
+            'order_id'  => 'main_table.order_id',
         ];
         $customFilters = [
             'last_charge_date',
@@ -115,7 +138,7 @@ class Subscription extends SearchResult
             'gateway_type',
             'gateway_description',
             'user_email',
-            'title'
+            'title',
         ];
         if (in_array($field, $customFilters)) {
             switch ($field) {

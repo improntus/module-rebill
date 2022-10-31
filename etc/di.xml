@@ -40,11 +40,8 @@
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">
-                <item name="rebill_payment_grid_data_source" xsi:type="string">Improntus\Rebill\Model\Grid\Payment
-                </item>
-                <item name="rebill_subscription_grid_data_source" xsi:type="string">
-                    Improntus\Rebill\Model\Grid\Subscription
-                </item>
+                <item name="rebill_payment_grid_data_source" xsi:type="string">Improntus\Rebill\Model\Grid\Payment</item>
+                <item name="subscription_grid_data_source" xsi:type="string">Improntus\Rebill\Model\Grid\Subscription</item>
             </argument>
         </arguments>
     </type>

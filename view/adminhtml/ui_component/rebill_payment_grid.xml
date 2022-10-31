@@ -9,8 +9,8 @@
 <listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">rebill_payment_index.rebill_payment_grid_data_source</item>
-            <item name="deps" xsi:type="string">rebill_payment_index.rebill_payment_grid_data_source</item>
+            <item name="provider" xsi:type="string">rebill_payment_grid.rebill_payment_grid_data_source</item>
+            <item name="deps" xsi:type="string">rebill_payment_grid.rebill_payment_grid_data_source</item>
         </item>
         <item name="spinner" xsi:type="string">rebill_payment_grid_table_columns</item>
     </argument>

@@ -134,8 +134,8 @@ class Subscription extends Data
     {
         return [
             'enable_subscription' => (bool)$product->getData('rebill_subscription_type'),
-            'subscription_type' => $product->getData('rebill_subscription_type'),
-            'frequency' => json_decode($product->getData('rebill_frequency') ?? '[]', true),
+            'subscription_type'   => $product->getData('rebill_subscription_type'),
+            'frequency'           => json_decode($product->getData('rebill_frequency') ?? '[]', true),
         ];
     }
 
@@ -195,15 +195,15 @@ class Subscription extends Data
     /**
      * @param Product|null $product
      * @param array $frequencyArray
-     * @param $price
+     * @param float|null $price
      * @return Phrase|string
      */
-    public function getFrequencyDescription(?Product $product = null, array $frequencyArray = [], $price = null)
+    public function getFrequencyDescription(?Product $product = null, array $frequencyArray = [], float $price = null)
     {
         try {
-            $frequency = $frequencyArray['frequency'];
+            $frequency = (int)$frequencyArray['frequency'];
             $frequencyType = $frequencyArray['frequencyType'];
-            $recurringPayments = $frequencyArray['recurringPayments'];
+            $recurringPayments = (int)$frequencyArray['recurringPayments'];
             $initialCost = $frequencyArray['initialCost'];
             $price = $this->getFrequencyPrice($price, $frequencyArray, $product);
 
@@ -220,7 +220,10 @@ class Subscription extends Data
                     );
                 }
             } else {
-                $recurringPaymentPeriod = $this->getRecurringPaymentPeriod($recurringPayments * $frequency, $frequencyType);
+                $recurringPaymentPeriod = $this->getRecurringPaymentPeriod(
+                    $recurringPayments * $frequency,
+                    $frequencyType
+                );
                 if ($initialCost == 0) {
                     return __(
                         '%1 for %2 %3',
@@ -245,10 +248,10 @@ class Subscription extends Data
     }
 
     /**
-     * @param $price
-     * @return string|void
+     * @param float|null $price
+     * @return float|string
      */
-    public function getFrequencyPriceFormat($price = null)
+    public function getFrequencyPriceFormat(float $price = null)
     {
         try {
             if (!$price) {
@@ -263,7 +266,13 @@ class Subscription extends Data
         }
     }
 
-    private function getFrequencyPrice($price, $frequencyArray, ?Product $product = null)
+    /**
+     * @param float $price
+     * @param array $frequencyArray
+     * @param Product|null $product
+     * @return float|string
+     */
+    private function getFrequencyPrice(float $price, array $frequencyArray, ?Product $product = null)
     {
         if (!$price) {
             $price = $this->currencyHelper->currencyByStore($frequencyArray['price'], null, false, false);
@@ -277,10 +286,11 @@ class Subscription extends Data
     }
 
     /**
-     * @param $recurringPayments
+     * @param int $recurringPayments
+     * @param string $frequencyType
      * @return Phrase
      */
-    private function getRecurringPaymentPeriod($recurringPayments, $frequencyType)
+    private function getRecurringPaymentPeriod(int $recurringPayments, string $frequencyType)
     {
         if ($frequencyType == 'months') {
             $recurringPaymentPeriod = __('months');
@@ -296,9 +306,14 @@ class Subscription extends Data
         return $recurringPaymentPeriod;
     }
 
-    private function getFirstPartDesc($frequencyType, $frequency, $price)
+    /**
+     * @param string $frequencyType
+     * @param int $frequency
+     * @param string $price
+     * @return Phrase
+     */
+    private function getFirstPartDesc(string $frequencyType, int $frequency, string $price)
     {
-        $description = "";
         if ($frequency == 1) {
             $period = __($frequencyType == 'months' ? 'monthly' : 'yearly');
             $description = __('%1 for %2', $period, $price);

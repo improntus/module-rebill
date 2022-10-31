@@ -9,18 +9,18 @@
 <listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">rebill_subscription_index.rebill_subscription_grid_data_source</item>
-            <item name="deps" xsi:type="string">rebill_subscription_index.rebill_subscription_grid_data_source</item>
+            <item name="provider" xsi:type="string">subscription_grid.subscription_grid_data_source</item>
+            <item name="deps" xsi:type="string">subscription_grid.subscription_grid_data_source</item>
         </item>
-        <item name="spinner" xsi:type="string">rebill_subscription_grid_table_columns</item>
+        <item name="spinner" xsi:type="string">subscription_grid_table_columns</item>
     </argument>
 
-    <dataSource name="rebill_subscription_grid_data_source" component="Magento_Ui/js/grid/provider">
+    <dataSource name="subscription_grid_data_source" component="Magento_Ui/js/grid/provider">
         <settings>
             <updateUrl path="mui/index/render"/>
         </settings>
         <aclResource>Improntus_Rebill::main</aclResource>
-        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="rebill_subscription_grid_data_source">
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="subscription_grid_data_source">
             <settings>
                 <requestFieldName>id</requestFieldName>
                 <primaryFieldName>main_table.entity_id</primaryFieldName>
@@ -36,47 +36,47 @@
         <filters name="listing_filters"/>
         <paging name="listing_paging"/>
     </listingToolbar>
-    <columns name="rebill_subscription_grid_table_columns">
+    <columns name="subscription_grid_table_columns">
+        <column name="entity_id">
+            <settings>
+                <filter>false</filter>
+                <label translate="true">Id</label>
+            </settings>
+        </column>
         <column name="rebill_id">
             <settings>
                 <filter>text</filter>
-                <sortable>false</sortable>
                 <label translate="true">Rebill Id</label>
             </settings>
         </column>
         <column name="status">
             <settings>
                 <filter>false</filter>
-                <sortable>false</sortable>
                 <label translate="true">Status</label>
             </settings>
         </column>
         <column name="quantity">
             <settings>
                 <filter>false</filter>
-                <sortable>false</sortable>
                 <label translate="true">Quantity</label>
             </settings>
         </column>
         <column name="user_email">
             <settings>
                 <filter>text</filter>
-                <sortable>false</sortable>
                 <label translate="true">User Email</label>
             </settings>
         </column>
         <column name="title">
             <settings>
                 <filter>text</filter>
-                <sortable>false</sortable>
                 <label translate="true">Title</label>
             </settings>
         </column>
-        <column name="orderLink" class="Improntus\Rebill\Ui\Component\Listing\Column\OrderLink">
+        <column name="increment_id" class="Improntus\Rebill\Ui\Component\Listing\Column\OrderLink">
             <settings>
                 <dataType>text</dataType>
-                <filter>false</filter>
-                <sortable>false</sortable>
+                <filter>text</filter>
                 <bodyTmpl>ui/grid/cells/html</bodyTmpl>
                 <label translate="true">Order Id</label>
             </settings>
@@ -84,21 +84,18 @@
         <column name="gateway_type">
             <settings>
                 <filter>text</filter>
-                <sortable>false</sortable>
                 <label translate="true">Gateway Type</label>
             </settings>
         </column>
         <column name="gateway_description">
             <settings>
                 <filter>text</filter>
-                <sortable>false</sortable>
                 <label translate="true">Gateway Description</label>
             </settings>
         </column>
         <column name="frequency" class="Improntus\Rebill\Ui\Component\Listing\Column\Frequency">
             <settings>
                 <filter>false</filter>
-                <sortable>false</sortable>
                 <label translate="true">Frequency</label>
             </settings>
         </column>
@@ -107,7 +104,6 @@
                 <filter>dateRange</filter>
                 <dataType>date</dataType>
                 <dateFormat>yyyy-MM-dd</dateFormat>
-                <sortable>false</sortable>
                 <label translate="true">Last Charge Date</label>
             </settings>
         </column>
@@ -116,7 +112,6 @@
                 <filter>dateRange</filter>
                 <dataType>date</dataType>
                 <dateFormat>yyyy-MM-dd</dateFormat>
-                <sortable>false</sortable>
                 <label translate="true">Next Charge Date</label>
             </settings>
         </column>
