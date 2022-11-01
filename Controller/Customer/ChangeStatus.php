@@ -17,8 +17,6 @@ use Magento\Customer\Model\Session;
 use Improntus\Rebill\Model\Rebill\Subscription as RebillSubscription;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
-use Magento\Framework\App\ResponseInterface;
-use Magento\Framework\Exception\CouldNotSaveException;
 
 abstract class ChangeStatus extends Action
 {
