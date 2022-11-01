@@ -217,7 +217,10 @@ class Model extends AbstractModel implements DataInterface
 
     public function canUpdateIt(): bool
     {
-        return $this->getStatus() == static::STATUS_ACTIVE;
+        return in_array($this->getStatus(),[
+            static::STATUS_ACTIVE,
+            static::STATUS_PAUSED,
+        ]);
     }
 
     public function canReactivateIt(): bool
