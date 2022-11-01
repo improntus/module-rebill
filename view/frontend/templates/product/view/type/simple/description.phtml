@@ -57,8 +57,6 @@ $frequencies = $configHelper->getProductRebillSubscriptionDetails($block->getPro
                 let cartButton = $("#product-addtocart-button");
                 let cartText = cartButton.text();
                 $("#use-subscription").click(function () {
-                    // Update Price
-                    addFrequencyPrice("#frequency");
                     $(".rebill-subscription .description").show();
                     cartButton.text("<?= $escaper->escapeJs($configHelper->getSubscriptionProductText()) ?>");
                 });
@@ -68,14 +66,16 @@ $frequencies = $configHelper->getProductRebillSubscriptionDetails($block->getPro
                     $(".rebill-subscription .description").hide();
                     cartButton.text(cartText);
                 });
-                $("#frequency").change(function (){
-                    addFrequencyPrice(this);
-                })
+                setInterval(function () {
+                    addFrequencyPrice();
+                }, 100);
 
-                function addFrequencyPrice(el){
-                    let frequencyPrice = $(el).find('option:selected').data('price');
+                function addFrequencyPrice(){
+                    let frequencyPrice = $("#frequency").find('option:selected').data('price');
                     let frequencyOperator = frequencyPrice.indexOf("-") === -1 ? " +" : " ";
-
+                    if ($('#one-time-purchase').is(':checked')) {
+                        frequencyPrice = "0";
+                    }
                     if (containsZeroPrice(frequencyPrice)) {
                         $("span.price").html(productOriginalPrice);
                     } else {

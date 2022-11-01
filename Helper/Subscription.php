@@ -205,7 +205,7 @@ class Subscription extends Data
             $frequencyType = $frequencyArray['frequencyType'];
             $recurringPayments = (int)$frequencyArray['recurringPayments'];
             $initialCost = $frequencyArray['initialCost'];
-            $price = $this->getFrequencyPrice($price, $frequencyArray, $product);
+            $price = $this->getFrequencyPrice($price ?? 0, $frequencyArray, $product);
 
             $description = $this->getFirstPartDesc($frequencyType, $frequency, $price);
 
@@ -278,7 +278,7 @@ class Subscription extends Data
             $price = $this->currencyHelper->currencyByStore($frequencyArray['price'], null, false, false);
             $price += $product ? $product->getFinalPrice() : 0;
             $price = $this->currencyHelper->currencyByStore($price, null, true, false);
-            $price = ($frequencyArray['price'] > 0 ? '+' : ' ') . $price;
+            $price = ($frequencyArray['price'] > 0 && !$product ? '+' : ' ') . $price;
         } else {
             $price = $this->currencyHelper->currencyByStore($price, null, true, false);
         }
