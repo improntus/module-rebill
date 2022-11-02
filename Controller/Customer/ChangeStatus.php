@@ -104,7 +104,7 @@ abstract class ChangeStatus extends Action
         );
 
         if ($subscription->getStatus() != $rebillSubscription['status']) {
-            $this->messageManager->addErrorMessage(__('Change cannot be made right now. Try again in a few minutes.'));
+            $this->messageManager->addErrorMessage($this->getOutOfSyncMessage());
             return $this->_redirect('rebill/customer/subscriptions');
         }
 
@@ -143,6 +143,14 @@ abstract class ChangeStatus extends Action
     protected function getCantExecuteChangeMessage(): string
     {
         return __('Change cannot be made due to subscription status. Contact the store owner to get more information.');
+    }
+
+    /**
+     * @return string
+     */
+    protected function getOutOfSyncMessage(): string
+    {
+        return __('Change cannot be made right now. Try again in a few minutes.');
     }
 
     /**
