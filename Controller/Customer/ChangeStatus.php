@@ -98,6 +98,16 @@ abstract class ChangeStatus extends Action
             return $this->_redirect('rebill/customer/subscriptions');
         }
 
+        $rebillSubscription = $this->rebillSubscription->getSubscription(
+            $subscription->getRebillId(),
+            $subscription->getDetails()['userEmail']
+        );
+
+        if ($subscription->getStatus() != $rebillSubscription['status']) {
+            $this->messageManager->addErrorMessage(__('Change cannot be made right now. Try again in a few minutes.'));
+            return $this->_redirect('rebill/customer/subscriptions');
+        }
+
         try {
             $this->changeStatus($this->subscriptionRepository,$subscription);
             $this->changeStatus($this->shipmentRepository,$subscriptionPackage['shipment']);
