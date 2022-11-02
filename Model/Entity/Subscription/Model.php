@@ -233,6 +233,14 @@ class Model extends AbstractModel implements DataInterface
         return $this->getStatus() == static::STATUS_ACTIVE;
     }
 
+    public function hasNextScheduledPayment(): bool
+    {
+        return ! in_array($this->getStatus(),[
+            static::STATUS_CANCELLED,
+            static::STATUS_FINISHED,
+        ]);
+    }
+
     public function canCancelIt(): bool
     {
         return static::canCancelSubscription($this->getStatus());

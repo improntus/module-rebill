@@ -46,7 +46,11 @@ $subscriptions = $block->getSubscriptions();
                     <td><?= $escaper->escapeHtml($subscription->getStatus()) ?></td>
                     <td><?= $currencyHelper->currencyByStore((float)$subscription->getData('price')) ?></td>
                     <td><?= $escaper->escapeHtml($block->getPaymentMethod($details, $cards)) ?></td>
-                    <td><?= $escaper->escapeHtml(date('Y-m-d', strtotime($details['nextChargeDate']))) ?></td>
+                    <td>
+                        <?php if ($subscription->hasNextScheduledPayment()): ?>
+                            <?= $escaper->escapeHtml(date('Y-m-d', strtotime($details['nextChargeDate']))) ?>
+                        <?php endif; ?>
+                    </td>
                     <td class="col actions">
                         <?php if ($subscription->canUpdateIt()): ?>
                         <a class="action edit"
