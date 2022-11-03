@@ -9,6 +9,7 @@ namespace Improntus\Rebill\Controller\Customer;
 
 use Exception;
 use Improntus\Rebill\Helper\Config;
+use Improntus\Rebill\Model\Entity\Queue\Repository as QueueRepository;
 use Improntus\Rebill\Model\Entity\Subscription\Model as EntitySubscription;
 use Improntus\Rebill\Model\Entity\Subscription\Repository as SubscriptionRepository;
 use Improntus\Rebill\Model\Entity\SubscriptionShipment\Model as EntityShipment;
@@ -50,6 +51,12 @@ abstract class ChangeStatus extends Action
      */
     protected ShipmentRepository $shipmentRepository;
 
+
+    /**
+     * @var QueueRepository $queueRepository
+     */
+    private QueueRepository $queueRepository;
+
     /**
      * @param Context $context
      * @param RebillSubscription $rebillSubscription
@@ -64,13 +71,15 @@ abstract class ChangeStatus extends Action
         Config                 $configHelper,
         Session                $session,
         SubscriptionRepository $subscriptionRepository,
-        ShipmentRepository     $shipmentRepository
+        ShipmentRepository     $shipmentRepository,
+        QueueRepository        $queueRepository
     ) {
         $this->subscriptionRepository = $subscriptionRepository;
         $this->shipmentRepository = $shipmentRepository;
         $this->session = $session;
         $this->configHelper = $configHelper;
         $this->rebillSubscription = $rebillSubscription;
+        $this->queueRepository = $queueRepository;
 
         $this->customerEmail = ($this->session->getCustomer())
             ? $this->session->getCustomer()->getEmail()
@@ -98,12 +107,7 @@ abstract class ChangeStatus extends Action
             return $this->_redirect('rebill/customer/subscriptions');
         }
 
-        $rebillSubscription = $this->rebillSubscription->getSubscription(
-            $subscription->getRebillId(),
-            $subscription->getDetails()['userEmail']
-        );
-
-        if ($subscription->getStatus() != $rebillSubscription['status']) {
+        if ( ! $this->checkOutOfSync($subscription)) {
             $this->messageManager->addErrorMessage($this->getOutOfSyncMessage());
             return $this->_redirect('rebill/customer/subscriptions');
         }
@@ -120,6 +124,24 @@ abstract class ChangeStatus extends Action
         }
 
         return $this->_redirect('rebill/customer/subscriptions');
+    }
+
+    protected function checkOutOfSync( EntitySubscription $subscription)
+    {
+//        $rebillSubscription = $this->rebillSubscription->getSubscription(
+//            $subscription->getRebillId(),
+//            $subscription->getDetails()['userEmail']
+//        );
+//
+//        return ($subscription->getStatus() == $rebillSubscription['status']);
+
+        $queues = $this->queueRepository->getEzList([
+            'type' => 'subscription_change_status',
+            'status' => 'pending',
+            'parameters' => ['like' => '%"billingScheduleId"="'.$subscription->getRebillId().'"%']
+        ]);
+
+        return $queues && (count($queues->getItems()) > 0);
     }
 
     /**
