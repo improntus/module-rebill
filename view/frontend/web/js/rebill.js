@@ -46,26 +46,37 @@ define([
                     invalidCVC: $t('CVC is invalid'),
                 },
             });
+
             let errorsMessage = $('.rebill-errors');
             let self = this;
+
             this.rebillCheckout.setCallbacks({
+
                 onSuccess: function (response) {
+                    $("body").trigger('processStart');
                     errorsMessage.html('');
                     if (response.invoice) {
                         window.location.href = self.urlConfirmation + `?invoice_id=${response.invoice.id}`;
                     } else {
+                        let msg = "";
+                        if(response.failedTransaction.paidBags.length >= 1){
+                            msg = $t(response.failedTransaction.paidBags['0'].payment.errorMessage.replace(`'`, ''));
+                        }
                         errorsMessage.append($('<div class="error-message"></div>')
-                            .text($t('The payment can\'t be processed, try again with another card.')));
+                            .text(msg));
+                        $("body").trigger('processStop');
                     }
+
                 },
                 onError: function (error) {
-                    console.log(error);
-                    console.log(self.rebillOptions);
                     errorsMessage.html('')
                         .append($('<div class="error-message"></div>')
                             .text($t('The payment can\'t be processed, try again with another card.')));
+                    $("body").trigger('processStop');
                 },
             });
+
+
             this.rebillCheckout.setElements('rebill_elements');
         },
         selectDocumentType: function (event) {

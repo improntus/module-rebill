@@ -134,8 +134,8 @@ class Subscription extends Data
     {
         return [
             'enable_subscription' => (bool)$product->getData('rebill_subscription_type'),
-            'subscription_type'   => $product->getData('rebill_subscription_type'),
-            'frequency'           => json_decode($product->getData('rebill_frequency') ?? '[]', true),
+            'subscription_type' => $product->getData('rebill_subscription_type'),
+            'frequency' => json_decode($product->getData('rebill_frequency') ?? '[]', true),
         ];
     }
 
@@ -226,10 +226,9 @@ class Subscription extends Data
                 );
                 if ($initialCost == 0) {
                     return __(
-                        '%1 for %2 %3',
+                        '%1 with a maximum of %2 payments',
                         $description,
-                        $recurringPayments * $frequency,
-                        $recurringPaymentPeriod
+                        $recurringPayments - 1
                     );
                 } else {
                     return __(

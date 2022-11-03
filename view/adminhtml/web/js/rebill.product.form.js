@@ -14,7 +14,6 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
             is_product_child: false
         },
         _create: function () {
-           //console.log(this.options);
             let self = this;
             $.each(self.options.attributes, function (index, attribute) {
                 if (attribute['apply_to'].includes(self.options.product_type)) {
@@ -62,8 +61,12 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
                     text: $.mage.__('Save'),
                     class: 'primary',
                     click: function () {
-                        this.closeModal();
-                        self.saveFrequencies();
+                        let thereAreError = self.saveFrequencies();
+                        if (!thereAreError) {
+                            self.removeValidateClass();
+                            this.closeModal();
+                        }
+
                     }
                 }]
             };
@@ -84,21 +87,61 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
             buttonElement.click(function () {
                 frequencyModal.openModal();
             });
+
+            document.addEventListener("click", e => {
+                if (e.target.matches(".action-close")) {
+                    self.removeValidateClass();
+                }
+            });
+
         },
         saveFrequencies: function () {
             let frequencies = [];
+            let errorMsg = "";
+            let self = this;
             $('#rebill-frequency-modal table tbody tr').each(function () {
                 let id = parseInt($(this).find('[data-type="id"]').text());
-                frequencies.push({
+                let frequencyElemt = $(this).find('[data-type="frequency"]');
+                let frequencyTypeElemt = $(this).find('[data-type="frequency-type"]');
+                let recurringPaymentsElemt = $(this).find('[data-type="max-recurring-payments"]');
+                let priceElemt = $(this).find('[data-type="price"]');
+                let initialCostElemt = $(this).find('[data-type="initial-cost"]');
+
+                let frequency = parseInt(frequencyElemt.val());
+                let frequencyType = frequencyTypeElemt.val();
+                let recurringPayments = parseInt(recurringPaymentsElemt.val());
+                let price = parseInt(priceElemt.val());
+                let initialCost = parseInt(initialCostElemt.val());
+
+                errorMsg += self.getErrorMsg(frequencyElemt, recurringPaymentsElemt, frequency, recurringPayments)
+
+                let frequencyObj = {
                     id: id,
-                    frequency: parseInt($(this).find('[data-type="frequency"]').val()),
-                    frequencyType: $(this).find('[data-type="frequency-type"]').val(),
-                    recurringPayments: parseInt($(this).find('[data-type="max-recurring-payments"]').val()),
-                    price: parseInt($(this).find('[data-type="price"]').val()),
-                    initialCost: parseInt($(this).find('[data-type="initial-cost"]').val()),
-                });
+                    frequency: frequency,
+                    frequencyType: frequencyType,
+                    recurringPayments: recurringPayments,
+                    price: price,
+                    initialCost: initialCost,
+                }
+
+                if (frequencies.some(x => x.frequency === frequencyObj.frequency &&
+                    x.frequencyType === frequencyType &&
+                    x.recurringPayments === recurringPayments &&
+                    x.price === price &&
+                    x.initialCost === initialCost
+                )) {
+                    $(this).addClass("rebill-invalid");
+                    errorMsg += "There are duplicate rows."
+                }
+
+                frequencies.push(frequencyObj);
             });
-            $('[name="product[rebill_frequency]"]').val(JSON.stringify(frequencies)).change();
+            if (errorMsg === "") {
+                $('[name="product[rebill_frequency]"]').val(JSON.stringify(frequencies)).change();
+            } else {
+                window.alert(errorMsg);
+            }
+            return errorMsg !== "";
         },
         addFrequencyRow: function (frequency, modal) {
             if (this.options.is_product_child) {
@@ -107,7 +150,7 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
             let price = frequency.price ?? this.options.product_price;
             let id = frequency.id;
             let idField = $(`<span data-id="${id}" data-type="id"></span>`).text(id);
-            let frequencyField = $(`<input min="0" type="number" class="input-text" data-id="${id}" data-type="frequency" value="${frequency.frequency}" />`);
+            let frequencyField = $(`<input min="-1" type="number" class="input-text" data-id="${id}" data-type="frequency" value="${frequency.frequency}" />`);
             let frequencyTypeField = $(`<select class="select" data-id="${id}" data-type="frequency-type"></select>`)
                 .append($('<option value="months"></option>').text($t('Months')))
                 .append($('<option value="years"></option>').text($t('Years')))
@@ -153,6 +196,29 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
         getAttributeValue: function (code) {
             return parseInt(this.getAttributeElement(code).val());
         },
+        removeValidateClass: function () {
+            $('#rebill-frequency-modal table tbody tr').each(function () {
+                let frequencyElemt = $(this).find('[data-type="frequency"]');
+                frequencyElemt.removeClass("rebill-invalid");
+                let recurringPaymentsElemt = $(this).find('[data-type="max-recurring-payments"]');
+                recurringPaymentsElemt.removeClass("rebill-invalid");
+                $(this).removeClass("rebill-invalid");
+            });
+        },
+        getErrorMsg: function (frequencyElemt, recurringPaymentsElemt, frequency, recurringPayments) {
+
+            let msg = "";
+            if (frequency <= 0) {
+                frequencyElemt.addClass("rebill-invalid");
+                msg += $t('The frequency should be bigger than 0.')
+            }
+
+            if (recurringPayments === 1 || recurringPayments < 0) {
+                recurringPaymentsElemt.addClass("rebill-invalid");
+                msg += (msg === "" ? "" : `\n`) + $t('The Max Recurring Payments should be bigger equal to 0 or bigger than 1.')
+            }
+            return msg;
+        }
     });
 
     return $.mage.rebill_product_form;
