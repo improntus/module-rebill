@@ -141,7 +141,7 @@ abstract class ChangeStatus extends Action
             'parameters' => ['like' => '%"billingScheduleId"="'.$subscription->getRebillId().'"%']
         ]);
 
-        return $queues && (count($queues->getItems()) > 0);
+        return $queues && (count($queues->getItems()) == 0);
     }
 
     /**
