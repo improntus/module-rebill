@@ -13,6 +13,7 @@
         <column xsi:type="varchar" name="rebill_item_id" length="255" nullable="false" comment="Rebill Item ID"/>
         <column xsi:type="varchar" name="hash" length="255" nullable="false" comment="Hash"/>
         <column xsi:type="text" name="product_description" comment="Product Description"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="false"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
@@ -33,6 +34,7 @@
         <column xsi:type="varchar" name="frequency_hash" length="255" nullable="false" comment="Frequency Hash"/>
         <column xsi:type="text" name="details" nullable="false" comment="Details"/>
         <column xsi:type="text" name="rebill_details" nullable="false" comment="Rebill Details"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="false"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
@@ -55,6 +57,7 @@
         <column xsi:type="text" name="next_schedule" nullable="true" comment="Next Schedule"/>
         <column xsi:type="text" name="details" nullable="true" comment="Details"/>
         <column xsi:type="text" name="package_hash" nullable="true" comment="Details"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="false"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
@@ -79,6 +82,7 @@
         <column xsi:type="int" name="payed" unsigned="true" default="0" comment="Payed"/>
         <column xsi:type="text" name="next_schedule" nullable="true" comment="Next Schedule"/>
         <column xsi:type="text" name="details" nullable="true" comment="Details"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="false"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
@@ -92,6 +96,7 @@
         <column xsi:type="varchar" name="rebill_id" length="255" nullable="false" comment="Rebill Id"/>
         <column xsi:type="varchar" name="status" length="255" nullable="false" comment="Status"/>
         <column xsi:type="text" name="details" nullable="true" comment="Details"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="false"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
@@ -104,6 +109,7 @@
         <column xsi:type="varchar" name="type" length="255" nullable="false" comment="Type"/>
         <column xsi:type="varchar" name="status" length="255" nullable="false" comment="Status"/>
         <column xsi:type="text" name="parameters" nullable="true" comment="Parameters"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="false"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
