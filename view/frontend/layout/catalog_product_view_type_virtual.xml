@@ -10,6 +10,6 @@
     <update handle="catalog_product_view_subscription"/>
     <referenceBlock name="product.info.form.content">
         <block class="Magento\Catalog\Block\Product\View" name="rebill.subscription.description"
-               before="-" template="Improntus_Rebill::product/view/type/simple/description.phtml"/>
+               before="-" template="Improntus_Rebill::product/view/description.phtml"/>
     </referenceBlock>
 </page>

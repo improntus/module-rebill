@@ -32,7 +32,7 @@ $frequencies = $configHelper->getProductRebillSubscriptionDetails($block->getPro
             <label for="use-subscription">
                 <?php if ($count === 1) : ?>
                     <?= /** @noEscape */
-                    __('Subscribe to this product %1', $configHelper->getFrequencyDescription($block->getProduct(), array_first($frequencies))) ?>
+                    __('Subscribe to this product %1', $configHelper->getFrequencyDescription($block->getProduct(), reset($frequencies))) ?>
                 <?php else : ?>
                     <?= /** @noEscape */
                     __('Subscribe to this product') ?>
@@ -93,8 +93,6 @@ $frequencies = $configHelper->getProductRebillSubscriptionDetails($block->getPro
                 function containsZeroPrice(price) {
                     return parseFloat(price.replace(/\D/g, '')) === 0;
                 }
-
-
             });
         });
     </script>
