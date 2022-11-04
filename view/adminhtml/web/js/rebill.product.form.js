@@ -150,7 +150,7 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
             let price = frequency.price ?? this.options.product_price;
             let id = frequency.id;
             let idField = $(`<span data-id="${id}" data-type="id"></span>`).text(id);
-            let frequencyField = $(`<input min="-1" type="number" class="input-text" data-id="${id}" data-type="frequency" value="${frequency.frequency}" />`);
+            let frequencyField = $(`<input min="1" type="number" class="input-text" data-id="${id}" data-type="frequency" value="${frequency.frequency}" />`);
             let frequencyTypeField = $(`<select class="select" data-id="${id}" data-type="frequency-type"></select>`)
                 .append($('<option value="months"></option>').text($t('Months')))
                 .append($('<option value="years"></option>').text($t('Years')))
@@ -217,6 +217,12 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
                 recurringPaymentsElemt.addClass("rebill-invalid");
                 msg += (msg === "" ? "" : `\n`) + $t('The Max Recurring Payments should be bigger equal to 0 or bigger than 1.')
             }
+
+            if(isNaN(recurringPayments) || recurringPaymentsElemt.val().includes(".")){
+                recurringPaymentsElemt.addClass("rebill-invalid");
+                msg += `\n` + $t('The Max Recurring Payments should be a number integer.');
+            }
+
             return msg;
         }
     });
