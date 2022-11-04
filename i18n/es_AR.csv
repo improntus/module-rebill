@@ -94,6 +94,7 @@ yearly, anual
 "%1 for %2 %3", "%1 por %2 %3"
 "every %1 %2 for %3", "cada %1 %2 por %3"
 "%1 with a maximum of %2 payments", "%1 con un maximo de %2 pagos"
+""%1 with a maximum of %2 payments with a sign-up fee of %3", "%1 con un maximo de %2 pagos con una tarifa de %3"
 "%1 with a sign-up fee of %2", "%1 con una tarifa de %2"
 "%1 for %2 %3 with a sign-up fee of %4", "%1 por %2 %3 con una tarifa de %4"
 "monthly for %1 for %2 %3","mensual para %1 para %2 %3"

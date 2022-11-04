@@ -220,10 +220,10 @@ class Subscription extends Data
                     );
                 }
             } else {
-                $recurringPaymentPeriod = $this->getRecurringPaymentPeriod(
+                /*$recurringPaymentPeriod = $this->getRecurringPaymentPeriod(
                     $recurringPayments * $frequency,
                     $frequencyType
-                );
+                );*/
                 if ($initialCost == 0) {
                     return __(
                         '%1 with a maximum of %2 payments',
@@ -232,10 +232,9 @@ class Subscription extends Data
                     );
                 } else {
                     return __(
-                        '%1 for %2 %3 with a sign-up fee of %4',
+                        '%1 with a maximum of %2 payments with a sign-up fee of %3',
                         $description,
-                        $recurringPayments * $frequency,
-                        $recurringPaymentPeriod,
+                        ($recurringPayments * $frequency) - 1,
                         $this->currencyHelper->currencyByStore($initialCost, null, true, false)
                     );
                 }
