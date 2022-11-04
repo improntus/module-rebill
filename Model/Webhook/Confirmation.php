@@ -154,6 +154,7 @@ class Confirmation extends WebhookAbstract
                     if ($hash == Transaction::getDefaultFrequencyHash()) {
                         continue;
                     }
+                    $shipmentModel = null;
                     if (isset($_subscriptions['shipment'])) {
                         $shipment = $_subscriptions['shipment'][0];
                         /** @var Model $price */
@@ -172,7 +173,7 @@ class Confirmation extends WebhookAbstract
                         /** @var Model $price */
                         $price = $prices[$subscription['price']['id']];
                         $model = $this->subscriptionRepository->getByRebillId($subscription['id']);
-                        $model->setShipmentId(isset($shipmentModel) ? $shipmentModel->getId() : 0);
+                        $model->setShipmentId($shipmentModel ? $shipmentModel->getId() : 0);
                         $model->setStatus($subscription['status']);
                         $model->setRebillId($subscription['id']);
                         $model->setRebillPriceId($price->getRebillPriceId());
