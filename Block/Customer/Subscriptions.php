@@ -94,7 +94,7 @@ class Subscriptions extends Template
                 '*',
                 'title'    => new Zend_Db_Expr("GROUP_CONCAT(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.title')) SEPARATOR ', ')"),
                 'shipment' => new Zend_Db_Expr("JSON_UNQUOTE(JSON_EXTRACT(rss.details, '$.title'))"),
-                'price'    => new Zend_Db_Expr("SUM(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.amount')) + JSON_UNQUOTE(JSON_EXTRACT(rss.details, '$.price.amount')))"),
+                'price'    => new Zend_Db_Expr("SUM(JSON_UNQUOTE(JSON_EXTRACT(main_table.details,'$.price.amount')) + IF(ISNULL(rss.entity_id), 0, JSON_UNQUOTE(JSON_EXTRACT(rss.details,'$.price.amount'))))"),
             ]);
             //phpcs:enable
             $subscriptions->addFieldToFilter('so.customer_id', $this->session->getCustomerId());
