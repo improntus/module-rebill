@@ -5,47 +5,62 @@
 "Payment gateway through which the product will be charged","Payment gateway through which the product will be charged"
 "Subscription Initial Cost","Subscription Initial Cost"
 "Rebill Payments","Rebill Payments"
+"Rebill Queue","Rebill Queue"
+"Failed queued process will be tried again.","Failed queued process will be tried again."
+"Queued process doesn't exists or it isn't failed.","Queued process doesn't exists or it isn't failed."
 "The subscription was cancelled.","The subscription was cancelled."
 "There was an error cancelling the subscription. Error: %1","There was an error cancelling the subscription. Error: %1"
+"Subscription cannot be cancelled.","Subscription cannot be cancelled."
 "To enter this section you need to be logged in","To enter this section you need to be logged in"
-"There was an error cancelling your subscription, contact the store owner to get more information.","There was an error cancelling your subscription, contact the store owner to get more information."
-"monthly for %1","monthly for %1"
-"monthly for %1 with a sign-up fee of %2","monthly for %1 with a sign-up fee of %2"
+"Change cannot be made due to subscription status. Contact the store owner to get more information.","Change cannot be made due to subscription status. Contact the store owner to get more information."
+"Change cannot be made right now. Try again in a few minutes.","Change cannot be made right now. Try again in a few minutes."
+"The subscription status was changed.","The subscription status was changed."
+"There was an error changing your subscription status. Contact the store owner to get more information.","There was an error changing your subscription status. Contact the store owner to get more information."
+"Subscription cannot be paused.","Subscription cannot be paused."
+"The subscription was paused.","The subscription was paused."
+"Subscription cannot be reactivated.","Subscription cannot be reactivated."
+"The subscription was reactivated.","The subscription was reactivated."
+"There was an error trying to update your subscription.","There was an error trying to update your subscription."
+"Unable to refund payment on Rebill.","Unable to refund payment on Rebill."
+"%1 with a sign-up fee of %2","%1 with a sign-up fee of %2"
+"%1 with a maximum of %2 payments","%1 with a maximum of %2 payments"
+"%1 for %2 %3 with a sign-up fee of %4","%1 for %2 %3 with a sign-up fee of %4"
+"months' 'monthly' 'yearly","months' 'monthly' 'yearly"
+"%1 for %2","%1 for %2"
+"months' 'months' 'years","months' 'months' 'years"
+"every %1 %2 for %3","every %1 %2 for %3"
 months,months
 year,year
 years,years
-"monthly for %1 for %2 %3","monthly for %1 for %2 %3"
-"monthly for %1 for %2 %3 with a sign-up fee of %4","monthly for %1 for %2 %3 with a sign-up fee of %4"
-"yearly for %1","yearly for %1"
-"yearly for %1 with a sign-up fee of %2","yearly for %1 with a sign-up fee of %2"
-"yearly for %1 for %2 %3","yearly for %1 for %2 %3"
-"yearly for %1 for %2 %3 with a sign-up fee of %4","yearly for %1 for %2 %3 with a sign-up fee of %4"
-"every %1 months for %2","every %1 months for %2"
-"every %1 months for %2 with a sign-up fee of %3","every %1 months for %2 with a sign-up fee of %3"
-"every %1 months for %2 for %3 %4","every %1 months for %2 for %3 %4"
-"every %1 months for %2 for %3 %4 with a sign-up fee of %5","every %1 months for %2 for %3 %4 with a sign-up fee of %5"
-"every %1 years for %2","every %1 years for %2"
-"every %1 years for %2 with a sign-up fee of %3","every %1 years for %2 with a sign-up fee of %3"
-"every %1 years for %2 for %3 %4","every %1 years for %2 for %3 %4"
-"every %1 years for %2 for %3 %4 with a sign-up fee of %5","every %1 years for %2 for %3 %4 with a sign-up fee of %5"
+"year' 'years","year' 'years"
 "None selected","None selected"
 Sandbox,Sandbox
 Production,Production
 "No product label","No product label"
 "Custom Text","Custom Text"
 "Rebill Logo","Rebill Logo"
+"No subscription found","No subscription found"
 "Can't find any order to pay with rebill.","Can't find any order to pay with rebill."
-"There was an error creating the payment, please try againt.","There was an error creating the payment, please try againt."
+"There was an error creating the payment, please try again.","There was an error creating the payment, please try again."
 "Unable to create prices on Rebill.","Unable to create prices on Rebill."
 "One-time only","One-time only"
 "One-time and Subscription","One-time and Subscription"
 "Subscription Only","Subscription Only"
-"%1 x %2 - %3","%1 x %2 - %3"
 "Invoice generation process","Invoice generation process"
+"The selected shipping method cannot be selected. Reason: %","The selected shipping method cannot be selected. Reason: %"
+"Order #%1","Order #%1"
+"Subscription: %1","Subscription: %1"
+"Queue Id: %1","Queue Id: %1"
+"Product %1 doen't exists anymore","Product %1 doen't exists anymore"
+"Product %1 is not salable","Product %1 is not salable"
+"Could not add the product with SKU ""%1"" to the shopping cart: %2","Could not add the product with SKU ""%1"" to the shopping cart: %2"
+"Could not add the product with SKU ""%1"" to the shopping cart","Could not add the product with SKU ""%1"" to the shopping cart"
+"Order cant be created.","Order cant be created."
 "Before trying to buy a subscription product, you have to be logged in first","Before trying to buy a subscription product, you have to be logged in first"
 Subscription,Subscription
 Cancel,Cancel
 "Are you sure you want to cancel a subscription?","Are you sure you want to cancel a subscription?"
+Retry,Retry
 status_detail,status_detail
 "Card Holder Name","Card Holder Name"
 "Last 4 four digits","Last 4 four digits"
@@ -61,6 +76,7 @@ Period:,Period:
 "Next payment date:","Next payment date:"
 "Remaining payments:","Remaining payments:"
 "Current payment method:","Current payment method:"
+"Card Holder","Card Holder"
 "Document Type","Document Type"
 "Document Number","Document Number"
 "The payment can't be processed, try again with another card.","The payment can't be processed, try again with another card."
@@ -79,8 +95,10 @@ Quantity,Quantity
 Status,Status
 Total,Total
 "Payment Method","Payment Method"
-"Created at","Created at"
+"Next Scheduled Payment","Next Scheduled Payment"
 Update,Update
+Pause,Pause
+Reactivate,Reactivate
 "You have no active subscriptions","You have no active subscriptions"
 "Print Payment","Print Payment"
 "Product Subscription with Rebill","Product Subscription with Rebill"
@@ -96,9 +114,15 @@ Months,Months
 Years,Years
 "If it is 0 the subscription will be cyclical","If it is 0 the subscription will be cyclical"
 Delete,Delete
+"The frequency should be bigger than 0.","The frequency should be bigger than 0."
+"The Max Recurring Payments should be bigger equal to 0 or bigger than 1.","The Max Recurring Payments should be bigger equal to 0 or bigger than 1."
 "Cancel Subscription","Cancel Subscription"
 "You are about to cancel a subscription. Are you sure?","You are about to cancel a subscription. Are you sure?"
 Ok,Ok
+"Pause Subscription","Pause Subscription"
+"You are about to pause a subscription. Are you sure?","You are about to pause a subscription. Are you sure?"
+"Reactivate Subscription","Reactivate Subscription"
+"You are about to reactivate this subscription. Are you sure?","You are about to reactivate this subscription. Are you sure?"
 Pay,Pay
 Rebill,Rebill
 Enabled,Enabled
@@ -107,10 +131,11 @@ Title,Title
 General,General
 "Status for Approved Orders","Status for Approved Orders"
 "Status for Denied Orders","Status for Denied Orders"
+"Email for failed reorder","Email for failed reorder"
+"Reorders happens when a new payment is placed from rebill or a subscription is about to be payed.","Reorders happens when a new payment is placed from rebill or a subscription is about to be payed."
+"Qty of days to retry a reorder in case of failure","Qty of days to retry a reorder in case of failure"
 "Allow mixed cart","Allow mixed cart"
 "This option will allow the customer to pay subscription and not subscription products in the same order","This option will allow the customer to pay subscription and not subscription products in the same order"
-"Enqueue Webhooks","Enqueue Webhooks"
-"If enabled, webhooks will be processed by a queue message system. Turning off this option may cause performance issues.","If enabled, webhooks will be processed by a queue message system. Turning off this option may cause performance issues."
 "Text for subscription products","Text for subscription products"
 "This text will be shown in product page to let customer know that the product is subscription type.","This text will be shown in product page to let customer know that the product is subscription type."
 "Text for guest customer in subscription products","Text for guest customer in subscription products"
@@ -141,10 +166,12 @@ Currency,Currency
 "Gateway Description","Gateway Description"
 Description,Description
 "Created At","Created At"
+Id,Id
+Type,Type
+Data,Data
 "User Email","User Email"
 "Last Charge Date","Last Charge Date"
 "Next Charge Date","Next Charge Date"
-"Apply to Subscriptions","Apply to Subscriptions"
 Subscriptions,Subscriptions
 "Subscription Update","Subscription Update"
 "Rebill Payment","Rebill Payment"
