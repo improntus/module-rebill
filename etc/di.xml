@@ -59,11 +59,6 @@
         <plugin name="Improntus_Rebill::setSubscriptionId" type="Improntus\Rebill\Plugin\Model\Quote" sortOrder="10"/>
     </type>
 
-    <type name="Magento\Customer\Helper\Address">
-        <plugin name="Improntus_Rebill::isVatAttributeVisible" type="Improntus\Rebill\Plugin\Helper\Address"
-                sortOrder="10"/>
-    </type>
-
     <type name="Magento\Checkout\Helper\Data">
         <plugin name="Improntus_Rebill::checkPaymentMethodsAvailability"
                 type="Improntus\Rebill\Plugin\Helper\CheckoutData" sortOrder="10"/>
