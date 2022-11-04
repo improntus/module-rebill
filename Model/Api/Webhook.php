@@ -30,7 +30,7 @@ class Webhook implements WebhookInterface
      */
     public function __construct(
         WebhookModel $webhook,
-        Request $request
+        Request      $request
     ) {
         $this->webhook = $webhook;
         $this->request = $request;

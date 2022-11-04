@@ -7,6 +7,7 @@
 
 namespace Improntus\Rebill\Model\Sales;
 
+use Exception;
 use Magento\Framework\DB\TransactionFactory;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Api\Data\TransactionInterface;
@@ -49,7 +50,7 @@ class Invoice
      * @param Order $order
      * @return Order\Invoice|null
      * @throws LocalizedException
-     * @throws \Exception
+     * @throws Exception
      */
     public function execute(Order &$order)
     {

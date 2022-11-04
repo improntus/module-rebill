@@ -122,17 +122,6 @@ class Subscriptions extends Template
     }
 
     /**
-     * @param string $id
-     * @return mixed
-     */
-    public function getCustomerCards(string $id): mixed
-    {
-        $cards = $this->card->getCards($id);
-
-        return $cards ? $cards : [];
-    }
-
-    /**
      * @param array $card
      * @return string
      * @description return the credit card expiration date
@@ -145,5 +134,16 @@ class Subscriptions extends Template
         $month = $month > 9 ? $month : '0' . $month;
         $year = substr($year, -2);
         return "$month/$year";
+    }
+
+    /**
+     * @param string $id
+     * @return mixed
+     */
+    public function getCustomerCards(string $id): mixed
+    {
+        $cards = $this->card->getCards($id);
+
+        return $cards ? $cards : [];
     }
 }

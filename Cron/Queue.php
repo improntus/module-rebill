@@ -6,7 +6,6 @@ use Exception;
 use Improntus\Rebill\Helper\Config;
 use Improntus\Rebill\Model\Entity\Queue\Repository;
 use Improntus\Rebill\Model\Webhook;
-use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 
 class Queue
@@ -43,7 +42,6 @@ class Queue
 
     /**
      * @return void
-     * @throws CouldNotDeleteException
      * @throws CouldNotSaveException
      */
     public function execute()
@@ -56,11 +54,12 @@ class Queue
                 $queue->setStatus('processing');
                 $this->queueRepository->save($queue);
                 try {
-                    $this->webhook->execute($queue->getType(), $queue->getParameters());
+                    $this->webhook->execute($queue->getType(), $queue->getParameters(), $queue->getId());
                     $queue->setStatus('success');
                 } catch (Exception $exception) {
                     $this->configHelper->logError($exception->getMessage());
                     $queue->setStatus('failed');
+                    $queue->setError($exception->getMessage());
                 }
                 $this->queueRepository->save($queue);
             }

@@ -23,36 +23,30 @@ class RepositoryAbstract
      * @var SearchCriteriaBuilder
      */
     protected SearchCriteriaBuilder $searchCriteriaBuilder;
-
-    /**
-     * @var string
-     */
-    private string $modelClass;
-
-    /**
-     * @var string
-     */
-    private string $resourceModelClass;
-
-    /**
-     * @var string
-     */
-    private string $collectionClass;
-
-    /**
-     * @var string
-     */
-    private string $searchResultsClass;
-
     /**
      * @var HydratorInterface|null
      */
     protected ?HydratorInterface $hydrator;
-
     /**
      * @var CollectionProcessorInterface
      */
     protected CollectionProcessorInterface $collectionProcessor;
+    /**
+     * @var string
+     */
+    private string $modelClass;
+    /**
+     * @var string
+     */
+    private string $resourceModelClass;
+    /**
+     * @var string
+     */
+    private string $collectionClass;
+    /**
+     * @var string
+     */
+    private string $searchResultsClass;
 
     /**
      * @param string $modelClass
@@ -83,6 +77,22 @@ class RepositoryAbstract
     }
 
     /**
+     * @return Hydrator
+     */
+    private function getHydrator(): Hydrator
+    {
+        return ObjectManager::getInstance()->get(Hydrator::class);
+    }
+
+    /**
+     * @return CollectionProcessor
+     */
+    private function getCollectionProcessor(): CollectionProcessor
+    {
+        return ObjectManager::getInstance()->get(CollectionProcessor::class);
+    }
+
+    /**
      * @param AbstractModel $item
      * @return mixed
      * @throws CouldNotSaveException
@@ -98,16 +108,21 @@ class RepositoryAbstract
     }
 
     /**
-     * @param int|null $id
+     * @return AbstractDb
+     */
+    protected function getResourceModel()
+    {
+        return $this->getObject($this->resourceModelClass);
+    }
+
+    /**
+     * @param string $class
+     * @param array $data
      * @return mixed
      */
-    public function getById(?int $id)
+    private function getObject(string $class, array $data = [])
     {
-        $item = $this->create();
-        if ($id) {
-            $this->getResourceModel()->load($item, $id);
-        }
-        return $item;
+        return ObjectManager::getInstance()->create($class, ['data' => $data]);
     }
 
     /**
@@ -120,20 +135,12 @@ class RepositoryAbstract
     }
 
     /**
-     * @param SearchCriteriaInterface $searchCriteria
-     * @return mixed
+     * @param array $data
+     * @return AbstractModel
      */
-    public function getList(SearchCriteriaInterface $searchCriteria)
+    private function getModel(array $data = [])
     {
-        $collection = $this->getCollection();
-        $this->collectionProcessor->process($searchCriteria, $collection);
-        $searchResults = $this->getSearchResult();
-        $searchResults->setSearchCriteria($searchCriteria);
-        /** @var array $items */
-        $items = $collection->getItems();
-        $searchResults->setItems($items);
-        $searchResults->setTotalCount($collection->getSize());
-        return $searchResults;
+        return $this->getObject($this->modelClass, $data);
     }
 
     /**
@@ -159,6 +166,49 @@ class RepositoryAbstract
     }
 
     /**
+     * @param SearchCriteriaInterface $searchCriteria
+     * @return mixed
+     */
+    public function getList(SearchCriteriaInterface $searchCriteria)
+    {
+        $collection = $this->getCollection();
+        $this->collectionProcessor->process($searchCriteria, $collection);
+        $searchResults = $this->getSearchResult();
+        $searchResults->setSearchCriteria($searchCriteria);
+        /** @var array $items */
+        $items = $collection->getItems();
+        $searchResults->setItems($items);
+        $searchResults->setTotalCount($collection->getSize());
+        return $searchResults;
+    }
+
+    /**
+     * @return AbstractCollection
+     */
+    public function getCollection()
+    {
+        return $this->getObject($this->collectionClass);
+    }
+
+    /**
+     * @return SearchResults
+     */
+    protected function getSearchResult()
+    {
+        return $this->getObject($this->searchResultsClass);
+    }
+
+    /**
+     * @param int $itemId
+     * @return void
+     * @throws CouldNotDeleteException
+     */
+    public function deleteById(int $itemId): void
+    {
+        $this->delete($this->getById($itemId));
+    }
+
+    /**
      * @param mixed $item
      * @return void
      * @throws CouldNotDeleteException
@@ -173,71 +223,15 @@ class RepositoryAbstract
     }
 
     /**
-     * @param int $itemId
-     * @return void
-     * @throws CouldNotDeleteException
-     */
-    public function deleteById(int $itemId): void
-    {
-        $this->delete($this->getById($itemId));
-    }
-
-    /**
-     * @return SearchResults
-     */
-    protected function getSearchResult()
-    {
-        return $this->getObject($this->searchResultsClass);
-    }
-
-    /**
-     * @param array $data
-     * @return AbstractModel
-     */
-    private function getModel(array $data = [])
-    {
-        return $this->getObject($this->modelClass, $data);
-    }
-
-    /**
-     * @return AbstractDb
-     */
-    protected function getResourceModel()
-    {
-        return $this->getObject($this->resourceModelClass);
-    }
-
-    /**
-     * @return AbstractCollection
-     */
-    public function getCollection()
-    {
-        return $this->getObject($this->collectionClass);
-    }
-
-    /**
-     * @param string $class
-     * @param array $data
+     * @param int|null $id
      * @return mixed
      */
-    private function getObject(string $class, array $data = [])
+    public function getById(?int $id)
     {
-        return ObjectManager::getInstance()->create($class, ['data' => $data]);
-    }
-
-    /**
-     * @return CollectionProcessor
-     */
-    private function getCollectionProcessor(): CollectionProcessor
-    {
-        return ObjectManager::getInstance()->get(CollectionProcessor::class);
-    }
-
-    /**
-     * @return Hydrator
-     */
-    private function getHydrator(): Hydrator
-    {
-        return ObjectManager::getInstance()->get(Hydrator::class);
+        $item = $this->create();
+        if ($id) {
+            $this->getResourceModel()->load($item, $id);
+        }
+        return $item;
     }
 }

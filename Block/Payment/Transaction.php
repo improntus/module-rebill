@@ -61,52 +61,6 @@ class Transaction extends Template
     }
 
     /**
-     * @param Order $order
-     * @return $this
-     */
-    public function setOrder(Order $order)
-    {
-        $this->order = $order;
-        return $this;
-    }
-
-    /**
-     * @param array $prices
-     * @return $this
-     */
-    public function setPrices(array $prices)
-    {
-        $this->prices = $prices;
-        return $this;
-    }
-
-    /**
-     * @return Order
-     */
-    public function getOrder()
-    {
-        return $this->order;
-    }
-
-    /**
-     * @return array
-     */
-    public function getPrices()
-    {
-        return $this->prices;
-    }
-
-    /**
-     * @return array
-     */
-    public function getDocumentTypes()
-    {
-        return array_map(function ($type) {
-            return $type['value'];
-        }, $this->customerDocumentType->toOptionArray());
-    }
-
-    /**
      * @return array
      */
     public function getRebillTransaction()
@@ -160,5 +114,51 @@ class Transaction extends Template
             ],
             'documentTypes'   => $documentTypes,
         ];
+    }
+
+    /**
+     * @return Order
+     */
+    public function getOrder()
+    {
+        return $this->order;
+    }
+
+    /**
+     * @param Order $order
+     * @return $this
+     */
+    public function setOrder(Order $order)
+    {
+        $this->order = $order;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPrices()
+    {
+        return $this->prices;
+    }
+
+    /**
+     * @param array $prices
+     * @return $this
+     */
+    public function setPrices(array $prices)
+    {
+        $this->prices = $prices;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDocumentTypes()
+    {
+        return array_map(function ($type) {
+            return $type['value'];
+        }, $this->customerDocumentType->toOptionArray());
     }
 }

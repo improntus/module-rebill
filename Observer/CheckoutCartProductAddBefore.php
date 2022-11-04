@@ -12,6 +12,7 @@ use Improntus\Rebill\Helper\Config;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\LocalizedException;
 
 class CheckoutCartProductAddBefore implements ObserverInterface
 {
@@ -39,9 +40,12 @@ class CheckoutCartProductAddBefore implements ObserverInterface
             /** @var Product $product */
             $product = $observer->getEvent()->getProduct();
             $info = $observer->getEvent()->getInfo();
-            if (isset($info['frequency']) && $info['frequency'] && isset($info['use_subscription']) && $info['use_subscription'] == 1) {
+            if (isset($info['frequency']) && $info['frequency']
+                && isset($info['use_subscription']) && $info['use_subscription'] == 1) {
                 if (!$this->configHelper->isLoggedIn()) {
-                    throw new Exception(__('Before trying to buy a subscription product, you have to be logged in first'));
+                    throw new LocalizedException(
+                        __('Before trying to buy a subscription product, you have to be logged in first')
+                    );
                 }
                 $this->configHelper->setCurrentSubscription($info['frequency']);
                 $frequencies = $this->configHelper->getProductRebillSubscriptionDetails($product)['frequency'];

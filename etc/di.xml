@@ -42,6 +42,7 @@
             <argument name="collections" xsi:type="array">
                 <item name="rebill_payment_grid_data_source" xsi:type="string">Improntus\Rebill\Model\Grid\Payment</item>
                 <item name="subscription_grid_data_source" xsi:type="string">Improntus\Rebill\Model\Grid\Subscription</item>
+                <item name="rebill_queue_data_source" xsi:type="string">Improntus\Rebill\Model\Grid\Queue</item>
             </argument>
         </arguments>
     </type>

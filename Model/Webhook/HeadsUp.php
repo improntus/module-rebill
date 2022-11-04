@@ -101,27 +101,31 @@ class HeadsUp extends WebhookAbstract
 
     /**
      * @return mixed|void
+     * @throws CouldNotSaveException
+     * @throws InputException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function execute()
     {
-        try {
-            $subscriptionId = $this->getParameter('id');
-            $this->executeHeadsUp($subscriptionId);
-        } catch (Exception $exception) {
-            $this->configHelper->logError($exception->getMessage());
+        $subscriptionId = $this->getParameter('id');
+        $result = $this->executeHeadsUp($subscriptionId);
+        if (!$result) {
+            throw new LocalizedException(__('Order cant be created.'));
         }
     }
 
     /**
      * @param string $rebillSubscriptionId
      * @param bool $force
-     * @return void
+     * @param bool $fromPayment
+     * @return bool
      * @throws CouldNotSaveException
      * @throws InputException
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    public function executeHeadsUp(string $rebillSubscriptionId, bool $force = false)
+    public function executeHeadsUp(string $rebillSubscriptionId, bool $force = false, bool $fromPayment = false)
     {
         $package = $this->subscriptionRepository->getSubscriptionPackage($rebillSubscriptionId);
         /** @var \Improntus\Rebill\Model\Entity\Subscription\Model $subscription */
@@ -134,7 +138,7 @@ class HeadsUp extends WebhookAbstract
         if (($rebillSubscription['status'] !== 'ACTIVE'
                 || $rebillSubscription['nextChargeDate'] == $subscription->getNextSchedule())
             && !$force) {
-            return;
+            return false;
         }
         $hashes = [];
         /** @var \Improntus\Rebill\Model\Entity\Subscription\Model $sub */
@@ -144,85 +148,117 @@ class HeadsUp extends WebhookAbstract
             $details = $price->getDetails();
             $hashes[$details['sku']] = $price->getFrequencyHash();
         }
+        $retryDays = ((int)$this->configHelper->getReorderRetryDays()) ?: 7;
         /** @var Order $_order */
-        $order = $this->reorder->execute($_order, $hashes);
+        $order = $this->reorder->execute($_order, $hashes, $subscription->getRebillId(), $this->queueId);
         /** @var \Improntus\Rebill\Model\Entity\SubscriptionShipment\Model $shipment */
         if ($shipment = $package['shipment']) {
             if ($shipment->getId()) {
-                $shippingPrice = array_sum([
-                    $order->getShippingAmount(),
-                    $order->getShippingTaxAmount(),
-                    -$order->getShippingDiscountAmount(),
-                    -$order->getShippingDiscountTaxCompensationAmount(),
-                ]);
-                $this->rebillSubscription->updateSubscription(
-                    $shipment->getRebillId(),
-                    [
-                        'amount' => $shippingPrice,
-                        'card' => $rebillSubscription['card'],
-                        'nextChargeDate' => $rebillSubscription['nextChargeDate'],
-                        'status' => $rebillSubscription['status'],
-                    ]
-                );
-                $shipment->setPayed(0);
-                $shipment->setOrderId($order->getId());
-                $shipment->setNextSchedule($rebillSubscription['nextChargeDate']);
+                if ($order) {
+                    $shippingPrice = array_sum([
+                        $order->getShippingAmount(),
+                        $order->getShippingTaxAmount(),
+                        -$order->getShippingDiscountAmount(),
+                        -$order->getShippingDiscountTaxCompensationAmount(),
+                    ]);
+                    $nextChargeDate = $rebillSubscription['nextChargeDate'];
+                } else {
+                    $shippingPrice = $shipment->getDetails()['price']['amount'];
+                    $nextChargeDate = date('Y-m-d H:i:s', strtotime("+$retryDays days"));
+                }
+                if (!$fromPayment) {
+                    $this->rebillSubscription->updateSubscription(
+                        $shipment->getRebillId(),
+                        [
+                            'amount'         => $shippingPrice,
+                            'card'           => $rebillSubscription['card'],
+                            'nextChargeDate' => $nextChargeDate,
+                            'status'         => $rebillSubscription['status'],
+                        ]
+                    );
+                    $shipment->setNextSchedule($nextChargeDate);
+                }
+                if ($order) {
+                    $shipment->setPayed(0);
+                    $shipment->setOrderId($order->getId());
+                }
                 if ($shipment->getId() == $subscription->getId()) {
                     $shipment->setDetails($rebillSubscription);
                 }
                 $this->shipmentRepository->save($shipment);
             }
         }
-        $quote = $this->quoteRepository->get($order->getQuoteId());
-        /** @var Order\Item $orderItem */
-        foreach ($order->getAllVisibleItems() as $orderItem) {
-            $quoteItem = $quote->getItemById($orderItem->getQuoteItemId());
-            $frequencyOption = $quoteItem->getOptionByCode('rebill_subscription');
-            $frequencyOption = json_decode($frequencyOption->getValue(), true);
-            $_frequencyQty = $frequencyOption['frequency'] ?? 0;
-            $frequency = [
-                'frequency'      => $_frequencyQty ?? 0,
-                'frequency_type' => $frequencyOption['frequencyType'] ?? 'months',
-            ];
-            if (isset($frequencyOption['recurringPayments']) && $frequencyOption['recurringPayments']) {
-                $frequency['recurring_payments'] = (int)$frequencyOption['recurringPayments'];
+        if ($order) {
+            $quote = $this->quoteRepository->get($order->getQuoteId());
+            /** @var Order\Item $orderItem */
+            foreach ($order->getAllVisibleItems() as $orderItem) {
+                $quoteItem = $quote->getItemById($orderItem->getQuoteItemId());
+                $frequencyOption = $quoteItem->getOptionByCode('rebill_subscription');
+                $frequencyOption = json_decode($frequencyOption->getValue(), true);
+                $_frequencyQty = $frequencyOption['frequency'] ?? 0;
+                $frequency = [
+                    'frequency'      => $_frequencyQty ?? 0,
+                    'frequency_type' => $frequencyOption['frequencyType'] ?? 'months',
+                ];
+                if (isset($frequencyOption['recurringPayments']) && $frequencyOption['recurringPayments']) {
+                    $frequency['recurring_payments'] = (int)$frequencyOption['recurringPayments'];
+                }
+                $frequencyHash = hash('md5', implode('-', $frequency));
+                /** @var \Improntus\Rebill\Model\Entity\Subscription\Model $sub */
+                foreach ($package['subscription_list'] as $sub) {
+                    /** @var Model $price */
+                    $price = $sub->getData('price');
+                    $options = $price->getDetails();
+                    if ($price->getData('frequency_hash') != $frequencyHash
+                        || $orderItem->getSku() != $options['sku']) {
+                        continue;
+                    }
+                    $discount = $orderItem->getDiscountAmount();
+                    $rowTotal = array_sum([
+                        $orderItem->getRowTotal(),
+                        $discount > 0 ? $discount * -1 : $discount,
+                        $orderItem->getTaxAmount(),
+                        $orderItem->getDiscountTaxCompensationAmount(),
+                    ]);
+                    $itemQty = $orderItem->getQtyOrdered();
+                    $price = $rowTotal / $itemQty;
+                    $this->rebillSubscription->updateSubscription(
+                        $sub->getRebillId(),
+                        [
+                            'amount'         => $price,
+                            'card'           => $rebillSubscription['card'],
+                            'nextChargeDate' => $rebillSubscription['nextChargeDate'],
+                            'status'         => $rebillSubscription['status'],
+                        ]
+                    );
+                    $sub->setNextSchedule($rebillSubscription['nextChargeDate']);
+                    $sub->setOrderId($order->getId());
+                    $sub->setPayed(0);
+                    if ($sub->getId() == $subscription->getId()) {
+                        $sub->setDetails($rebillSubscription);
+                    }
+                    $this->subscriptionRepository->save($sub);
+                }
             }
-            $frequencyHash = hash('md5', implode('-', $frequency));
-            /** @var \Improntus\Rebill\Model\Entity\Subscription\Model $sub */
-            foreach ($package['subscription_list'] as $sub) {
-                /** @var Model $price */
-                $price = $sub->getData('price');
-                $options = $price->getDetails();
-                if ($price->getData('frequency_hash') != $frequencyHash
-                    || $orderItem->getSku() != $options['sku']) {
-                    continue;
+        } else {
+            /** @var \Improntus\Rebill\Model\Entity\Subscription\Model $_subscription */
+            foreach ($package['subscription_list'] as $_subscription) {
+                if (!$fromPayment) {
+                    $this->rebillSubscription->updateSubscription(
+                        $_subscription->getRebillId(),
+                        [
+                            'amount'         => $_subscription->getDetails()['price']['amount'],
+                            'card'           => $rebillSubscription['card'],
+                            'nextChargeDate' => date('Y-m-d H:i:s', strtotime("+$retryDays days")),
+                            'status'         => $rebillSubscription['status'],
+                        ]
+                    );
+                    $_subscription->setNextSchedule(date('Y-m-d H:i:s', strtotime("+$retryDays days")));
                 }
-                $discount = $orderItem->getDiscountAmount();
-                $rowTotal = array_sum([
-                    $orderItem->getRowTotal(),
-                    $discount > 0 ? $discount * -1 : $discount,
-                    $orderItem->getTaxAmount(),
-                    $orderItem->getDiscountTaxCompensationAmount(),
-                ]);
-                $itemQty = $orderItem->getQtyOrdered();
-                $price = $rowTotal / $itemQty;
-                $this->rebillSubscription->updateSubscription(
-                    $sub->getRebillId(),
-                    [
-                        'amount' => $price,
-                        'card' => $rebillSubscription['card'],
-                        'nextChargeDate' => $rebillSubscription['nextChargeDate'],
-                        'status' => $rebillSubscription['status'],
-                    ]
-                );
-                $sub->setNextSchedule($rebillSubscription['nextChargeDate']);
-                $sub->setOrderId($order->getId());
-                $sub->setPayed(0);
-                if ($sub->getId() == $subscription->getId()) {
-                    $sub->setDetails($rebillSubscription);
-                }
-                $this->subscriptionRepository->save($sub);
+                $_subscription->setDetails($rebillSubscription);
+                $this->subscriptionRepository->save($_subscription);
             }
         }
+        return (bool)$order;
     }
 }

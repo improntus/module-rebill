@@ -95,7 +95,7 @@ class InitialCost extends AbstractTotal
         return [
             'code'  => $this->getCode(),
             'title' => __('Subscription Initial Cost'),
-            'value' => $amount
+            'value' => $amount,
         ];
     }
 }

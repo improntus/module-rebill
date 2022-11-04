@@ -41,9 +41,8 @@ class Transaction extends Action
             $result = $this->transaction->prepareTransaction();
         } catch (Exception $exception) {
             $this->messageManager->addErrorMessage($exception->getMessage());
-            die();
-//            $this->_redirect('checkout/cart/index');
-//            return;
+            $this->_redirect('checkout/cart/index');
+            return;
         }
         $this->_view->loadLayout();
         /** @var \Improntus\Rebill\Block\Payment\Transaction $rebillBlock */

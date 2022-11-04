@@ -93,6 +93,16 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
     }
 
     /**
+     * @param array $data
+     * @return DataInterface
+     */
+    public function create(array $data = [])
+    {
+        $result = parent::create($data);
+        return $result instanceof DataInterface ? $result : null;
+    }
+
+    /**
      * @param SearchCriteriaInterface $searchCriteria
      * @return SearchResultInterface
      */
@@ -143,16 +153,6 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
             return parent::save($item);
         }
         return $item;
-    }
-
-    /**
-     * @param array $data
-     * @return DataInterface
-     */
-    public function create(array $data = [])
-    {
-        $result = parent::create($data);
-        return $result instanceof DataInterface ? $result : null;
     }
 
     /**

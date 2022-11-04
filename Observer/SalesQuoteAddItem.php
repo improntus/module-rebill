@@ -39,15 +39,10 @@ class SalesQuoteAddItem implements ObserverInterface
             /** @var Item $item */
             $item = $observer->getEvent()->getData('quote_item');
             $product = $item->getProduct();
-            if ($subscriptionId = $this->configHelper->getCurrentSubscription()) {
-                $frequencies = $this->configHelper->getProductRebillSubscriptionDetails($product)['frequency'];
-                if ($frequencies) {
-                    $frequency = [];
-                    foreach ($frequencies as $_frequency) {
-                        if ($_frequency['id'] == $subscriptionId) {
-                            $frequency = $_frequency;
-                        }
-                    }
+            $frequencyOption = $item->getOptionByCode('rebill_subscription');
+            if ($frequencyOption) {
+                $frequency = json_decode($frequencyOption->getValue(), true);
+                if ($frequency) {
                     $price = $frequency['price'] + $product->getFinalPrice();
                     $item->setCustomPrice($price);
                     $item->setOriginalCustomPrice($price);

@@ -103,7 +103,7 @@ class ConfigProvider implements ConfigProviderInterface
                     'actionUrl'        => $this->_storeManager->getStore()->getUrl('rebill/payment/transaction'),
                     'currency'         => '',
                     'country'          => '',
-                    'method_available' => $this->isMethodAvailable()
+                    'method_available' => $this->isMethodAvailable(),
                 ],
             ],
         ] : [];

@@ -33,7 +33,7 @@ class ProductAttributes implements DataPatchInterface, PatchRevertableInterface
      * @var array[]
      */
     protected $attributes = [
-        'rebill_subscription_type'     => [
+        'rebill_subscription_type' => [
             'type'    => 'varchar',
             'input'   => 'select',
             'label'   => 'Subscription Type',
@@ -41,7 +41,7 @@ class ProductAttributes implements DataPatchInterface, PatchRevertableInterface
             'source'  => SourceSubscriptionType::class,
             'default' => null,
         ],
-        'rebill_frequency'             => [
+        'rebill_frequency'         => [
             'type'    => 'text',
             'input'   => 'text',
             'label'   => 'Frequency',
@@ -61,6 +61,14 @@ class ProductAttributes implements DataPatchInterface, PatchRevertableInterface
     ) {
         $this->moduleDataSetup = $moduleDataSetup;
         $this->eavSetupFactory = $eavSetupFactory;
+    }
+
+    /**
+     * @return array|string[]
+     */
+    public static function getDependencies()
+    {
+        return [];
     }
 
     /**
@@ -114,14 +122,6 @@ class ProductAttributes implements DataPatchInterface, PatchRevertableInterface
      * @return array|string[]
      */
     public function getAliases()
-    {
-        return [];
-    }
-
-    /**
-     * @return array|string[]
-     */
-    public static function getDependencies()
     {
         return [];
     }

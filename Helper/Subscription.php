@@ -104,6 +104,20 @@ class Subscription extends Data
     }
 
     /**
+     * @param Product $product
+     * @return array
+     * @description return rebill attributes values from product
+     */
+    public function getProductRebillSubscriptionDetails(Product $product)
+    {
+        return [
+            'enable_subscription' => (bool)$product->getData('rebill_subscription_type'),
+            'subscription_type'   => $product->getData('rebill_subscription_type'),
+            'frequency'           => json_decode($product->getData('rebill_frequency') ?? '[]', true),
+        ];
+    }
+
+    /**
      * @param Order $order
      * @return array
      * @throws NoSuchEntityException
@@ -123,20 +137,6 @@ class Subscription extends Data
             $subscriptionProducts[] = $frequency;
         }
         return $subscriptionProducts;
-    }
-
-    /**
-     * @param Product $product
-     * @return array
-     * @description return rebill attributes values from product
-     */
-    public function getProductRebillSubscriptionDetails(Product $product)
-    {
-        return [
-            'enable_subscription' => (bool)$product->getData('rebill_subscription_type'),
-            'subscription_type' => $product->getData('rebill_subscription_type'),
-            'frequency' => json_decode($product->getData('rebill_frequency') ?? '[]', true),
-        ];
     }
 
     /**
@@ -247,25 +247,6 @@ class Subscription extends Data
     }
 
     /**
-     * @param float|null $price
-     * @return float|string
-     */
-    public function getFrequencyPriceFormat(float $price = null)
-    {
-        try {
-            if (!$price) {
-                $price = $this->currencyHelper->currencyByStore($price, null, true, false);
-                $price = ($price > 0 ? '+' : ' ') . $price;
-            } else {
-                $price = $this->currencyHelper->currencyByStore($price, null, true, false);
-            }
-            return $price;
-        } catch (Exception $exception) {
-            return '';
-        }
-    }
-
-    /**
      * @param float $price
      * @param array $frequencyArray
      * @param Product|null $product
@@ -282,6 +263,24 @@ class Subscription extends Data
             $price = $this->currencyHelper->currencyByStore($price, null, true, false);
         }
         return $price;
+    }
+
+    /**
+     * @param string $frequencyType
+     * @param int $frequency
+     * @param string $price
+     * @return Phrase
+     */
+    private function getFirstPartDesc(string $frequencyType, int $frequency, string $price)
+    {
+        if ($frequency == 1) {
+            $period = __($frequencyType == 'months' ? 'monthly' : 'yearly');
+            $description = __('%1 for %2', $period, $price);
+        } else {
+            $period = __($frequencyType == 'months' ? 'months' : 'years');
+            $description = __('every %1 %2 for %3', $frequency, $period, $price);
+        }
+        return $description;
     }
 
     /**
@@ -306,20 +305,21 @@ class Subscription extends Data
     }
 
     /**
-     * @param string $frequencyType
-     * @param int $frequency
-     * @param string $price
-     * @return Phrase
+     * @param float|null $price
+     * @return float|string
      */
-    private function getFirstPartDesc(string $frequencyType, int $frequency, string $price)
+    public function getFrequencyPriceFormat(float $price = null)
     {
-        if ($frequency == 1) {
-            $period = __($frequencyType == 'months' ? 'monthly' : 'yearly');
-            $description = __('%1 for %2', $period, $price);
-        } else {
-            $period = __($frequencyType == 'months' ? 'months' : 'years');
-            $description = __('every %1 %2 for %3', $frequency, $period, $price);
+        try {
+            if (!$price) {
+                $price = $this->currencyHelper->currencyByStore($price, null, true, false);
+                $price = ($price > 0 ? '+' : ' ') . $price;
+            } else {
+                $price = $this->currencyHelper->currencyByStore($price, null, true, false);
+            }
+            return $price;
+        } catch (Exception $exception) {
+            return '';
         }
-        return $description;
     }
 }

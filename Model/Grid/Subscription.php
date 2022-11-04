@@ -55,49 +55,6 @@ class Subscription extends SearchResult
         parent::__construct($entityFactory, $logger, $fetchStrategy, $eventManager, $mainTable, $resourceModel);
     }
 
-    /**
-     * @return $this|Subscription|void
-     * phpcs:disable
-     */
-    protected function _initSelect()
-    {
-        parent::_initSelect();
-
-        $columns = [
-            /**
-             * Main Table Columns
-             */
-            "entity_id"           => "main_table.entity_id",
-            "rebill_id"           => "main_table.rebill_id",
-            "status"              => "main_table.status",
-            "quantity"            => "main_table.quantity",
-            "order_id"            => "main_table.order_id",
-            "last_charge_date"    => "DATE_FORMAT(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.lastChargeDate')),'%Y-%m-%d')",
-            "next_charge_date"    => "DATE_FORMAT(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.nextChargeDate')),'%Y-%m-%d')",
-            "user_email"          => "JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.userEmail'))",
-            "title"               => "JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.title'))",
-            "amount"              => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.amount')),'')",
-            "frequency_type"      => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.frequency.type')),'')",
-            "frequency"           => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.frequency.quantity')),'')",
-            "repetitions"         => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.repetitions')),'')",
-            "gateway_type"        => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.gateway.type')),'')",
-            "gateway_description" => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.gateway.description')),'')",
-            /**
-             * Order Columns
-             */
-            "increment_id"  => "o.increment_id",
-        ];
-
-        // o => Sales Order
-        $this->getSelect()->joinLeft(['o' => 'sales_order'], 'main_table.order_id = o.entity_id', []);
-
-        $this->getSelect()->reset('columns');
-        foreach ($columns as $alias => $column) {
-            $this->addFieldToSelect(new Zend_Db_Expr("{$column} AS {$alias}"));
-        }
-        return $this;
-    }
-
     public function setOrder($field, $direction = self::SORT_ORDER_DESC)
     {
         $jsonFields = [
@@ -180,5 +137,48 @@ class Subscription extends SearchResult
             $field = $aliasFilters[$field];
         }
         return parent::addFieldToFilter($field, $condition);
+    }
+
+    /**
+     * @return $this|Subscription|void
+     * phpcs:disable
+     */
+    protected function _initSelect()
+    {
+        parent::_initSelect();
+
+        $columns = [
+            /**
+             * Main Table Columns
+             */
+            "entity_id"           => "main_table.entity_id",
+            "rebill_id"           => "main_table.rebill_id",
+            "status"              => "main_table.status",
+            "quantity"            => "main_table.quantity",
+            "order_id"            => "main_table.order_id",
+            "last_charge_date"    => "DATE_FORMAT(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.lastChargeDate')),'%Y-%m-%d')",
+            "next_charge_date"    => "DATE_FORMAT(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.nextChargeDate')),'%Y-%m-%d')",
+            "user_email"          => "JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.userEmail'))",
+            "title"               => "JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.title'))",
+            "amount"              => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.amount')),'')",
+            "frequency_type"      => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.frequency.type')),'')",
+            "frequency"           => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.frequency.quantity')),'')",
+            "repetitions"         => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.repetitions')),'')",
+            "gateway_type"        => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.gateway.type')),'')",
+            "gateway_description" => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.gateway.description')),'')",
+            /**
+             * Order Columns
+             */
+            "increment_id"        => "o.increment_id",
+        ];
+
+        // o => Sales Order
+        $this->getSelect()->joinLeft(['o' => 'sales_order'], 'main_table.order_id = o.entity_id', []);
+
+        $this->getSelect()->reset('columns');
+        foreach ($columns as $alias => $column) {
+            $this->addFieldToSelect(new Zend_Db_Expr("{$column} AS {$alias}"));
+        }
+        return $this;
     }
 }

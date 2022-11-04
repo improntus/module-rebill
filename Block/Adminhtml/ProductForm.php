@@ -7,16 +7,15 @@
 
 namespace Improntus\Rebill\Block\Adminhtml;
 
-use Improntus\Rebill\Helper\Config;
 use Magento\Backend\Block\Template;
 use Magento\Catalog\Model\Entity\Attribute;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ResourceModel\Product\Attribute\Collection as AttributeCollection;
+use Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory as AttributeCollectionFactory;
 use Magento\Directory\Helper\Data as DirectoryHelper;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Json\Helper\Data as JsonHelper;
 use Magento\Framework\Registry;
-use Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory as AttributeCollectionFactory;
-use Magento\Catalog\Model\ResourceModel\Product\Attribute\Collection as AttributeCollection;
 
 class ProductForm extends Template
 {
@@ -88,27 +87,6 @@ class ProductForm extends Template
     }
 
     /**
-     * @param string|null $code
-     * @return int[]|mixed|string[]
-     * @description return attributes with its tooltips
-     */
-    protected function getRebillAttributes(?string $code = null)
-    {
-        $attributes = [
-            'rebill_enable_subscription'       => __('Add the option to subscribe to this product'),
-            'rebill_free_trial_time_lapse'     => __('Time lapse of free trial expressed in days. Once it\'s finished, it will be billed for the first time'),
-            'rebill_frequency'                 => __('Frequency in which the subscription will be billed, expressed in months or years'),
-            'rebill_gateway_id'                => __('Payment gateway through which the product will be charged'),
-        ];
-        if ($code) {
-            $result = $attributes[$code];
-        } else {
-            $result = array_keys($attributes);
-        }
-        return $result;
-    }
-
-    /**
      * @return string
      * @description return attributes in a json array to process the data in the js
      */
@@ -132,5 +110,26 @@ class ProductForm extends Template
             $attributes[] = $_attribute;
         }
         return $this->jsonHelper->jsonEncode($attributes);
+    }
+
+    /**
+     * @param string|null $code
+     * @return int[]|mixed|string[]
+     * @description return attributes with its tooltips
+     */
+    protected function getRebillAttributes(?string $code = null)
+    {
+        $attributes = [
+            'rebill_enable_subscription'   => __('Add the option to subscribe to this product'),
+            'rebill_free_trial_time_lapse' => __('Time lapse of free trial expressed in days. Once it\'s finished, it will be billed for the first time'),
+            'rebill_frequency'             => __('Frequency in which the subscription will be billed, expressed in months or years'),
+            'rebill_gateway_id'            => __('Payment gateway through which the product will be charged'),
+        ];
+        if ($code) {
+            $result = $attributes[$code];
+        } else {
+            $result = array_keys($attributes);
+        }
+        return $result;
     }
 }

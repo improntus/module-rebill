@@ -16,5 +16,7 @@
              parent="Improntus_Rebill::rebill" action="rebill/subscription/index" resource="Improntus_Rebill::subscriptions"/>
         <add id="Improntus_Rebill::payments" title="Payments" module="Improntus_Rebill" sortOrder="0"
              parent="Improntus_Rebill::rebill" action="rebill/payment/index" resource="Improntus_Rebill::payments"/>
+        <add id="Improntus_Rebill::queue" title="Queue" module="Improntus_Rebill" sortOrder="0"
+             parent="Improntus_Rebill::rebill" action="rebill/queue/index" resource="Improntus_Rebill::queue"/>
     </menu>
 </config>

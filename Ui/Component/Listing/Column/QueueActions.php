@@ -7,29 +7,31 @@
 
 namespace Improntus\Rebill\Ui\Component\Listing\Column;
 
-use Magento\Backend\Model\Url;
-use Magento\Ui\Component\Listing\Columns\Column;
-use Magento\Framework\View\Element\UiComponentFactory;
+use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
+use Magento\Framework\View\Element\UiComponentFactory;
+use Magento\Ui\Component\Listing\Columns\Column;
+use Magento\Framework\App\ObjectManager;
+use Magento\Framework\Escaper;
 
-class OrderLink extends Column
+class QueueActions extends Column
 {
     /**
-     * @var Url
+     * @var UrlInterface
      */
     protected $urlBuilder;
 
     /**
      * @param ContextInterface $context
      * @param UiComponentFactory $uiComponentFactory
-     * @param Url $urlBuilder
+     * @param UrlInterface $urlBuilder
      * @param array $components
      * @param array $data
      */
     public function __construct(
         ContextInterface   $context,
         UiComponentFactory $uiComponentFactory,
-        Url                $urlBuilder,
+        UrlInterface       $urlBuilder,
         array              $components = [],
         array              $data = []
     ) {
@@ -38,21 +40,23 @@ class OrderLink extends Column
     }
 
     /**
-     * Prepare Data Source
-     * @param array $dataSource
-     * @return array
+     * @inheritDoc
      */
     public function prepareDataSource(array $dataSource)
     {
         if (isset($dataSource['data']['items'])) {
-            foreach ($dataSource['data']['items'] as &$item) {
-                $name = $this->getData('name');
-                if (isset($item['order_id'])) {
-                    $orderLink = $this->urlBuilder->getUrl("sales/order/view", ['order_id' => $item['order_id']]);
-                    $item[$name] = "<a target='_blank' href='{$orderLink}'>#{$item['increment_id']}</a>";
+            foreach ($dataSource['data']['items'] as & $item) {
+                if ($item['status'] == 'failed') {
+                    $item[$this->getData('name')] = [
+                        'delete' => [
+                            'href'  => $this->urlBuilder->getUrl('rebill/queue/retry', ['id' => $item['entity_id']]),
+                            'label' => __('Retry'),
+                        ],
+                    ];
                 }
             }
         }
+
         return $dataSource;
     }
 }

@@ -7,16 +7,16 @@
 
 namespace Improntus\Rebill\Model\Grid;
 
-use Zend_Db_Expr;
-use Psr\Log\LoggerInterface as Logger;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Event\ManagerInterface as EventManager;
 use Improntus\Rebill\Model\ResourceModel\Payment as PaymentModel;
-use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
 use Magento\Framework\Api\ExtensionAttribute\JoinDataInterfaceFactory;
-use Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult;
-use Magento\Framework\Data\Collection\EntityFactoryInterface as EntityFactory;
+use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
 use Magento\Framework\Data\Collection\Db\FetchStrategyInterface as FetchStrategy;
+use Magento\Framework\Data\Collection\EntityFactoryInterface as EntityFactory;
+use Magento\Framework\Event\ManagerInterface as EventManager;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult;
+use Psr\Log\LoggerInterface as Logger;
+use Zend_Db_Expr;
 
 class Payment extends SearchResult
 {
@@ -54,62 +54,15 @@ class Payment extends SearchResult
         parent::__construct($entityFactory, $logger, $fetchStrategy, $eventManager, $mainTable, $resourceModel);
     }
 
-    /**
-     * @return Payment|void
-     */
-    protected function _initSelect()
-    {
-        parent::_initSelect();
-
-        $columns = [
-            /**
-             * Main Table Columns
-             */
-            "item_id" => "JSON_UNQUOTE((JSON_EXTRACT(main_table.details, '$.id')))",
-            "amount" => "JSON_UNQUOTE((JSON_EXTRACT(main_table.details, '$.amount')))",
-            "currency" => "JSON_UNQUOTE((JSON_EXTRACT(main_table.details, '$.currency')))",
-            "paymentId" => "JSON_UNQUOTE((JSON_EXTRACT(main_table.details, '$.paymentId')))",
-            "description" => "JSON_UNQUOTE((JSON_EXTRACT(main_table.details, '$.description')))",
-            "createdAt" => "DATE_FORMAT(JSON_UNQUOTE((JSON_EXTRACT(main_table.details, '$.createdAt'))),'%Y-%m-%d')",
-            "card_last_number" => "JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.card.last4'))",
-            "card_brand" => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.card.brand')),'')",
-            "entity_id" => "main_table.entity_id",
-            "status" => "main_table.status",
-            "rebill_id" => "main_table.rebill_id",
-            /**
-             * Order Columns
-             */
-            "customer_fullname" => "CONCAT_WS(' ',o.customer_firstname,o.customer_middlename,o.customer_lastname)",
-            "order_id" => "o.entity_id",
-            "increment_id" => "o.increment_id",
-            "customer_firstname" => "o.customer_firstname",
-            "customer_lastname" => "o.customer_lastname",
-            /**
-             * Rebill Subscription Columns
-             */
-            "gateway_type" => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.gateway.type')),'')",
-            "gateway_description" => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.gateway.description')),'')",
-        ];
-
-        // o => Sales Order
-        $this->getSelect()->joinLeft(['o' => 'sales_order'], 'main_table.order_id = o.entity_id', []);
-
-        $this->getSelect()->reset('columns');
-        foreach ($columns as $alias => $column) {
-            $this->addFieldToSelect(new Zend_Db_Expr("{$column} AS {$alias}"));
-        }
-        return $this;
-    }
-
     public function addFieldToFilter($field, $condition = null)
     {
         $aliasFilters = [
-            'order_id' => 'o.entity_id',
-            'increment_id' => 'o.increment_id',
+            'order_id'           => 'o.entity_id',
+            'increment_id'       => 'o.increment_id',
             'order_increment_id' => 'o.increment_id',
             'customer_firstname' => 'o.customer_firstname',
-            'customer_lastname' => 'o.customer_lastname',
-            'rebill_id' => 'main_table.rebill_id',
+            'customer_lastname'  => 'o.customer_lastname',
+            'rebill_id'          => 'main_table.rebill_id',
         ];
         $customFilters = [
             'customer_fullname',
@@ -120,7 +73,7 @@ class Payment extends SearchResult
             'card_brand',
             'description',
             'paymentId',
-            'amount'
+            'amount',
         ];
         if (in_array($field, $customFilters)) {
             switch ($field) {
@@ -176,4 +129,50 @@ class Payment extends SearchResult
         return parent::addFieldToFilter($field, $condition);
     }
 
+    /**
+     * @return Payment|void
+     */
+    protected function _initSelect()
+    {
+        parent::_initSelect();
+
+        $columns = [
+            /**
+             * Main Table Columns
+             */
+            "item_id"             => "JSON_UNQUOTE((JSON_EXTRACT(main_table.details, '$.id')))",
+            "amount"              => "JSON_UNQUOTE((JSON_EXTRACT(main_table.details, '$.amount')))",
+            "currency"            => "JSON_UNQUOTE((JSON_EXTRACT(main_table.details, '$.currency')))",
+            "paymentId"           => "JSON_UNQUOTE((JSON_EXTRACT(main_table.details, '$.paymentId')))",
+            "description"         => "JSON_UNQUOTE((JSON_EXTRACT(main_table.details, '$.description')))",
+            "createdAt"           => "DATE_FORMAT(JSON_UNQUOTE((JSON_EXTRACT(main_table.details, '$.createdAt'))),'%Y-%m-%d')",
+            "card_last_number"    => "JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.card.last4'))",
+            "card_brand"          => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.card.brand')),'')",
+            "entity_id"           => "main_table.entity_id",
+            "status"              => "main_table.status",
+            "rebill_id"           => "main_table.rebill_id",
+            /**
+             * Order Columns
+             */
+            "customer_fullname"   => "CONCAT_WS(' ',o.customer_firstname,o.customer_middlename,o.customer_lastname)",
+            "order_id"            => "o.entity_id",
+            "increment_id"        => "o.increment_id",
+            "customer_firstname"  => "o.customer_firstname",
+            "customer_lastname"   => "o.customer_lastname",
+            /**
+             * Rebill Subscription Columns
+             */
+            "gateway_type"        => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.gateway.type')),'')",
+            "gateway_description" => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.gateway.description')),'')",
+        ];
+
+        // o => Sales Order
+        $this->getSelect()->joinLeft(['o' => 'sales_order'], 'main_table.order_id = o.entity_id', []);
+
+        $this->getSelect()->reset('columns');
+        foreach ($columns as $alias => $column) {
+            $this->addFieldToSelect(new Zend_Db_Expr("{$column} AS {$alias}"));
+        }
+        return $this;
+    }
 }

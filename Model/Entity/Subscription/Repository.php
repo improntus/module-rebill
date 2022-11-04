@@ -88,44 +88,12 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
     }
 
     /**
-     * @param int|null $id
-     * @return DataInterface
-     */
-    public function getById(?int $id)
-    {
-        $result = parent::getById($id);
-        return $result instanceof DataInterface ? $result : null;
-    }
-
-    /**
-     * @param string $id
-     * @return DataInterface|null
-     */
-    public function getByRebillId(string $id)
-    {
-        $price = $this->create();
-        $this->getResourceModel()->load($price, $id, 'rebill_id');
-        return $price;
-    }
-
-    /**
      * @param SearchCriteriaInterface $searchCriteria
      * @return SearchResultInterface
      */
     public function getList(SearchCriteriaInterface $searchCriteria)
     {
         $result = parent::getList($searchCriteria);
-        return $result instanceof SearchResultInterface ? $result : null;
-    }
-
-    /**
-     * @param array $filters
-     * @param int|null $pageSize
-     * @return SearchResultInterface
-     */
-    public function getEzList(array $filters = [], ?int $pageSize = null)
-    {
-        $result = parent::getEzList($filters, $pageSize);
         return $result instanceof SearchResultInterface ? $result : null;
     }
 
@@ -140,16 +108,6 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
             return parent::save($item);
         }
         return null;
-    }
-
-    /**
-     * @param array $data
-     * @return DataInterface
-     */
-    public function create(array $data = [])
-    {
-        $result = parent::create($data);
-        return $result instanceof DataInterface ? $result : null;
     }
 
     /**
@@ -225,5 +183,47 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
             'subscription_list' => $subscriptionList,
             'shipment'          => $shipment,
         ];
+    }
+
+    /**
+     * @param string $id
+     * @return DataInterface|null
+     */
+    public function getByRebillId(string $id)
+    {
+        $price = $this->create();
+        $this->getResourceModel()->load($price, $id, 'rebill_id');
+        return $price;
+    }
+
+    /**
+     * @param array $data
+     * @return DataInterface
+     */
+    public function create(array $data = [])
+    {
+        $result = parent::create($data);
+        return $result instanceof DataInterface ? $result : null;
+    }
+
+    /**
+     * @param int|null $id
+     * @return DataInterface
+     */
+    public function getById(?int $id)
+    {
+        $result = parent::getById($id);
+        return $result instanceof DataInterface ? $result : null;
+    }
+
+    /**
+     * @param array $filters
+     * @param int|null $pageSize
+     * @return SearchResultInterface
+     */
+    public function getEzList(array $filters = [], ?int $pageSize = null)
+    {
+        $result = parent::getEzList($filters, $pageSize);
+        return $result instanceof SearchResultInterface ? $result : null;
     }
 }

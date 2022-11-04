@@ -7,26 +7,25 @@
 
 namespace Improntus\Rebill\Model\Payment;
 
+use Improntus\Rebill\Block\Sales\Order\Rebill as RebillBlock;
 use Improntus\Rebill\Helper\Config;
 use Magento\Framework\Api\AttributeValueFactory;
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\DataObject;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Module\ModuleListInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\Framework\UrlInterface;
 use Magento\Payment\Block\Form;
-use Improntus\Rebill\Block\Sales\Order\Rebill as RebillBlock;
 use Magento\Payment\Helper\Data;
-use Magento\Payment\Model\InfoInterface;
 use Magento\Payment\Model\Method\Cc;
 use Magento\Payment\Model\Method\ConfigInterface;
 use Magento\Payment\Model\Method\Logger;
 use Magento\Payment\Model\Method\Online\GatewayInterface;
 use Magento\Quote\Api\Data\CartInterface;
-use Magento\Framework\UrlInterface;
 
 class _Rebill extends Cc implements GatewayInterface
 {

@@ -11,7 +11,6 @@ use Exception;
 use Improntus\Rebill\Api\Price\DataInterface;
 use Improntus\Rebill\Helper\Config;
 use Improntus\Rebill\Model\Entity\Price\Repository;
-use Improntus\Rebill\Model\Payment\Rebill as RebillPayment;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Registry;
@@ -83,6 +82,19 @@ class Transaction
     }
 
     /**
+         * @return string
+         * phpcs:disable
+         */
+    public static function getDefaultFrequencyHash()
+    {
+        return self::createHashFromArray([
+            'frequency'          => 0,
+            'frequency_type'     => 'months',
+            'recurring_payments' => 1,
+        ]);
+    }
+
+    /**
      * @return array
      * @throws LocalizedException
      */
@@ -103,105 +115,13 @@ class Transaction
                 'rebill_details' => $rebillDetails,
             ];
         } catch (Exception $exception) {
-//            if ($order->getId()) {
-//                $order->cancel();
-//            }
-//            $this->session->restoreQuote();
+            if ($order->getId()) {
+                $order->cancel();
+            }
+            $this->session->restoreQuote();
             $this->configHelper->logError($exception->getMessage());
-            throw new LocalizedException(__('There was an error creating the payment, please try againt.'));
+            throw new LocalizedException(__('There was an error creating the payment, please try again.'));
         }
-    }
-
-    /**
-     * @param Order $order
-     * @param array $items
-     * @return array
-     * @throws Exception
-     */
-    private function sendItems(Order $order, array $items)
-    {
-        $defaultFrequencyHash = $this->createHashFromArray($this->defaultFrequency);
-        $gateway = $this->configHelper->getGatewayId();
-        $compiledItems = [];
-        $frequenciesQty = count($items);
-        foreach ($items as $hash => $_items) {
-            if ($hash == $defaultFrequencyHash) {
-                if ($frequenciesQty == 1) {
-                    $total = $order->getGrandTotal();
-                } else {
-                    $total = 0;
-                    foreach ($_items as $item) {
-                        $total += $item['price'] * $item['quantity'];
-                    }
-                }
-                $compiledItems[] = [
-                    'type'           => 'order',
-                    'frequency_hash' => $defaultFrequencyHash,
-                    'frequency'      => $this->defaultFrequency,
-                    'sku'            => "order-{$order->getIncrementId()}",
-                    'product_name'   => "Order #{$order->getIncrementId()}",
-                    'price'          => $total,
-                    'quantity'       => 1,
-                    'gateway'        => $gateway,
-                    'currency'       => $this->configHelper->getCurrency(),
-                ];
-            } else {
-                foreach ($_items as $item) {
-                    $compiledItems[] = $item;
-                }
-            }
-        }
-        $result = [];
-        foreach ($compiledItems as $item) {
-            if (in_array($item['type'], ['shipment', 'additional']) && $item['price'] <= 0) {
-                continue;
-            }
-            $rebillPrice = $this->getRebillPrice($item);
-            $result[] = [
-                'id'       => $rebillPrice->getRebillPriceId(),
-                'quantity' => (int)$item['quantity'],
-            ];
-        }
-        return $result;
-    }
-
-    /**
-     * @param array $item
-     * @return DataInterface
-     * @throws Exception
-     */
-    private function getRebillPrice(array $item)
-    {
-        $hash = $this->createHashFromArray($item);
-        $rebillPrice = $this->priceRepository->getByHash($hash);
-        if (!$rebillPrice->getId()) {
-            $details = [
-                'amount'      => (string)$item['price'],
-                'type'        => 'fixed',
-                'repetitions' => 1,
-                'currency'    => $item['currency'],
-                'gatewayId'   => $item['gateway'],
-                'description' => $item['price_name'] ?? $item['product_name'],
-                'enabled'     => true,
-            ];
-            if ($item['frequency']['frequency'] > 0) {
-                $details['frequency'] = [
-                    'type'     => $item['frequency']['frequency_type'],
-                    'quantity' => (int)$item['frequency']['frequency'],
-                ];
-                $details['repetitions'] = $item['frequency']['recurring_payments'] ?? null;
-            }
-            $rebillPrice->setType($item['type']);
-            $rebillPrice->setDetails($item);
-            $rebillPrice->setRebillDetails($details);
-            $rebillPrice->setDetailsHash($hash);
-            $rebillPrice->setFrequencyHash($item['frequency_hash']);
-            $this->priceRepository->save($rebillPrice);
-        }
-        if ($rebillPrice->getRebillPriceId() === null) {
-            throw new Exception(__('Unable to create prices on Rebill.'));
-        }
-        return $rebillPrice;
     }
 
     /**
@@ -243,7 +163,7 @@ class Transaction
                     $frequency['recurring_payments'] = (int)$frequencyOption['recurringPayments'];
                 }
             }
-            $frequencyHash = $this->createHashFromArray($frequency);
+            $frequencyHash = self::createHashFromArray($frequency);
             $this->frequencyHashes[$frequencyHash] = $frequency;
             $preparedItems[$frequencyHash][] = [
                 'type'           => 'product',
@@ -261,6 +181,18 @@ class Transaction
     }
 
     /**
+         * @param array $array
+         * @return string
+         * phpcs:disable
+         */
+    public static function createHashFromArray(array $array)
+    {
+        return hash('md5', implode('-', array_map(function ($item) {
+            return is_array($item) ? json_encode($item) : $item;
+        }, $array)));
+    }
+
+    /**
      * @param Order $order
      * @param Quote $quote
      * @param array $items
@@ -268,7 +200,7 @@ class Transaction
      */
     private function prepareAdditionalItems(Order $order, Quote $quote, array &$items)
     {
-        $defaultFrequencyHash = $this->createHashFromArray($this->defaultFrequency);
+        $defaultFrequencyHash = self::createHashFromArray($this->defaultFrequency);
         $gateway = $this->configHelper->getGatewayId();
         $itemsTotals = [];
         foreach ($order->getAllVisibleItems() as $item) {
@@ -346,29 +278,87 @@ class Transaction
     }
 
     /**
-     * @param array $array
-     * @return string
+     * @param Order $order
+     * @param array $items
+     * @return array
+     * @throws Exception
      */
-    private function createHashFromArray(array $array)
+    private function sendItems(Order $order, array $items)
     {
-        return hash('md5', implode('-', array_map(function ($item) {
-            return is_array($item) ? json_encode($item) : $item;
-        }, $array)));
-    }
+        $defaultFrequencyHash = self::createHashFromArray($this->defaultFrequency);
+        $gateway = $this->configHelper->getGatewayId();
+        $compiledItems = [];
+        foreach ($items as $hash => $_items) {
+            if ($hash == $defaultFrequencyHash) {
+                foreach ($_items as $item) {
+                    $compiledItems[] = [
+                        'type'           => $item['type'],
+                        'frequency_hash' => $defaultFrequencyHash,
+                        'frequency'      => $this->defaultFrequency,
+                        'sku'            => $item['sku'],
+                        'product_name'   => $item['price_name'] ?? $item['product_name'],
+                        'price'          => $item['price'],
+                        'quantity'       => $item['quantity'],
+                        'gateway'        => $gateway,
+                        'currency'       => $this->configHelper->getCurrency(),
+                    ];
+                }
+            } else {
+                foreach ($_items as $item) {
+                    $compiledItems[] = $item;
+                }
+            }
+        }
+        $result = [];
+        foreach ($compiledItems as $item) {
+            if (in_array($item['type'], ['shipment', 'additional']) && $item['price'] <= 0) {
+                continue;
+            }
+            $rebillPrice = $this->getRebillPrice($item);
+            $result[] = [
+                'id'       => $rebillPrice->getRebillPriceId(),
+                'quantity' => (int)$item['quantity'],
+            ];
+        }
+        return $result;
+    }//phpcs:enable
 
     /**
-     * @return string
-     * phpcs:disable
+     * @param array $item
+     * @return DataInterface
+     * @throws Exception
      */
-    public static function getDefaultFrequencyHash()
+    private function getRebillPrice(array $item)
     {
-
-        return hash('md5', implode('-', array_map(function ($item) {
-            return is_array($item) ? json_encode($item) : $item;
-        }, [
-            'frequency'          => 0,
-            'frequency_type'     => 'months',
-            'recurring_payments' => 1,
-        ])));
-    }
+        $hash = self::createHashFromArray($item);
+        $rebillPrice = $this->priceRepository->getByHash($hash);
+        if (!$rebillPrice->getId()) {
+            $details = [
+                'amount'      => (string)$item['price'],
+                'type'        => 'fixed',
+                'repetitions' => 1,
+                'currency'    => $item['currency'],
+                'gatewayId'   => $item['gateway'],
+                'description' => $item['price_name'] ?? $item['product_name'],
+                'enabled'     => true,
+            ];
+            if ($item['frequency']['frequency'] > 0) {
+                $details['frequency'] = [
+                    'type'     => $item['frequency']['frequency_type'],
+                    'quantity' => (int)$item['frequency']['frequency'],
+                ];
+                $details['repetitions'] = $item['frequency']['recurring_payments'] ?? null;
+            }
+            $rebillPrice->setType($item['type']);
+            $rebillPrice->setDetails($item);
+            $rebillPrice->setRebillDetails($details);
+            $rebillPrice->setDetailsHash($hash);
+            $rebillPrice->setFrequencyHash($item['frequency_hash']);
+            $this->priceRepository->save($rebillPrice);
+        }
+        if ($rebillPrice->getRebillPriceId() === null) {
+            throw new Exception(__('Unable to create prices on Rebill.'));
+        }
+        return $rebillPrice;
+    }//phpcs:enable
 }

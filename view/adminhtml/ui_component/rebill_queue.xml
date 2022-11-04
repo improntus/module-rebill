@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">rebill_queue.rebill_queue_data_source</item>
+            <item name="deps" xsi:type="string">rebill_queue.rebill_queue_data_source</item>
+        </item>
+        <item name="spinner" xsi:type="string">rebill_queue_table_columns</item>
+    </argument>
+
+    <dataSource name="rebill_queue_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>Improntus_Rebill::main</aclResource>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="rebill_queue_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>main_table.entity_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="rebill_queue_table_columns">
+        <column name="entity_id">
+            <settings>
+                <filter>false</filter>
+                <sortable>false</sortable>
+                <label translate="true">Id</label>
+            </settings>
+        </column>
+        <column name="status">
+            <settings>
+                <filter>false</filter>
+                <sortable>false</sortable>
+                <label translate="true">Status</label>
+            </settings>
+        </column>
+        <column name="type">
+            <settings>
+                <filter>false</filter>
+                <sortable>false</sortable>
+                <label translate="true">Type</label>
+            </settings>
+        </column>
+        <column name="parameters" class="Improntus\Rebill\Ui\Component\Listing\Column\QueueData">
+            <settings>
+                <filter>false</filter>
+                <sortable>false</sortable>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <label translate="true">Data</label>
+            </settings>
+        </column>
+        <column name="error">
+            <settings>
+                <filter>false</filter>
+                <sortable>false</sortable>
+                <label translate="true">Data</label>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="Improntus\Rebill\Ui\Component\Listing\Column\QueueActions">
+            <settings>
+                <indexField>entity_id</indexField>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

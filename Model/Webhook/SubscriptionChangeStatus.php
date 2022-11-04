@@ -28,11 +28,11 @@ class SubscriptionChangeStatus extends WebhookAbstract
     /**
      * @var SubscriptionRepository
      */
-    private SubscriptionRepository $subscriptionRepository;
+    private $subscriptionRepository;
     /**
      * @var Subscription
      */
-    private Subscription $rebillSubscription;
+    private $rebillSubscription;
 
     /**
      * @param SubscriptionRepository $subscriptionRepository

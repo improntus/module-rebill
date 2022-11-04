@@ -16,6 +16,11 @@ use Improntus\Rebill\Model\Entity\SubscriptionShipment\Repository as ShipmentRep
 use Improntus\Rebill\Model\Entity\Payment\Repository as PaymentRepository;
 use Improntus\Rebill\Model\Payment\Transaction;
 use Improntus\Rebill\Model\Sales\Invoice;
+use Magento\Framework\Exception\AlreadyExistsException;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Sales\Model\OrderRepository;
@@ -96,54 +101,60 @@ class Confirmation extends WebhookAbstract
     }
 
     /**
-     * @return void
+     * @return mixed|void
+     * @throws AlreadyExistsException
+     * @throws CouldNotSaveException
+     * @throws InputException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function execute()
     {
-        try {
-            $invoiceId = $this->getParameter('invoice_id');
-            if ($invoiceId) {
-                $invoice = $this->subscriptionRepository->getInvoiceById($invoiceId);
-                if (isset($invoice['id'])) {
-                    $orderId = $this->getParameter('order_id');
-                    /** @var Order $order */
-                    $order = $this->orderRepository->get($orderId);
-                    $order->setStatus($this->configHelper->getApprovedStatus());
-                    try {
-                        $this->orderSender->send($order);
-                    } catch (Exception $exception) {
-                        $this->configHelper->logError($exception->getMessage());
+        $invoiceId = $this->getParameter('invoice_id');
+        if ($invoiceId) {
+            $invoice = $this->subscriptionRepository->getInvoiceById($invoiceId);
+            if (isset($invoice['id'])) {
+                $orderId = $this->getParameter('order_id');
+                /** @var Order $order */
+                $order = $this->orderRepository->get($orderId);
+                $order->setStatus($this->configHelper->getApprovedStatus());
+                try {
+                    $this->orderSender->send($order);
+                } catch (Exception $exception) {
+                    $this->configHelper->logError($exception->getMessage());
+                }
+                $order->setIsCustomerNotified(true);
+                $this->orderRepository->save($order);
+                $doInvoice = true;
+                $doCancel = true;
+                foreach ($invoice['paidBags'] as $_payment) {
+                    $payment = $this->paymentRepository->getByRebillId($_payment['payment']['id']);
+                    $payment->setOrderId($orderId);
+                    $payment->setRebillId($_payment['payment']['id']);
+                    $payment->setStatus($_payment['payment']['status']);
+                    $this->paymentRepository->save($payment);
+                    if ($doInvoice && $_payment['payment']['status'] !== 'SUCCEEDED') {
+                        $doInvoice = false;
                     }
-                    $order->setIsCustomerNotified(true);
-                    $this->orderRepository->save($order);
-                    $doInvoice = true;
-                    $doCancel = true;
-                    foreach ($invoice['paidBags'] as $_payment) {
-                        $payment = $this->paymentRepository->getByRebillId($_payment['payment']['id']);
-                        $payment->setOrderId($orderId);
-                        $payment->setRebillId($_payment['payment']['id']);
-                        $payment->setStatus($_payment['payment']['status']);
-                        $this->paymentRepository->save($payment);
-                        if ($doInvoice && $_payment['payment']['status'] !== 'SUCCEEDED') {
-                            $doInvoice = false;
-                        }
-                        if ($doCancel && $_payment['payment']['status'] !== 'CANCELLED') {
-                            $doCancel = false;
-                        }
+                    if ($doCancel && $_payment['payment']['status'] !== 'CANCELLED') {
+                        $doCancel = false;
                     }
-                    if ($doInvoice) {
-                        $this->rebillInvoice->execute($order);
+                    $order->addCommentToStatusHistory(json_encode($_payment));
+                }
+                if ($doInvoice) {
+                    $this->rebillInvoice->execute($order);
+                }
+                if ($doCancel && $order->canCancel()) {
+                    $order->cancel();
+                }
+                $subscriptions = [];
+                $prices = [];
+                $this->getSubscriptions($invoice, $subscriptions, $prices);
+                foreach ($subscriptions as $hash => $_subscriptions) {
+                    if ($hash == Transaction::getDefaultFrequencyHash()) {
+                        continue;
                     }
-                    if ($doCancel && $order->canCancel()) {
-                        $order->cancel();
-                    }
-                    $subscriptions = [];
-                    $prices = [];
-                    $this->getSubscriptions($invoice, $subscriptions, $prices);
-                    foreach ($subscriptions as $hash => $_subscriptions) {
-                        if ($hash == Transaction::getDefaultFrequencyHash()) {
-                            continue;
-                        }
+                    if (isset($_subscriptions['shipment'])) {
                         $shipment = $_subscriptions['shipment'][0];
                         /** @var Model $price */
                         $price = $prices[$shipment['price']['id']];
@@ -156,28 +167,25 @@ class Confirmation extends WebhookAbstract
                         $shipmentModel->setDetails($shipment);
                         $shipmentModel->setPayed(1);
                         $this->shipmentRepository->save($shipmentModel);
-                        foreach ($_subscriptions['product'] as $subscription) {
-                            /** @var Model $price */
-                            $price = $prices[$subscription['price']['id']];
-                            $model = $this->subscriptionRepository->getByRebillId($subscription['id']);
-                            $model->setShipmentId($shipmentModel->getId());
-                            $model->setStatus($subscription['status']);
-                            $model->setRebillId($subscription['id']);
-                            $model->setRebillPriceId($price->getRebillPriceId());
-                            $model->setOrderId($orderId);
-                            $model->setQuantity(1);
-                            $model->setDetails($subscription);
-                            $packageHash = hash('md5', "$orderId-{$price->getFrequencyHash()}");
-                            $model->setPackageHash($packageHash);
-                            $model->setPayed(1);
-                            $this->subscriptionRepository->save($model);
-                        }
+                    }
+                    foreach ($_subscriptions['product'] as $subscription) {
+                        /** @var Model $price */
+                        $price = $prices[$subscription['price']['id']];
+                        $model = $this->subscriptionRepository->getByRebillId($subscription['id']);
+                        $model->setShipmentId(isset($shipmentModel) ? $shipmentModel->getId() : 0);
+                        $model->setStatus($subscription['status']);
+                        $model->setRebillId($subscription['id']);
+                        $model->setRebillPriceId($price->getRebillPriceId());
+                        $model->setOrderId($orderId);
+                        $model->setQuantity(1);
+                        $model->setDetails($subscription);
+                        $packageHash = hash('md5', "$orderId-{$price->getFrequencyHash()}");
+                        $model->setPackageHash($packageHash);
+                        $model->setPayed(1);
+                        $this->subscriptionRepository->save($model);
                     }
                 }
             }
-        } catch (Exception $exception) {
-            $this->configHelper->logError(json_encode($this->getParameters()));
-            $this->configHelper->logError($exception->getMessage());
         }
     }
 

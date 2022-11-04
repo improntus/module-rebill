@@ -24,38 +24,37 @@ abstract class ChangeStatus extends Action
     /**
      * @var RebillSubscription $rebillSubscription
      */
-    protected RebillSubscription $rebillSubscription;
+    protected $rebillSubscription;
 
     /**
      * @var string $customerEmail
      */
-    protected string $customerEmail;
+    protected $customerEmail;
 
     /**
      * @var Config $configHelper
      */
-    protected Config $configHelper;
+    protected $configHelper;
 
     /**
      * @var Session $session
      */
-    protected Session $session;
+    protected $session;
 
     /**
      * @var SubscriptionRepository $subscriptionRepository
      */
-    protected SubscriptionRepository $subscriptionRepository;
+    protected $subscriptionRepository;
 
     /**
      * @var ShipmentRepository $shipmentRepository
      */
-    protected ShipmentRepository $shipmentRepository;
-
+    protected $shipmentRepository;
 
     /**
      * @var QueueRepository $queueRepository
      */
-    private QueueRepository $queueRepository;
+    private $queueRepository;
 
     /**
      * @param Context $context
@@ -93,30 +92,32 @@ abstract class ChangeStatus extends Action
      */
     public function execute()
     {
-        if ( ! $this->configHelper->isLoggedIn()) {
+        if (!$this->configHelper->isLoggedIn()) {
             $this->messageManager->addWarningMessage(__('To enter this section you need to be logged in'));
             return $this->_redirect('customer/account/login');
         }
 
-        $subscriptionPackage = $this->subscriptionRepository->getSubscriptionPackage($this->getRequest()->getParam('id'));
+        $subscriptionPackage = $this->subscriptionRepository->getSubscriptionPackage(
+            $this->getRequest()->getParam('id')
+        );
 
         /** @var EntitySubscription $subscription */
         $subscription = $subscriptionPackage['subscription'];
-        if (is_null($subscription) || ( ! $this->canExecuteChange($subscription))) {
+        if (!$subscription || (!$this->canExecuteChange($subscription))) {
             $this->messageManager->addErrorMessage($this->getCantExecuteChangeMessage());
             return $this->_redirect('rebill/customer/subscriptions');
         }
 
-        if ( ! $this->checkOutOfSync($subscription)) {
+        if (!$this->checkOutOfSync($subscription)) {
             $this->messageManager->addErrorMessage($this->getOutOfSyncMessage());
             return $this->_redirect('rebill/customer/subscriptions');
         }
 
         try {
-            $this->changeStatus($this->subscriptionRepository,$subscription);
-            $this->changeStatus($this->shipmentRepository,$subscriptionPackage['shipment']);
+            $this->changeStatus($this->subscriptionRepository, $subscription);
+            $this->changeStatus($this->shipmentRepository, $subscriptionPackage['shipment']);
             foreach ($subscriptionPackage['subscription_list'] as $_subscription) {
-                $this->changeStatus($this->subscriptionRepository,$_subscription);
+                $this->changeStatus($this->subscriptionRepository, $_subscription);
             }
             $this->messageManager->addSuccessMessage($this->getSuccessMessage());
         } catch (Exception $exception) {
@@ -126,7 +127,25 @@ abstract class ChangeStatus extends Action
         return $this->_redirect('rebill/customer/subscriptions');
     }
 
-    protected function checkOutOfSync( EntitySubscription $subscription)
+    /**
+     * @param EntitySubscription $subscription
+     * @return bool
+     */
+    abstract protected function canExecuteChange(EntitySubscription $subscription): bool;
+
+    /**
+     * @return string
+     */
+    protected function getCantExecuteChangeMessage(): string
+    {
+        return __('Change cannot be made due to subscription status. Contact the store owner to get more information.');
+    }
+
+    /**
+     * @param EntitySubscription $subscription
+     * @return bool
+     */
+    protected function checkOutOfSync(EntitySubscription $subscription)
     {
 //        $rebillSubscription = $this->rebillSubscription->getSubscription(
 //            $subscription->getRebillId(),
@@ -136,35 +155,12 @@ abstract class ChangeStatus extends Action
 //        return ($subscription->getStatus() == $rebillSubscription['status']);
 
         $queues = $this->queueRepository->getEzList([
-            'type' => 'subscription_change_status',
-            'status' => 'pending',
-            'parameters' => ['like' => '%"billingScheduleId"="'.$subscription->getRebillId().'"%']
+            'type'       => 'subscription_change_status',
+            'status'     => 'pending',
+            'parameters' => ['like' => '%"billingScheduleId"="' . $subscription->getRebillId() . '"%'],
         ]);
 
         return $queues && (count($queues->getItems()) == 0);
-    }
-
-    /**
-     * @param SubscriptionRepository|ShipmentRepository $repository
-     * @param EntitySubscription|EntityShipment|null $subscription
-     */
-    abstract protected function changeStatus(
-        SubscriptionRepository|ShipmentRepository $repository,
-        EntitySubscription|EntityShipment|null $subscription = null
-    );
-
-    /**
-     * @param EntitySubscription $subscription
-     * @return bool
-     */
-    abstract protected function canExecuteChange( EntitySubscription $subscription): bool;
-
-    /**
-     * @return string
-     */
-    protected function getCantExecuteChangeMessage(): string
-    {
-        return __('Change cannot be made due to subscription status. Contact the store owner to get more information.');
     }
 
     /**
@@ -176,6 +172,12 @@ abstract class ChangeStatus extends Action
     }
 
     /**
+     * @param SubscriptionRepository|ShipmentRepository $repository
+     * @param EntitySubscription|EntityShipment|null $subscription
+     */
+    abstract protected function changeStatus($repository, $subscription = null);
+
+    /**
      * @return string
      */
     protected function getSuccessMessage(): string
@@ -185,6 +187,7 @@ abstract class ChangeStatus extends Action
 
     /**
      * @return string
+     * @phpcs:disable
      */
     protected function getExceptionMessage(): string
     {

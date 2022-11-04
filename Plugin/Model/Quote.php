@@ -37,12 +37,18 @@ class Quote
      */
     public function beforeAddProduct(Subject $subject, Product $product, $request = null)
     {
+
+        if (!($request instanceof DataObject)) {
+            return [$product, $request];
+        }
         try {
-            if ($request instanceof DataObject) {
-                $info = $request->getData();
-                if (isset($info['frequency']) && $info['frequency']
-                    && isset($info['use_subscription']) && $info['use_subscription'] == 1) {
-                    $this->configHelper->setCurrentSubscription($info['frequency']);
+            $info = $request->getData();
+            if (isset($info['frequency']) && $info['frequency']
+                && isset($info['use_subscription']) && $info['use_subscription'] == 1) {
+                $this->configHelper->setCurrentSubscription($info['frequency']);
+                if (is_array($info['frequency'])) {
+                    $frequency = $info['frequency'];
+                } else {
                     $frequencies = $this->configHelper->getProductRebillSubscriptionDetails($product)['frequency'];
                     $frequency = [];
                     foreach ($frequencies as $_frequency) {
@@ -50,14 +56,14 @@ class Quote
                             $frequency = $_frequency;
                         }
                     }
-                    $additionalOptions = $product->getData('additional_options') ?: [];
-                    $additionalOptions[] = [
-                        'value' => $this->configHelper->getFrequencyDescription($product, $frequency),
-                        'label' => __('Subscription'),
-                    ];
-                    $product->addCustomOption('rebill_subscription', json_encode($frequency));
-                    $product->addCustomOption('additional_options', json_encode($additionalOptions));
                 }
+                $additionalOptions = $product->getData('additional_options') ?: [];
+                $additionalOptions[] = [
+                    'value' => $this->configHelper->getFrequencyDescription($product, $frequency),
+                    'label' => __('Subscription'),
+                ];
+                $product->addCustomOption('rebill_subscription', json_encode($frequency));
+                $product->addCustomOption('additional_options', json_encode($additionalOptions));
             }
         } catch (Exception $exception) {
             $this->configHelper->logError($exception->getMessage());

@@ -82,4 +82,22 @@ class Model extends AbstractModel implements DataInterface
         $this->setData('parameters', json_encode($parameters));
         return $this;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getError(): ?string
+    {
+        return $this->getData('error');
+    }
+
+    /**
+     * @param string $error
+     * @return DataInterface
+     */
+    public function setError(string $error): DataInterface
+    {
+        $this->setData('error', $error);
+        return $this;
+    }
 }

@@ -100,6 +100,16 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
     }
 
     /**
+     * @param array $data
+     * @return DataInterface
+     */
+    public function create(array $data = [])
+    {
+        $result = parent::create($data);
+        return $result instanceof DataInterface ? $result : null;
+    }
+
+    /**
      * @param string $hash
      * @return DataInterface
      */
@@ -121,17 +131,6 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
     }
 
     /**
-     * @param array $filters
-     * @param int|null $pageSize
-     * @return SearchResultInterface
-     */
-    public function getEzList(array $filters = [], ?int $pageSize = null)
-    {
-        $result = parent::getEzList($filters, $pageSize);
-        return $result instanceof SearchResultInterface ? $result : null;
-    }
-
-    /**
      * @param array $pricesIds
      * @return array
      */
@@ -143,6 +142,17 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
             $prices[$item->getFrequencyHash()][] = $item;
         }
         return $prices;
+    }
+
+    /**
+     * @param array $filters
+     * @param int|null $pageSize
+     * @return SearchResultInterface
+     */
+    public function getEzList(array $filters = [], ?int $pageSize = null)
+    {
+        $result = parent::getEzList($filters, $pageSize);
+        return $result instanceof SearchResultInterface ? $result : null;
     }
 
     /**
@@ -192,16 +202,6 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
             return parent::save($item);
         }
         return null;
-    }
-
-    /**
-     * @param array $data
-     * @return DataInterface
-     */
-    public function create(array $data = [])
-    {
-        $result = parent::create($data);
-        return $result instanceof DataInterface ? $result : null;
     }
 
     /**

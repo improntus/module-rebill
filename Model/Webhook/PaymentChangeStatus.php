@@ -11,6 +11,11 @@ use Exception;
 use Improntus\Rebill\Helper\Config;
 use Improntus\Rebill\Model\Entity\Payment\Repository as PaymentRepository;
 use Improntus\Rebill\Model\Sales\Invoice;
+use Magento\Framework\Exception\AlreadyExistsException;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\CreditmemoFactory;
 use Magento\Sales\Model\OrderRepository;
@@ -34,11 +39,6 @@ class PaymentChangeStatus extends WebhookAbstract
      * @var PaymentRepository
      */
     private $paymentRepository;
-
-    /**
-     * @var Config
-     */
-    private $configHelper;
 
     /**
      * @var Invoice
@@ -67,7 +67,6 @@ class PaymentChangeStatus extends WebhookAbstract
     public function __construct(
         OrderRepository   $orderRepository,
         PaymentRepository $paymentRepository,
-        Config            $configHelper,
         Invoice           $invoiceProcessor,
         CreditmemoFactory $creditMemoFactory,
         CreditmemoService $creditMemoService,
@@ -76,7 +75,6 @@ class PaymentChangeStatus extends WebhookAbstract
         $this->creditMemoFactory = $creditMemoFactory;
         $this->creditMemoService = $creditMemoService;
         $this->invoiceProcessor = $invoiceProcessor;
-        $this->configHelper = $configHelper;
         $this->orderRepository = $orderRepository;
         $this->paymentRepository = $paymentRepository;
         parent::__construct($parameters);
@@ -84,6 +82,11 @@ class PaymentChangeStatus extends WebhookAbstract
 
     /**
      * @return mixed|void
+     * @throws AlreadyExistsException
+     * @throws CouldNotSaveException
+     * @throws InputException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function execute()
     {
@@ -102,59 +105,55 @@ class PaymentChangeStatus extends WebhookAbstract
         if (!$paymentModel) {
             return;
         }
-        try {
-            $paymentModel->setStatus($newStatus);
-            $this->paymentRepository->save($paymentModel);
-            /** @var Order $orderModel */
-            $orderModel = $this->orderRepository->get($paymentModel->getOrderId());
-            if ($newStatus == 'SUCCEEDED') {
-                if ($orderModel->canInvoice()) {
-                    $paymentList = $this->paymentRepository->getEzList(['order_id' => $paymentModel->getOrderId()]);
-                    $doInvoice = true;
-                    foreach ($paymentList->getItems() as $payment) {
-                        if ($payment->getStatus() != 'SUCCEEDED' && $doInvoice) {
-                            $doInvoice = false;
-                        }
-                    }
-                    if ($doInvoice) {
-                        $this->invoiceProcessor->execute($orderModel);
-                    }
-                }
-            }
-            if ($newStatus == 'CANCELLED') {
-                if ($orderModel->canCancel()) {
-                    $paymentList = $this->paymentRepository->getEzList(['order_id' => $paymentModel->getOrderId()]);
-                    $doCancel = true;
-                    foreach ($paymentList->getItems() as $payment) {
-                        if ($payment->getStatus() != 'CANCELLED' && $doCancel) {
-                            $doCancel = false;
-                        }
-                    }
-                    if ($doCancel) {
-                        $orderModel->cancel();
-                    } else {
-                        $orderModel->setState('payment_review');
-                        $orderModel->setStatus('payment_review');
-                    }
-                    $this->orderRepository->save($orderModel);
-                }
-            }
-            if ($newStatus == 'REFUNDED') {
+        $paymentModel->setStatus($newStatus);
+        $this->paymentRepository->save($paymentModel);
+        /** @var Order $orderModel */
+        $orderModel = $this->orderRepository->get($paymentModel->getOrderId());
+        if ($newStatus == 'SUCCEEDED') {
+            if ($orderModel->canInvoice()) {
                 $paymentList = $this->paymentRepository->getEzList(['order_id' => $paymentModel->getOrderId()]);
-                $doRefunds = true;
+                $doInvoice = true;
                 foreach ($paymentList->getItems() as $payment) {
-                    if ($payment->getStatus() != 'REFUNDED' && $doRefunds) {
-                        $doRefunds = false;
+                    if ($payment->getStatus() != 'SUCCEEDED' && $doInvoice) {
+                        $doInvoice = false;
                     }
                 }
-                if ($doRefunds) {
-                    $creditMemo = $this->creditMemoFactory->createByOrder($orderModel);
-                    $this->creditMemoService->refund($creditMemo);
-                    $this->orderRepository->save($orderModel);
+                if ($doInvoice) {
+                    $this->invoiceProcessor->execute($orderModel);
                 }
             }
-        } catch (Exception $exception) {
-            $this->configHelper->logError($exception->getMessage());
+        }
+        if ($newStatus == 'CANCELLED') {
+            if ($orderModel->canCancel()) {
+                $paymentList = $this->paymentRepository->getEzList(['order_id' => $paymentModel->getOrderId()]);
+                $doCancel = true;
+                foreach ($paymentList->getItems() as $payment) {
+                    if ($payment->getStatus() != 'CANCELLED' && $doCancel) {
+                        $doCancel = false;
+                    }
+                }
+                if ($doCancel) {
+                    $orderModel->cancel();
+                } else {
+                    $orderModel->setState('payment_review');
+                    $orderModel->setStatus('payment_review');
+                }
+                $this->orderRepository->save($orderModel);
+            }
+        }
+        if ($newStatus == 'REFUNDED') {
+            $paymentList = $this->paymentRepository->getEzList(['order_id' => $paymentModel->getOrderId()]);
+            $doRefunds = true;
+            foreach ($paymentList->getItems() as $payment) {
+                if ($payment->getStatus() != 'REFUNDED' && $doRefunds) {
+                    $doRefunds = false;
+                }
+            }
+            if ($doRefunds) {
+                $creditMemo = $this->creditMemoFactory->createByOrder($orderModel);
+                $this->creditMemoService->refund($creditMemo);
+                $this->orderRepository->save($orderModel);
+            }
         }
     }
 }

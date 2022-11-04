@@ -70,16 +70,6 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
     }
 
     /**
-     * @param int|null $id
-     * @return DataInterface
-     */
-    public function getById(?int $id)
-    {
-        $result = parent::getById($id);
-        return $result instanceof DataInterface ? $result : null;
-    }
-
-    /**
      * @param int $id
      * @param string $status
      * @return bool
@@ -88,6 +78,16 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
     {
         $result = $this->getById($id);
         return $result->getStatus() == $status;
+    }
+
+    /**
+     * @param int|null $id
+     * @return DataInterface
+     */
+    public function getById(?int $id)
+    {
+        $result = parent::getById($id);
+        return $result instanceof DataInterface ? $result : null;
     }
 
     /**

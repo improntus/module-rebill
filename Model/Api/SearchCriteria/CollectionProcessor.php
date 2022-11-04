@@ -19,8 +19,8 @@ class CollectionProcessor extends \Magento\Framework\Api\SearchCriteria\Collecti
         PaginationProcessor $paginationProcessor
     ) {
         parent::__construct([
-            'filters' => $filterProcessor,
-            'sorting' => $sortingProcessor,
+            'filters'    => $filterProcessor,
+            'sorting'    => $sortingProcessor,
             'pagination' => $paginationProcessor,
         ]);
     }

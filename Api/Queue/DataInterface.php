@@ -52,4 +52,15 @@ interface DataInterface
      * @return DataInterface
      */
     public function setParameters(array $parameters): DataInterface;
+
+    /**
+     * @return string|null
+     */
+    public function getError(): ?string;
+
+    /**
+     * @param string $error
+     * @return DataInterface
+     */
+    public function setError(string $error): DataInterface;
 }

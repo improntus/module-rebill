@@ -16,15 +16,13 @@ use Magento\Framework\Session\SessionManagerInterface;
 class Rebill
 {
     /**
-     * @var Curl
-     */
-    private $curl;
-
-    /**
      * @var Config
      */
     protected $configHelper;
-
+    /**
+     * @var Curl
+     */
+    private $curl;
     /**
      * @var SessionManagerInterface
      */
@@ -113,30 +111,6 @@ class Rebill
     /**
      * @return string|null
      */
-    protected function getToken()
-    {
-        if (!$this->session) {
-            return null;
-        }
-        return $this->session->getData('rebill_token') ?? null;
-    }
-
-    /**
-     * @param string|null $token
-     * @return $this|null
-     */
-    protected function setToken(?string $token)
-    {
-        if (!$this->session) {
-            return null;
-        }
-        $this->session->setData('rebill_token', $token);
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
     protected function auth()
     {
         $token = $this->cacheManager->load('rebill_token');
@@ -155,35 +129,6 @@ class Rebill
             );
         }
         return $token;
-    }
-
-    /**
-     * @param string $customerEmail
-     * @return mixed|null
-     */
-    public function customerAuth(string $customerEmail)
-    {
-        $authParams = [
-            'customerEmail' => $customerEmail,
-        ];
-        $result = $this->request('customer_auth', 'POST', [], $authParams);
-        return $result['token'] ?? null;
-    }
-
-    /**
-     * @param string $endpoint
-     * @param array $ids
-     * @return string
-     */
-    protected function getEndpointUrl(string $endpoint, array $ids = []): string
-    {
-        if (!isset($this->endpoints[$endpoint])) {
-            return false;
-        }
-        if ($ids) {
-            return $this->baseUrl . vsprintf($this->endpoints[$endpoint], $ids);
-        }
-        return $this->baseUrl . $this->endpoints[$endpoint];
     }
 
     /**
@@ -280,5 +225,58 @@ class Rebill
             $this->configHelper->logError($e->getMessage());
         }
         return null;
+    }
+
+    /**
+     * @return string|null
+     */
+    protected function getToken()
+    {
+        if (!$this->session) {
+            return null;
+        }
+        return $this->session->getData('rebill_token') ?? null;
+    }
+
+    /**
+     * @param string $customerEmail
+     * @return mixed|null
+     */
+    public function customerAuth(string $customerEmail)
+    {
+        $authParams = [
+            'customerEmail' => $customerEmail,
+        ];
+        $result = $this->request('customer_auth', 'POST', [], $authParams);
+        return $result['token'] ?? null;
+    }
+
+    /**
+     * @param string $endpoint
+     * @param array $ids
+     * @return string
+     */
+    protected function getEndpointUrl(string $endpoint, array $ids = []): string
+    {
+        if (!isset($this->endpoints[$endpoint])) {
+            return false;
+        }
+        if ($ids) {
+            return $this->baseUrl . vsprintf($this->endpoints[$endpoint], $ids);
+        }
+        return $this->baseUrl . $this->endpoints[$endpoint];
+    }
+
+    /**
+     * @param string|null $token
+     * @return $this|null
+     */
+    protected function setToken(?string $token)
+    {
+        if (!$this->session) {
+            return null;
+        }
+        $this->session->setData('rebill_token', $token);
+        return $this;
     }
 }

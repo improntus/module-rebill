@@ -7,6 +7,7 @@
 
 namespace Improntus\Rebill\Controller\Customer;
 
+use Exception;
 use Improntus\Rebill\Model\Entity\Subscription\Model as EntitySubscription;
 use Improntus\Rebill\Model\Entity\Subscription\Repository as SubscriptionRepository;
 use Improntus\Rebill\Model\Entity\SubscriptionShipment\Model as EntityShipment;
@@ -19,13 +20,13 @@ class Cancel extends ChangeStatus
      * @param SubscriptionRepository|ShipmentRepository $repository
      * @param EntitySubscription|EntityShipment|null $subscription
      * @throws CouldNotSaveException
-     * @throws \Exception
+     * @throws Exception
      */
     protected function changeStatus(
-        SubscriptionRepository|ShipmentRepository $repository,
-        EntitySubscription|EntityShipment|null $subscription = null
+        $repository,
+        $subscription = null
     ) {
-        if (is_null($subscription)) {
+        if (!$subscription) {
             return;
         }
         $this->rebillSubscription->cancelSubscription($subscription->getRebillId(), $this->customerEmail);
@@ -37,7 +38,7 @@ class Cancel extends ChangeStatus
      * @param EntitySubscription $subscription
      * @return bool
      */
-    protected function canExecuteChange( EntitySubscription $subscription): bool
+    protected function canExecuteChange(EntitySubscription $subscription): bool
     {
         return $subscription->canCancelIt();
     }

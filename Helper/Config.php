@@ -20,6 +20,15 @@ class Config extends Subscription
     }
 
     /**
+     * @param string $path
+     * @return mixed
+     */
+    protected function getPaymentConfig(string $path)
+    {
+        return $this->scopeConfig->getValue("payment/improntus_rebill/$path", ScopeInterface::SCOPE_STORE);
+    }
+
+    /**
      * @return string
      */
     public function getTitle()
@@ -33,22 +42,6 @@ class Config extends Subscription
     public function getSortOrder()
     {
         return (int)$this->getPaymentConfig('sort_order');
-    }
-
-    /**
-     * @return string
-     */
-    public function getCustomerAttributeForDocument()
-    {
-        return (string)$this->getPaymentConfig('general/customer_document_attribute');
-    }
-
-    /**
-     * @return string
-     */
-    public function getCustomerDocumentType()
-    {
-        return (string)$this->getPaymentConfig('general/customer_document_type');
     }
 
     /**
@@ -68,6 +61,14 @@ class Config extends Subscription
     }
 
     /**
+     * @return string
+     */
+    public function getFailedReorderEmail()
+    {
+        return (string)$this->getPaymentConfig('general/failed_reorder_email');
+    }
+
+    /**
      * @return bool
      */
     public function isMixedCartAllowed()
@@ -78,9 +79,17 @@ class Config extends Subscription
     /**
      * @return bool
      */
+    public function getReorderRetryDays()
+    {
+        return (bool)$this->getPaymentConfig('general/reorder_retry_days');
+    }
+
+    /**
+     * @return bool
+     */
     public function isEnqueueWebhooksEnabled()
     {
-        return (bool)$this->getPaymentConfig('general/enqueue_webhooks');
+        return true;
     }
 
     /**
@@ -164,20 +173,21 @@ class Config extends Subscription
     }
 
     /**
-     * @return bool
-     */
-    public function isDebugLogsEnabled()
-    {
-        return (bool)$this->getPaymentConfig('api_options/debug_logs');
-    }
-
-    /**
      * @return string
      */
     public function getCountry()
     {
         $result = (string)$this->getConfig('general/country/default');
         return $result == 'GB' ? 'UK' : $result;
+    }
+
+    /**
+     * @param string $path
+     * @return mixed
+     */
+    public function getConfig(string $path)
+    {
+        return $this->scopeConfig->getValue($path, ScopeInterface::SCOPE_STORE);
     }
 
     /**
@@ -189,24 +199,6 @@ class Config extends Subscription
     }
 
     /**
-     * @param string $path
-     * @return mixed
-     */
-    protected function getConfig(string $path)
-    {
-        return $this->scopeConfig->getValue($path, ScopeInterface::SCOPE_STORE);
-    }
-
-    /**
-     * @param string $path
-     * @return mixed
-     */
-    protected function getPaymentConfig(string $path)
-    {
-        return $this->scopeConfig->getValue("payment/improntus_rebill/$path", ScopeInterface::SCOPE_STORE);
-    }
-
-    /**
      * @param string $message
      */
     public function logInfo(string $message)
@@ -214,6 +206,14 @@ class Config extends Subscription
         if ($this->isDebugLogsEnabled()) {
             parent::logInfo($message);
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDebugLogsEnabled()
+    {
+        return (bool)$this->getPaymentConfig('api_options/debug_logs');
     }
 
     /**

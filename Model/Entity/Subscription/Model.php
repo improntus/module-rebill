@@ -14,11 +14,11 @@ use Magento\Framework\Model\AbstractModel;
 
 class Model extends AbstractModel implements DataInterface
 {
-    const STATUS_ACTIVE = 'ACTIVE';
-    const STATUS_PAUSED = 'PAUSED';
-    const STATUS_DEFAULT = 'DEFAULT';
-    const STATUS_CANCELLED = 'CANCELLED';
-    const STATUS_FINISHED = 'FINISHED';
+    public const STATUS_ACTIVE = 'ACTIVE';
+    public const STATUS_PAUSED = 'PAUSED';
+    public const STATUS_DEFAULT = 'DEFAULT';
+    public const STATUS_CANCELLED = 'CANCELLED';
+    public const STATUS_FINISHED = 'FINISHED';
 
     /**
      * @var string
@@ -87,14 +87,6 @@ class Model extends AbstractModel implements DataInterface
     {
         $this->setData('rebill_price_id', $rebillPriceId);
         return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getStatus(): ?string
-    {
-        return $this->getData('status');
     }
 
     /**
@@ -215,40 +207,68 @@ class Model extends AbstractModel implements DataInterface
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function canUpdateIt(): bool
     {
-        return in_array($this->getStatus(),[
+        return in_array($this->getStatus(), [
             static::STATUS_ACTIVE,
             static::STATUS_PAUSED,
         ]);
     }
 
+    /**
+     * @return string|null
+     */
+    public function getStatus(): ?string
+    {
+        return $this->getData('status');
+    }
+
+    /**
+     * @return bool
+     */
     public function canReactivateIt(): bool
     {
         return $this->getStatus() == static::STATUS_PAUSED;
     }
 
+    /**
+     * @return bool
+     */
     public function canPauseIt(): bool
     {
         return $this->getStatus() == static::STATUS_ACTIVE;
     }
 
+    /**
+     * @return bool
+     */
     public function hasNextScheduledPayment(): bool
     {
-        return ! in_array($this->getStatus(),[
+        return !in_array($this->getStatus(), [
             static::STATUS_CANCELLED,
             static::STATUS_FINISHED,
         ]);
     }
 
+    /**
+     * @return bool
+     */
     public function canCancelIt(): bool
     {
         return static::canCancelSubscription($this->getStatus());
     }
 
-    public static function canCancelSubscription($currentStatus): bool
+    /**
+     * @param string $currentStatus
+     * @return bool
+     * @phpcs:disable
+     */
+    public static function canCancelSubscription(string $currentStatus): bool
     {
-        return in_array($currentStatus,[
+        return in_array($currentStatus, [
             static::STATUS_ACTIVE,
             static::STATUS_PAUSED,
         ]);

@@ -35,14 +35,6 @@ class InitialCost extends Template
     }
 
     /**
-     * @return mixed
-     */
-    public function getSource()
-    {
-        return $this->getParentBlock()->getSource();
-    }
-
-    /**
      * @return $this
      * @throws NoSuchEntityException
      * @description add rebill costs to total orders and calculate them if they don't exist
@@ -83,5 +75,13 @@ class InitialCost extends Template
         }
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSource()
+    {
+        return $this->getParentBlock()->getSource();
     }
 }

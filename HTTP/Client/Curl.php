@@ -39,16 +39,6 @@ class Curl extends \Magento\Framework\HTTP\Client\Curl
     }
 
     /**
-     * @param $uri
-     * @return void
-     * @throws Exception
-     */
-    public function delete($uri)
-    {
-        $this->makeRequest("DELETE", $uri);
-    }
-
-    /**
      * @param $method
      * @param $uri
      * @param $params
@@ -114,5 +104,15 @@ class Curl extends \Magento\Framework\HTTP\Client\Curl
             $this->doError(curl_error($this->_ch));
         }
         curl_close($this->_ch);
+    }
+
+    /**
+     * @param $uri
+     * @return void
+     * @throws Exception
+     */
+    public function delete($uri)
+    {
+        $this->makeRequest("DELETE", $uri);
     }
 }

@@ -148,16 +148,6 @@ class Edit extends Template
     }
 
     /**
-     * @param $cardId
-     * @return mixed|null
-     */
-    public function getCard($cardId)
-    {
-        $customerEmail = $this->session->getCustomer()->getEmail();
-        return $this->card->getCard($cardId, $customerEmail);
-    }
-
-    /**
      * @param $card
      * @return string
      * @description return the credit card expiration date
@@ -169,5 +159,15 @@ class Edit extends Template
         $month = $month > 9 ? $month : '0' . $month;
         $year = substr($year, -2);
         return "$month/$year";
+    }
+
+    /**
+     * @param $cardId
+     * @return mixed|null
+     */
+    public function getCard($cardId)
+    {
+        $customerEmail = $this->session->getCustomer()->getEmail();
+        return $this->card->getCard($cardId, $customerEmail);
     }
 }

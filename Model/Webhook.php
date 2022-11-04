@@ -62,15 +62,19 @@ class Webhook
     /**
      * @param string $type
      * @param array $parameters
+     * @param int|null $queueId
      * @return void
      */
-    public function execute(string $type, array $parameters)
+    public function execute(string $type, array $parameters, int $queueId = null)
     {
         if (!isset($this->webhooks[$type]) || !class_exists($this->webhooks[$type])) {
             return;
         }
         /** @var WebhookAbstract $webhook */
-        $webhook = ObjectManager::getInstance()->create($this->webhooks[$type], ['parameters' => $parameters]);
+        $webhook = ObjectManager::getInstance()->create(
+            $this->webhooks[$type],
+            ['parameters' => $parameters, 'queueId' => $queueId]
+        );
         $webhook->execute();
     }
 }

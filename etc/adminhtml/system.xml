@@ -35,15 +35,17 @@
                         <label>Status for Denied Orders</label>
                         <source_model>Improntus\Rebill\Model\Config\Source\DeniedStatus</source_model>
                     </field>
+                    <field id="failed_reorder_email" translate="label comment" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Email for failed reorder</label>
+                        <comment>Reorders happens when a new payment is placed from rebill or a subscription is about to be payed.</comment>
+                    </field>
+                    <field id="reorder_retry_days" translate="label comment" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Qty of days to retry a reorder in case of failure</label>
+                    </field>
                     <field id="allow_mixed_cart" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Allow mixed cart</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <comment>This option will allow the customer to pay subscription and not subscription products in the same order</comment>
-                    </field>
-                    <field id="enqueue_webhooks" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Enqueue Webhooks</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <comment>If enabled, webhooks will be processed by a queue message system. Turning off this option may cause performance issues.</comment>
                     </field>
                     <field id="subscription_product_text" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Text for subscription products</label>

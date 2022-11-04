@@ -10,11 +10,19 @@ abstract class WebhookAbstract
     protected $parameters;
 
     /**
+     * @var int
+     */
+    protected $queueId;
+
+    /**
      * @param array $parameters
+     * @param int|null $queueId
      */
     public function __construct(
-        array $parameters = []
+        array $parameters = [],
+        ?int  $queueId = null
     ) {
+        $this->queueId = $queueId;
         $this->parameters = $parameters;
     }
 

@@ -35,7 +35,7 @@ class Gateway extends AbstractSource
             $this->_options = [];
             $this->_options[] = [
                 'value' => null,
-                'label' => __('None selected')
+                'label' => __('None selected'),
             ];
             foreach ($gateways as $item) {
                 if ($item['status'] != 'ACCEPTED') {
@@ -43,7 +43,7 @@ class Gateway extends AbstractSource
                 }
                 $this->_options[] = [
                     'value' => $item['id'],
-                    'label' => "{$item['type']} - {$item['country']} - {$item['description']}"
+                    'label' => "{$item['type']} - {$item['country']} - {$item['description']}",
                 ];
             }
         }

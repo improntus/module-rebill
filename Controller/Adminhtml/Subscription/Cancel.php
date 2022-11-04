@@ -91,22 +91,31 @@ class Cancel extends Action
 
         /** @var EntitySubscription $subscription */
         $subscription = $subscriptionPackage['subscription'];
-        if (is_null($subscription) || ( ! $this->canExecuteChange($subscription))) {
+        if (is_null($subscription) || (!$this->canExecuteChange($subscription))) {
             $this->messageManager->addErrorMessage($this->getCantExecuteChangeMessage());
             return $this->_redirect('*/*/index');
         }
 
         try {
-            $this->changeStatus($this->subscriptionRepository,$subscription);
-            $this->changeStatus($this->shipmentRepository,$subscriptionPackage['shipment']);
+            $this->changeStatus($this->subscriptionRepository, $subscription);
+            $this->changeStatus($this->shipmentRepository, $subscriptionPackage['shipment']);
             foreach ($subscriptionPackage['subscription_list'] as $_subscription) {
-                $this->changeStatus($this->subscriptionRepository,$_subscription);
+                $this->changeStatus($this->subscriptionRepository, $_subscription);
             }
             $this->messageManager->addSuccessMessage(__('The subscription was cancelled.'));
         } catch (Exception $exception) {
             $this->messageManager->addErrorMessage(__('There was an error cancelling the subscription. Error: %1', $exception->getMessage()));
         }
         return $this->_redirect('*/*/index');
+    }
+
+    /**
+     * @param EntitySubscription $subscription
+     * @return bool
+     */
+    protected function canExecuteChange(EntitySubscription $subscription): bool
+    {
+        return $subscription->canCancelIt();
     }
 
     /**
@@ -117,7 +126,7 @@ class Cancel extends Action
      */
     protected function changeStatus(
         SubscriptionRepository|ShipmentRepository $repository,
-        EntitySubscription|EntityShipment|null $subscription = null
+        EntitySubscription|EntityShipment|null    $subscription = null
     ) {
         if (is_null($subscription)) {
             return;
@@ -125,14 +134,5 @@ class Cancel extends Action
         $this->rebillSubscription->cancelSubscription($subscription->getRebillId(), $this->customerEmail);
         $subscription->setStatus(EntitySubscription::STATUS_CANCELLED);
         $repository->save($subscription);
-    }
-
-    /**
-     * @param EntitySubscription $subscription
-     * @return bool
-     */
-    protected function canExecuteChange( EntitySubscription $subscription): bool
-    {
-        return $subscription->canCancelIt();
     }
 }

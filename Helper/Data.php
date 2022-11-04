@@ -10,18 +10,14 @@ namespace Improntus\Rebill\Helper;
 use Exception;
 use Improntus\Rebill\Logger\Logger;
 use Magento\Catalog\Model\Product;
-use Magento\Quote\Model\QuoteRepository;
 use Magento\Catalog\Model\ProductFactory;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
-use Magento\Framework\Registry;
-use Magento\Quote\Model\Quote;
-use Magento\Quote\Model\Quote\Item\OptionFactory;
-use Magento\Sales\Model\Order;
-use Magento\SalesRule\Model\Rule;
 use Magento\Framework\Pricing\Helper\Data as CurrencyHelper;
+use Magento\Framework\Registry;
+use Magento\Quote\Model\QuoteRepository;
 
 class Data extends AbstractHelper
 {

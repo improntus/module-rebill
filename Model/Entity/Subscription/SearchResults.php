@@ -30,14 +30,6 @@ class SearchResults extends \Magento\Framework\Api\SearchResults implements Sear
     }
 
     /**
-     * @return DataInterface[]
-     */
-    public function getItems()
-    {
-        return $this->_get(self::KEY_ITEMS) === null ? [] : $this->_get(self::KEY_ITEMS);
-    }
-
-    /**
      * @return DataInterface|null
      */
     public function getFirstItem()
@@ -46,6 +38,14 @@ class SearchResults extends \Magento\Framework\Api\SearchResults implements Sear
             return $this->getItems()[array_key_first($this->getItems())];
         }
         return null;
+    }
+
+    /**
+     * @return DataInterface[]
+     */
+    public function getItems()
+    {
+        return $this->_get(self::KEY_ITEMS) === null ? [] : $this->_get(self::KEY_ITEMS);
     }
 
     /**

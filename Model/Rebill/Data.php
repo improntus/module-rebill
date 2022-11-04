@@ -27,9 +27,9 @@ class Data extends Rebill
      * @param CacheInterface $cacheManager
      */
     public function __construct(
-        Curl    $curl,
-        Config  $configHelper,
-        Gateway $gateway,
+        Curl           $curl,
+        Config         $configHelper,
+        Gateway        $gateway,
         CacheInterface $cacheManager
     ) {
         $this->gateway = $gateway;

@@ -3,28 +3,32 @@
 namespace Improntus\Rebill\Gateway\Command;
 
 use Exception;
-use Improntus\Rebill\Model\Rebill\Payment as RebillPayment;
 use Improntus\Rebill\Model\Entity\Payment\Repository as PaymentRepository;
-use Magento\Payment\Gateway\CommandInterface;
+use Improntus\Rebill\Model\Rebill\Payment as RebillPayment;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Payment\Gateway\Command\ResultInterface;
+use Magento\Payment\Gateway\CommandInterface;
 
 class Refund implements CommandInterface
 {
     /**
      * @var RebillPayment $rebillPayment
      */
-    protected RebillPayment $rebillPayment;
+    protected $rebillPayment;
 
     /**
      * @var PaymentRepository $paymentRepository
      */
-    protected PaymentRepository $paymentRepository;
+    protected $paymentRepository;
 
+    /**
+     * @param RebillPayment $rebillPayment
+     * @param PaymentRepository $paymentRepository
+     */
     public function __construct(
-        RebillPayment $rebillPayment,
+        RebillPayment     $rebillPayment,
         PaymentRepository $paymentRepository
-    )
-    {
+    ) {
         $this->rebillPayment = $rebillPayment;
         $this->paymentRepository = $paymentRepository;
     }
@@ -32,7 +36,7 @@ class Refund implements CommandInterface
     /**
      * @param array $commandSubject
      * @return ResultInterface|void|null
-     * @throws \Exception
+     * @throws CouldNotSaveException
      */
     public function execute(array $commandSubject)
     {
@@ -45,17 +49,16 @@ class Refund implements CommandInterface
 
         $items = $this->paymentRepository->getEzList([
             'order_id' => ['eq' => $order->getId()],
-            'status' => ['eq' => 'SUCCEEDED']
+            'status'   => ['eq' => 'SUCCEEDED'],
         ])->getItems();
 
         $throwException = false;
         foreach ($items as $payment) {
-
             $response = $this->rebillPayment->refundPaymentById(
                 $payment->getData('rebill_id')
             );
 
-            if (isset($response['statusCode']) || ( ! isset($response['status']))) {
+            if (isset($response['statusCode']) || (!isset($response['status']))) {
                 /** Si es OK, la respuesta no trae 'statusCode', y si trae 'status' (el nuevo estado del pago: "REFUNDED"). */
                 $throwException = true;
                 continue;

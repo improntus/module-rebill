@@ -27,9 +27,9 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
      * @param HydratorInterface|null $hydrator
      */
     public function __construct(
-        SearchCriteriaBuilder $searchCriteriaBuilder,
+        SearchCriteriaBuilder        $searchCriteriaBuilder,
         CollectionProcessorInterface $collectionProcessor = null,
-        ?HydratorInterface $hydrator = null
+        ?HydratorInterface           $hydrator = null
     ) {
         parent::__construct(
             Model::class,
@@ -73,6 +73,16 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
     }
 
     /**
+     * @param array $data
+     * @return DataInterface
+     */
+    public function create(array $data = [])
+    {
+        $result = parent::create($data);
+        return $result instanceof DataInterface ? $result : null;
+    }
+
+    /**
      * @param SearchCriteriaInterface $searchCriteria
      * @return SearchResultInterface
      */
@@ -104,16 +114,6 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
             return parent::save($item);
         }
         return null;
-    }
-
-    /**
-     * @param array $data
-     * @return DataInterface
-     */
-    public function create(array $data = [])
-    {
-        $result = parent::create($data);
-        return $result instanceof DataInterface ? $result : null;
     }
 
     /**

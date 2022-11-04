@@ -21,14 +21,12 @@ class Reactivate extends ChangeStatus
      * @throws CouldNotSaveException
      */
     protected function changeStatus(
-        SubscriptionRepository|ShipmentRepository $repository,
-        EntitySubscription|EntityShipment|null $subscription = null
-    )
-    {
-        if (is_null($subscription)) {
+        $repository,
+        $subscription = null
+    ) {
+        if (!$subscription) {
             return;
         }
-
         $_details = $subscription->getDetails();
         $this->rebillSubscription->updateSubscription(
             $subscription->getRebillId(),
@@ -47,7 +45,7 @@ class Reactivate extends ChangeStatus
      * @param EntitySubscription $subscription
      * @return bool
      */
-    protected function canExecuteChange( EntitySubscription $subscription): bool
+    protected function canExecuteChange(EntitySubscription $subscription): bool
     {
         return $subscription->canReactivateIt();
     }
