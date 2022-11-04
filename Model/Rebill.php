@@ -113,20 +113,24 @@ class Rebill
      */
     protected function auth()
     {
-        $token = $this->cacheManager->load('rebill_token');
-        if (!$token) {
-            $authParams = [
-                'email'    => $this->configHelper->getApiUser(),
-                'password' => $this->configHelper->getApiPassword(),
-            ];
-            $result = $this->request('auth', 'POST', [$this->configHelper->getApiAlias()], $authParams);
-            $this->setToken($result['authToken'] ?? null);
-            $this->cacheManager->save(
-                $result['authToken'] ?? null,
-                'rebill_token',
-                [],
-                72000 //20 hours in seconds
-            );
+        if ($this->configHelper->getUseApiKey()) {
+            $token = $this->configHelper->getApiKey();
+        } else {
+            $token = $this->cacheManager->load('rebill_token');
+            if (!$token) {
+                $authParams = [
+                    'email'    => $this->configHelper->getApiUser(),
+                    'password' => $this->configHelper->getApiPassword(),
+                ];
+                $result = $this->request('auth', 'POST', [$this->configHelper->getApiAlias()], $authParams);
+                $this->setToken($result['authToken'] ?? null);
+                $this->cacheManager->save(
+                    $result['authToken'] ?? null,
+                    'rebill_token',
+                    [],
+                    72000 //20 hours in seconds
+                );
+            }
         }
         return $token;
     }

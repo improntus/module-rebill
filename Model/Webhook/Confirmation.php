@@ -136,7 +136,7 @@ class Confirmation extends WebhookAbstract
                     if ($doInvoice && $_payment['payment']['status'] !== 'SUCCEEDED') {
                         $doInvoice = false;
                     }
-                    if ($doCancel && $_payment['payment']['status'] !== 'CANCELLED') {
+                    if ($doCancel && $_payment['payment']['status'] !== 'FAILED') {
                         $doCancel = false;
                     }
                     $order->addCommentToStatusHistory(json_encode($_payment));

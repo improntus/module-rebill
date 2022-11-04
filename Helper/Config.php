@@ -135,6 +135,22 @@ class Config extends Subscription
     /**
      * @return string
      */
+    public function getApiKey()
+    {
+        return (string)$this->getPaymentConfig('api_options/api_key');
+    }
+
+    /**
+     * @return bool
+     */
+    public function getUseApiKey()
+    {
+        return (bool)$this->getPaymentConfig('api_options/use_api_key');
+    }
+
+    /**
+     * @return string
+     */
     public function getApiUser()
     {
         return (string)$this->getPaymentConfig('api_options/user_email');
