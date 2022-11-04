@@ -25,9 +25,9 @@ class PaymentChangeStatus extends WebhookAbstract
 {
     private const MAPS_STATUS = [
         'SUCCEEDED' => 'processing',
-        'PENDING'   => 'pending',
-        'REFUNDED'  => 'closed',
-        'CANCELLED' => 'canceled',
+        'PENDING' => 'pending',
+        'REFUNDED' => 'closed',
+        'FAILED' => 'canceled',
     ];
 
     /**
@@ -71,7 +71,8 @@ class PaymentChangeStatus extends WebhookAbstract
         CreditmemoFactory $creditMemoFactory,
         CreditmemoService $creditMemoService,
         array             $parameters = []
-    ) {
+    )
+    {
         $this->creditMemoFactory = $creditMemoFactory;
         $this->creditMemoService = $creditMemoService;
         $this->invoiceProcessor = $invoiceProcessor;
@@ -123,12 +124,12 @@ class PaymentChangeStatus extends WebhookAbstract
                 }
             }
         }
-        if ($newStatus == 'CANCELLED') {
+        if ($newStatus == 'FAILED') {
             if ($orderModel->canCancel()) {
                 $paymentList = $this->paymentRepository->getEzList(['order_id' => $paymentModel->getOrderId()]);
                 $doCancel = true;
                 foreach ($paymentList->getItems() as $payment) {
-                    if ($payment->getStatus() != 'CANCELLED' && $doCancel) {
+                    if ($payment->getStatus() != 'FAILED' && $doCancel) {
                         $doCancel = false;
                     }
                 }
