@@ -117,6 +117,8 @@ Years,Años
 Delete,Borrar
 "The frequency should be bigger than 0.","La frecuencia debe ser mayor que 0."
 "The Max Recurring Payments should be bigger equal to 0 or bigger than 1.","Los pagos recurrentes máximos deben ser mayores, iguales a 0 o mayores a 1."
+"The Max Recurring Payments should be a number integer.", "Los pagos recurrentes máximos deben ser un numero entero"
+"There are duplicate rows.", "Hay filas duplicadas."
 "Cancel Subscription","Cancelar suscripción"
 "You are about to cancel a subscription. Are you sure?","Está a punto de cancelar una suscripción. ¿Está seguro?"
 Ok,Ok
