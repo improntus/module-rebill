@@ -70,10 +70,10 @@
                 <group id="api_options" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Api Options</label>
                     <attribute type="expanded">1</attribute>
-                    <field id="use_api_key" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <!--<field id="use_api_key" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Use Api Key</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    </field>
+                    </field>-->
                     <field id="api_key" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Api Key</label>
                         <depends>
