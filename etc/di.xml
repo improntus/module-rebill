@@ -133,6 +133,7 @@
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="refund" xsi:type="string">Improntus\Rebill\Gateway\Command\Refund</item>
+                <item name="initialize" xsi:type="string">Improntus\Rebill\Gateway\Command\Initialize</item>
             </argument>
         </arguments>
     </virtualType>
