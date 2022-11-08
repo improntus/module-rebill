@@ -112,7 +112,7 @@ Save,Save
 "Edit Frequencies","Edit Frequencies"
 Months,Months
 Years,Years
-"If it is 0 the subscription will be cyclical","If it is 0 the subscription will be cyclical"
+"If it is 0 the subscription will be recurrent","If it is 0 the subscription will be recurrent"
 Delete,Delete
 "The frequency should be bigger than 0.","The frequency should be bigger than 0."
 "The Max Recurring Payments should be bigger equal to 0 or bigger than 1.","The Max Recurring Payments should be bigger equal to 0 or bigger than 1."
