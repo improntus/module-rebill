@@ -209,7 +209,7 @@ class Reorder
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    public function execute(Order $_order, array $frequencies, string $subscription, int $queueId)
+    public function execute(Order $_order, array $frequencies, string $subscription, ?int $queueId)
     {
         $newCartData = $this->buildNewCartData($_order, $frequencies);
         if (!$newCartData['items']) {
@@ -261,7 +261,9 @@ class Reorder
             try {
                 $this->addError(__('Order #%1', $_order->getIncrementId()));
                 $this->addError(__('Subscription: %1', $subscription));
-                $this->addError(__('Queue Id: %1', $queueId));
+                if ($queueId) {
+                    $this->addError(__('Queue Id: %1', $queueId));
+                }
                 $to = [$this->helperConfig->getFailedReorderEmail()];
                 $email = new Zend_Mail();
                 $email->setSubject("Subscription Reorder Failed");
