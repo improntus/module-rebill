@@ -115,6 +115,7 @@ class Rebill
     {
         if ($this->configHelper->getUseApiKey()) {
             $token = $this->configHelper->getApiKey();
+            $this->setToken($token);
         } else {
             $token = $this->cacheManager->load('rebill_token');
             if (!$token) {
@@ -130,9 +131,11 @@ class Rebill
                     [],
                     72000 //20 hours in seconds
                 );
+            } else {
+                $this->setToken($token);
             }
         }
-        return $token;
+        return $this->getToken();
     }
 
     /**
