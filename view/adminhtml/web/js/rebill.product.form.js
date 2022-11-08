@@ -88,6 +88,11 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
                 frequencyModal.openModal();
             });
 
+            const disabledTypes = [''];
+            self.disableFrequencyButton('.admin__control-select',
+                disabledTypes,
+                buttonElement);
+
             document.addEventListener("click", e => {
                 if (e.target.matches(".action-close")) {
                     self.removeValidateClass();
@@ -206,22 +211,32 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
                 lstErrorMsg.add($t('The Max Recurring Payments should be bigger equal to 0 or bigger than 1.'));
             }
 
-            if(isNaN(frequencyObj.recurringPayments) || elemt.recurringPayments.val().includes(".")){
+            if (isNaN(frequencyObj.recurringPayments) || elemt.recurringPayments.val().includes(".")) {
                 elemt.recurringPayments.addClass("rebill-invalid");
                 lstErrorMsg.add($t('The Max Recurring Payments should be a number integer.'));
             }
 
             return msg;
         },
-        getFrequencieElemt: function (trElem){
+        getFrequencieElemt: function (trElem) {
             return {
-                id :$(trElem).find('[data-type="id"]'),
-                frequency : $(trElem).find('[data-type="frequency"]'),
-                frequencyType : $(trElem).find('[data-type="frequency-type"]'),
-                recurringPayments : $(trElem).find('[data-type="max-recurring-payments"]'),
-                price : $(trElem).find('[data-type="price"]'),
-                initialCost : $(trElem).find('[data-type="initial-cost"]'),
+                id: $(trElem).find('[data-type="id"]'),
+                frequency: $(trElem).find('[data-type="frequency"]'),
+                frequencyType: $(trElem).find('[data-type="frequency-type"]'),
+                recurringPayments: $(trElem).find('[data-type="max-recurring-payments"]'),
+                price: $(trElem).find('[data-type="price"]'),
+                initialCost: $(trElem).find('[data-type="initial-cost"]'),
             }
+        },
+        disableFrequencyButton: function (elementId, typesDisabled, buttonElement) {
+            $(elementId).change(function () {
+                let select = this;
+                if (typesDisabled.includes(select.options[select.selectedIndex].value)) {
+                    buttonElement.prop('disabled', true);
+                } else {
+                    buttonElement.prop('disabled', false);
+                }
+            })
         }
     });
 
