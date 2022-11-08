@@ -245,7 +245,7 @@ class Reorder
                 'shipping_discount_amount'                  => $order->getShippingDiscountAmount(),
                 'shipping_discount_tax_compensation_amount' => $order->getShippingDiscountTaxCompensationAmount(),
             ],
-            'payment'          => $order->getPayment(),
+            'payment'          => $oldQuote->getPayment(),
             'payment_method'   => $order->getPayment()->getMethod(),
         ];
     }
