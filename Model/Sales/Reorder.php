@@ -15,7 +15,7 @@ use Magento\Catalog\Model\ProductFactory;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Mail\EmailMessageInterfaceFactory;
+use Magento\Framework\Mail\Message;
 use Magento\Framework\Mail\TransportInterfaceFactory;
 use Magento\Framework\Model\AbstractExtensibleModel;
 use Magento\Quote\Api\CartManagementInterface;
@@ -68,11 +68,6 @@ class Reorder
     private $mailTransportFactory;
 
     /**
-     * @var EmailMessageInterfaceFactory
-     */
-    private $emailMessageFactory;
-
-    /**
      * @var array
      */
     private $errors = [];
@@ -84,7 +79,6 @@ class Reorder
      * @param CustomerCartResolver $customerCartProvider
      * @param OrderInfoBuyRequestGetter $orderInfoBuyRequestGetter
      * @param TransportInterfaceFactory $mailTransportFactory
-     * @param EmailMessageInterfaceFactory $emailMessageFactory
      * @param Config $helperConfig
      */
     public function __construct(
@@ -94,10 +88,8 @@ class Reorder
         CustomerCartResolver         $customerCartProvider,
         OrderInfoBuyRequestGetter    $orderInfoBuyRequestGetter,
         TransportInterfaceFactory    $mailTransportFactory,
-        EmailMessageInterfaceFactory $emailMessageFactory,
         Config                       $helperConfig
     ) {
-        $this->emailMessageFactory = $emailMessageFactory;
         $this->mailTransportFactory = $mailTransportFactory;
         $this->helperConfig = $helperConfig;
         $this->customerCartProvider = $customerCartProvider;
@@ -172,8 +164,8 @@ class Reorder
                 if ($queueId) {
                     $this->addError(__('Queue Id: %1', $queueId));
                 }
-                $message = $this->emailMessageFactory->create();
-                $message->setFrom($this->helperConfig->getConfig('trans_email/ident_general/email'));
+                $message = new Message();
+                $message->setFromAddress($this->helperConfig->getConfig('trans_email/ident_general/email'));
                 $message->addTo($this->helperConfig->getFailedReorderEmail());
                 $message->setSubject("Subscription Reorder Failed");
                 $message->setBodyText(json_encode($this->errors, JSON_PRETTY_PRINT));
