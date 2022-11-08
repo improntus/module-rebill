@@ -19,14 +19,16 @@ class Rebill
      * @var Config
      */
     protected $configHelper;
+
+    /**
+     * @var string|null
+     */
+    protected $token;
+
     /**
      * @var Curl
      */
     private $curl;
-    /**
-     * @var SessionManagerInterface
-     */
-    private $session;
 
     /**
      * @var string
@@ -99,22 +101,13 @@ class Rebill
     }
 
     /**
-     * @param SessionManagerInterface $session
-     * @return $this
-     */
-    public function setSession(SessionManagerInterface $session)
-    {
-        $this->session = $session;
-        return $this;
-    }
-
-    /**
      * @return string|null
      */
     protected function auth()
     {
         if ($this->configHelper->getUseApiKey()) {
             $token = $this->configHelper->getApiKey();
+            $this->setToken($token);
         } else {
             $token = $this->cacheManager->load('rebill_token');
             if (!$token) {
@@ -130,9 +123,11 @@ class Rebill
                     [],
                     72000 //20 hours in seconds
                 );
+            } else {
+                $this->setToken($token);
             }
         }
-        return $token;
+        return $this->getToken();
     }
 
     /**
@@ -236,10 +231,7 @@ class Rebill
      */
     protected function getToken()
     {
-        if (!$this->session) {
-            return null;
-        }
-        return $this->session->getData('rebill_token') ?? null;
+        return $this->token;
     }
 
     /**
@@ -277,10 +269,7 @@ class Rebill
      */
     protected function setToken(?string $token)
     {
-        if (!$this->session) {
-            return null;
-        }
-        $this->session->setData('rebill_token', $token);
+        $this->token = $token;
         return $this;
     }
 }

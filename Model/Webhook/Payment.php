@@ -129,6 +129,7 @@ class Payment extends WebhookAbstract
         $packagesHashes = [];
         $orderId = 0;
         $reordered = false;
+        $throwError = false;
         foreach ($rebillPayment['billingSchedulesId'] as $subscriptionId) {
             $subscription = $this->subscriptionRepository->getByRebillId($subscriptionId);
             if (!$subscription->getId()) {
@@ -138,7 +139,8 @@ class Payment extends WebhookAbstract
                 continue;
             }
             if ($subscription->getPayed() == 1 && !$reordered) {
-                $this->webhookHeadsUp->executeHeadsUp($subscription->getRebillId(), true);
+                $orderGenerated = $this->webhookHeadsUp->executeHeadsUp($subscription->getRebillId(), true);
+                $throwError = !$orderGenerated;
                 $minimumRemainingPayments = 0;
                 $reordered = true;
                 if ($subscription instanceof Model) {
@@ -193,6 +195,9 @@ class Payment extends WebhookAbstract
                     $this->orderRepository->save($order);
                 }
             }
+        }
+        if ($throwError && (isset($orderGenerated) && !$orderGenerated)) {
+            throw new LocalizedException(__('New order cannot be created. Failing to try again later.'));
         }
     }
 
