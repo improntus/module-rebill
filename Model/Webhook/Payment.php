@@ -119,7 +119,7 @@ class Payment extends WebhookAbstract
     {
         $_payment = $this->getParameter('payment');
         $minimumRemainingPayments = 1;
-        if (isset($_payment['id'])) {
+        if (!isset($_payment['id'])) {
             return;
         }
         $rebillPayment = $this->rebillPayment->getPaymentById($_payment['id']);

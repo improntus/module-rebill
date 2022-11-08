@@ -93,55 +93,43 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
                     self.removeValidateClass();
                 }
             });
-
         },
         saveFrequencies: function () {
             let frequencies = [];
-            let errorMsg = "";
+            let errorMsgArray = new Set();
             let self = this;
             $('#rebill-frequency-modal table tbody tr').each(function () {
-                let id = parseInt($(this).find('[data-type="id"]').text());
-                let frequencyElemt = $(this).find('[data-type="frequency"]');
-                let frequencyTypeElemt = $(this).find('[data-type="frequency-type"]');
-                let recurringPaymentsElemt = $(this).find('[data-type="max-recurring-payments"]');
-                let priceElemt = $(this).find('[data-type="price"]');
-                let initialCostElemt = $(this).find('[data-type="initial-cost"]');
-
-                let frequency = parseInt(frequencyElemt.val());
-                let frequencyType = frequencyTypeElemt.val();
-                let recurringPayments = parseInt(recurringPaymentsElemt.val());
-                let price = parseInt(priceElemt.val());
-                let initialCost = parseInt(initialCostElemt.val());
-
-                errorMsg += self.getErrorMsg(frequencyElemt, recurringPaymentsElemt, frequency, recurringPayments)
+                let elemt = self.getFrequencieElemt(this);
 
                 let frequencyObj = {
-                    id: id,
-                    frequency: frequency,
-                    frequencyType: frequencyType,
-                    recurringPayments: recurringPayments,
-                    price: price,
-                    initialCost: initialCost,
+                    id: parseInt(elemt.id.text()),
+                    frequency: parseInt(elemt.frequency.val()),
+                    frequencyType: elemt.frequencyType.val(),
+                    recurringPayments: parseInt(elemt.recurringPayments.val()),
+                    price: parseInt(elemt.price.val()),
+                    initialCost: parseInt(elemt.initialCost.val()),
                 }
 
+                self.getErrorMsg(elemt, frequencyObj, errorMsgArray);
+
                 if (frequencies.some(x => x.frequency === frequencyObj.frequency &&
-                    x.frequencyType === frequencyType &&
-                    x.recurringPayments === recurringPayments &&
-                    x.price === price &&
-                    x.initialCost === initialCost
+                    x.frequencyType === frequencyObj.frequencyType &&
+                    x.recurringPayments === frequencyObj.recurringPayments &&
+                    x.price === frequencyObj.price &&
+                    x.initialCost === frequencyObj.initialCost
                 )) {
-                    $(this).addClass("rebill-invalid");
-                    errorMsg += "There are duplicate rows."
+                    $(this).addClass("rebill-row-invalid");
+                    errorMsgArray.add($t("There are duplicate rows."));
                 }
 
                 frequencies.push(frequencyObj);
             });
-            if (errorMsg === "") {
+            if (errorMsgArray.size === 0) {
                 $('[name="product[rebill_frequency]"]').val(JSON.stringify(frequencies)).change();
             } else {
-                window.alert(errorMsg);
+                window.alert(([...errorMsgArray].join("\n")));
             }
-            return errorMsg !== "";
+            return errorMsgArray.size > 0;
         },
         addFrequencyRow: function (frequency, modal) {
             if (this.options.is_product_child) {
@@ -205,25 +193,35 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
                 $(this).removeClass("rebill-invalid");
             });
         },
-        getErrorMsg: function (frequencyElemt, recurringPaymentsElemt, frequency, recurringPayments) {
+        getErrorMsg: function (elemt, frequencyObj, lstErrorMsg) {
 
             let msg = "";
-            if (frequency <= 0) {
-                frequencyElemt.addClass("rebill-invalid");
-                msg += $t('The frequency should be bigger than 0.')
+            if (frequencyObj.frequency <= 0) {
+                elemt.frequency.addClass("rebill-invalid");
+                lstErrorMsg.add($t('The frequency should be bigger than 0.'));
             }
 
-            if (recurringPayments === 1 || recurringPayments < 0) {
-                recurringPaymentsElemt.addClass("rebill-invalid");
-                msg += (msg === "" ? "" : `\n`) + $t('The Max Recurring Payments should be bigger equal to 0 or bigger than 1.')
+            if (frequencyObj.recurringPayments === 1 || frequencyObj.recurringPayments < 0) {
+                elemt.recurringPayments.addClass("rebill-invalid");
+                lstErrorMsg.add($t('The Max Recurring Payments should be bigger equal to 0 or bigger than 1.'));
             }
 
-            if(isNaN(recurringPayments) || recurringPaymentsElemt.val().includes(".")){
-                recurringPaymentsElemt.addClass("rebill-invalid");
-                msg += `\n` + $t('The Max Recurring Payments should be a number integer.');
+            if(isNaN(frequencyObj.recurringPayments) || elemt.recurringPayments.val().includes(".")){
+                elemt.recurringPayments.addClass("rebill-invalid");
+                lstErrorMsg.add($t('The Max Recurring Payments should be a number integer.'));
             }
 
             return msg;
+        },
+        getFrequencieElemt: function (trElem){
+            return {
+                id :$(trElem).find('[data-type="id"]'),
+                frequency : $(trElem).find('[data-type="frequency"]'),
+                frequencyType : $(trElem).find('[data-type="frequency-type"]'),
+                recurringPayments : $(trElem).find('[data-type="max-recurring-payments"]'),
+                price : $(trElem).find('[data-type="price"]'),
+                initialCost : $(trElem).find('[data-type="initial-cost"]'),
+            }
         }
     });
 
