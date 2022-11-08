@@ -13,11 +13,11 @@ use Improntus\Rebill\Model\Payment\Transaction;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductFactory;
 use Magento\Framework\Exception\CouldNotSaveException;
-use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Mail\EmailMessageInterfaceFactory;
+use Magento\Framework\Mail\TransportInterfaceFactory;
 use Magento\Framework\Model\AbstractExtensibleModel;
-use Magento\Framework\Phrase;
 use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Model\Cart\CustomerCartResolver;
 use Magento\Quote\Model\Quote;
@@ -27,18 +27,10 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Item;
 use Magento\Sales\Model\Reorder\OrderInfoBuyRequestGetter;
-use Magento\Sales\Model\Reorder\Reorder as MagentoReorder;
-use Zend_Mail;
-use Zend_Mail_Exception;
 
 class Reorder
 {
     private const SUBSTITUTE_SHIPPING_METHOD = 'flatrate_flatrate';
-
-    /**
-     * @var MagentoReorder
-     */
-    private $reorder;
 
     /**
      * @var QuoteRepository
@@ -71,139 +63,55 @@ class Reorder
     private $helperConfig;
 
     /**
+     * @var TransportInterfaceFactory
+     */
+    private $mailTransportFactory;
+
+    /**
+     * @var EmailMessageInterfaceFactory
+     */
+    private $emailMessageFactory;
+
+    /**
      * @var array
      */
     private $errors = [];
 
     /**
-     * @param MagentoReorder $reorder
      * @param QuoteRepository $quoteRepository
      * @param CartManagementInterface $cartManagement
      * @param ProductFactory $productFactory
      * @param CustomerCartResolver $customerCartProvider
      * @param OrderInfoBuyRequestGetter $orderInfoBuyRequestGetter
+     * @param TransportInterfaceFactory $mailTransportFactory
+     * @param EmailMessageInterfaceFactory $emailMessageFactory
      * @param Config $helperConfig
      */
     public function __construct(
-        MagentoReorder            $reorder,
-        QuoteRepository           $quoteRepository,
-        CartManagementInterface   $cartManagement,
-        ProductFactory            $productFactory,
-        CustomerCartResolver      $customerCartProvider,
-        OrderInfoBuyRequestGetter $orderInfoBuyRequestGetter,
-        Config                    $helperConfig
+        QuoteRepository              $quoteRepository,
+        CartManagementInterface      $cartManagement,
+        ProductFactory               $productFactory,
+        CustomerCartResolver         $customerCartProvider,
+        OrderInfoBuyRequestGetter    $orderInfoBuyRequestGetter,
+        TransportInterfaceFactory    $mailTransportFactory,
+        EmailMessageInterfaceFactory $emailMessageFactory,
+        Config                       $helperConfig
     ) {
+        $this->emailMessageFactory = $emailMessageFactory;
+        $this->mailTransportFactory = $mailTransportFactory;
         $this->helperConfig = $helperConfig;
         $this->customerCartProvider = $customerCartProvider;
         $this->orderInfoBuyRequestGetter = $orderInfoBuyRequestGetter;
         $this->productFactory = $productFactory;
-        $this->reorder = $reorder;
         $this->quoteRepository = $quoteRepository;
         $this->cartManagement = $cartManagement;
     }
 
     /**
-     * @param Order $order
-     * @param array $frequencies
-     * @return OrderInterface|null
-     * @throws CouldNotSaveException
-     * @throws InputException
-     * @throws LocalizedException
-     * @throws NoSuchEntityException
-     */
-//    public function _execute(Order $order, array $frequencies = [])
-//    {
-//        $oldQuote = $this->quoteRepository->get($order->getQuoteId());
-//        $shippingAddress = $oldQuote->getShippingAddress();
-//        $payment = $oldQuote->getPayment();
-//        $result = $this->reorder->execute($order->getIncrementId(), $order->getStoreId());
-//        /** @var Quote $cart */
-//        $cart = $result->getCart();
-//        $cart->setStore($oldQuote->getStore());
-//        $cart->setShippingAddress($shippingAddress);
-//        if ($frequencies) {
-//            /** @var Quote\Item $item */
-//            foreach ($cart->getAllVisibleItems() as $item) {
-//                $frequencyOption = $item->getOptionByCode('rebill_subscription');
-//                if (!$frequencyOption) {
-//                    if ($children = $item->getChildren()) {
-//                        foreach ($children as $child) {
-//                            $cart->removeItem($child->getId());
-//                        }
-//                    }
-//                    $cart->removeItem($item->getId());
-//                    continue;
-//                }
-//                $frequencyOption = json_decode($frequencyOption->getValue(), true);
-//                $_frequencyQty = $frequencyOption['frequency'] ?? 0;
-//                $frequency = [
-//                    'frequency'      => $_frequencyQty ?? 0,
-//                    'frequency_type' => $frequencyOption['frequencyType'] ?? 'months',
-//                ];
-//                if (isset($frequencyOption['recurringPayments']) && $frequencyOption['recurringPayments']) {
-//                    $frequency['recurring_payments'] = (int)$frequencyOption['recurringPayments'];
-//                }
-//                $frequencyHash = hash('md5', implode('-', $frequency));
-//                $remove = true;
-//                foreach ($frequencies as $sku => $_frequency) {
-//                    if ($_frequency == $frequencyHash && $item->getSku() == $sku) {
-//                        $remove = false;
-//                        break;
-//                    }
-//                }
-//                if ($remove) {
-//                    if ($children = $item->getChildren()) {
-//                        foreach ($children as $child) {
-//                            $cart->removeItem($child->getId());
-//                        }
-//                    }
-//                    $cart->removeItem($item->getId());
-//                    continue;
-//                }
-//                $productPrice = $item->getPrice();
-//                if ($product = $item->getProduct()) {
-//                    $productPrice = $frequencyOption['price'] + $product->getFinalPrice();
-//                }
-//                $item->setCustomPrice($productPrice);
-//                $item->setOriginalCustomPrice($productPrice);
-//                $item->getProduct()->setIsSuperMode(true);
-//            }
-//        }
-//        if (count($frequencies) != $cart->getItemsCount()) {
-//            return null;
-//        }
-//        $shippingAddress = $shippingAddress
-//            ->setShippingMethod($order->getShippingMethod())
-//            ->setCollectShippingRates(true)
-//            ->collectShippingRates();
-//        $cart->setShippingAddress($shippingAddress);
-//        $cart->setBillingAddress($oldQuote->getBillingAddress());
-//        $cart->setPayment($payment);
-//        $cart->collectTotals();
-//        $this->quoteRepository->save($cart);
-//        $cart->getShippingAddress()
-//            ->setCollectShippingRates(true)
-//            ->collectShippingRates();
-//        // if shipping method doesn't apply anymore, then flatrate is selected
-//        // and the shipping amount will be equal to the latest order
-//        if (!$cart->getShippingAddress()->getShippingMethod()) {
-//            $cart->getShippingAddress()->setShippingMethod('flatrate_flatrate');
-//            $cart->getShippingAddress()->setShippingAmount($order->getShippingAmount());
-//            $cart->getShippingAddress()->setShippingTaxAmount($order->getShippingTaxAmount());
-//            $cart->getShippingAddress()->setShippingDiscountAmount($order->getShippingDiscountAmount());
-//            $cart->getShippingAddress()->setBaseShippingAmount($order->getBaseShippingAmount());
-//            $cart->getShippingAddress()->setBaseShippingTaxAmount($order->getBaseShippingTaxAmount());
-//            $cart->getShippingAddress()->setBaseShippingDiscountAmount($order->getBaseShippingDiscountAmount());
-//        }
-//        $cart->getPayment()->setMethod($payment->getMethod());
-//        return $this->cartManagement->submit($cart);
-//    }
-
-    /**
      * @param Order $_order
      * @param array $frequencies
      * @param string $subscription
-     * @param int $queueId
+     * @param int|null $queueId
      * @return AbstractExtensibleModel|OrderInterface|object|null
      * @throws CouldNotSaveException
      * @throws LocalizedException
@@ -264,13 +172,14 @@ class Reorder
                 if ($queueId) {
                     $this->addError(__('Queue Id: %1', $queueId));
                 }
-                $to = [$this->helperConfig->getFailedReorderEmail()];
-                $email = new Zend_Mail();
-                $email->setSubject("Subscription Reorder Failed");
-                $email->setBodyText(json_encode($this->errors, JSON_PRETTY_PRINT));
-                $email->setFrom($this->helperConfig->getConfig('trans_email/ident_general/email'));
-                $email->addTo($to);
-                $email->send();
+                $message = $this->emailMessageFactory->create();
+                $message->setFrom($this->helperConfig->getConfig('trans_email/ident_general/email'));
+                $message->addTo($this->helperConfig->getFailedReorderEmail());
+                $message->setSubject("Subscription Reorder Failed");
+                $message->setBodyText(json_encode($this->errors, JSON_PRETTY_PRINT));
+                $transport = $this->mailTransportFactory->create(['message' => $message]);
+                $transport->sendMessage();
+                $this->helperConfig->logInfo('Reorder Failed. Email Sended.');
             } catch (Exception $exception) {
                 $this->helperConfig->logError($exception->getMessage());
             }
