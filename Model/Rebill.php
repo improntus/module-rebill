@@ -19,14 +19,16 @@ class Rebill
      * @var Config
      */
     protected $configHelper;
+
+    /**
+     * @var string|null
+     */
+    protected $token;
+
     /**
      * @var Curl
      */
     private $curl;
-    /**
-     * @var SessionManagerInterface
-     */
-    private $session;
 
     /**
      * @var string
@@ -96,16 +98,6 @@ class Rebill
         } else {
             $this->baseUrl = 'https://api.rebill.to';
         }
-    }
-
-    /**
-     * @param SessionManagerInterface $session
-     * @return $this
-     */
-    public function setSession(SessionManagerInterface $session)
-    {
-        $this->session = $session;
-        return $this;
     }
 
     /**
@@ -239,10 +231,7 @@ class Rebill
      */
     protected function getToken()
     {
-        if (!$this->session) {
-            return null;
-        }
-        return $this->session->getData('rebill_token') ?? null;
+        return $this->token;
     }
 
     /**
@@ -280,10 +269,7 @@ class Rebill
      */
     protected function setToken(?string $token)
     {
-        if (!$this->session) {
-            return null;
-        }
-        $this->session->setData('rebill_token', $token);
+        $this->token = $token;
         return $this;
     }
 }
