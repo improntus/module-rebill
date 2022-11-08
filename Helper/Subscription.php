@@ -273,10 +273,10 @@ class Subscription extends Data
     private function getFirstPartDesc(string $frequencyType, int $frequency, string $price)
     {
         if ($frequency == 1) {
-            $period = __($frequencyType == 'months' ? 'monthly' : 'yearly');
+            $period = $frequencyType == 'months' ? __('monthly') : __('yearly');
             $description = __('%1 for %2', $period, $price);
         } else {
-            $period = __($frequencyType == 'months' ? 'months' : 'years');
+            $period = $frequencyType == 'months' ? __('months') : __('years');
             $description = __('every %1 %2 for %3', $frequency, $period, $price);
         }
         return $description;
