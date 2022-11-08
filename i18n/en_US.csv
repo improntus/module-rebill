@@ -24,7 +24,7 @@
 "Unable to refund payment on Rebill.","Unable to refund payment on Rebill."
 "%1 with a sign-up fee of %2","%1 with a sign-up fee of %2"
 "%1 with a maximum of %2 payments","%1 with a maximum of %2 payments"
-"%1 for %2 %3 with a sign-up fee of %4","%1 for %2 %3 with a sign-up fee of %4"
+"%1 with a maximum of %2 payments with a sign-up fee of %3","%1 with a maximum of %2 payments with a sign-up fee of %3"
 "months' 'monthly' 'yearly","months' 'monthly' 'yearly"
 "%1 for %2","%1 for %2"
 "months' 'months' 'years","months' 'months' 'years"
@@ -116,6 +116,7 @@ Years,Years
 Delete,Delete
 "The frequency should be bigger than 0.","The frequency should be bigger than 0."
 "The Max Recurring Payments should be bigger equal to 0 or bigger than 1.","The Max Recurring Payments should be bigger equal to 0 or bigger than 1."
+"The Max Recurring Payments should be a number integer.","The Max Recurring Payments should be a number integer."
 "Cancel Subscription","Cancel Subscription"
 "You are about to cancel a subscription. Are you sure?","You are about to cancel a subscription. Are you sure?"
 Ok,Ok
@@ -175,3 +176,4 @@ Data,Data
 Subscriptions,Subscriptions
 "Subscription Update","Subscription Update"
 "Rebill Payment","Rebill Payment"
+"Pay with rebill","Pay with rebill"

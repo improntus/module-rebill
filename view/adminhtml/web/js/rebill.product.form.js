@@ -41,7 +41,7 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
             let options = {
                 type: 'slide',
                 responsive: true,
-                title: 'Edit Frequencies',
+                title: $.mage.__('Edit Frequencies'),
                 buttons: [{
                     text: $.mage.__('Add Frequency'),
                     class: '',
