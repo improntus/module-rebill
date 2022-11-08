@@ -40,6 +40,16 @@ abstract class WebhookAbstract
     }
 
     /**
+     * @param int $queueId
+     * @return $this
+     */
+    protected function setQueueId(int $queueId)
+    {
+        $this->queueId = $queueId;
+        return $this;
+    }
+
+    /**
      * @param string $parameter
      * @return mixed|null
      */

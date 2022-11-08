@@ -138,6 +138,7 @@ class Payment extends WebhookAbstract
                 continue;
             }
             if ($subscription->getPayed() == 1 && !$reordered) {
+                $this->webhookHeadsUp->setQueueId($this->queueId);
                 $this->webhookHeadsUp->executeHeadsUp($subscription->getRebillId(), true);
                 $minimumRemainingPayments = 0;
                 $reordered = true;
