@@ -268,6 +268,9 @@ class Reorder
         $infoBuyRequest = $this->orderInfoBuyRequestGetter->getInfoBuyRequest($orderItem);
         $infoBuyRequest->setData('frequency', $frequency);
         $addProductResult = $cart->addProduct($product, $infoBuyRequest);
+        if (!is_string($addProductResult) && $addProductResult instanceof Quote\Item) {
+            $cart->addItem($addProductResult);
+        }
         // error happens in case the result is string
         if (is_string($addProductResult)) {
             $errors = array_unique(explode("\n", $addProductResult));

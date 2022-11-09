@@ -5,11 +5,11 @@ namespace Improntus\Rebill\Gateway\Command;
 use Exception;
 use Magento\Payment\Gateway\Command\ResultInterface;
 use Magento\Payment\Gateway\CommandInterface;
+use Magento\Payment\Gateway\Data\OrderAdapterInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Payment;
 use Magento\Sales\Model\OrderFactory;
 use Magento\Sales\Model\OrderRepository;
-use PayPal\Braintree\Gateway\Data\Order\OrderAdapter;
 
 class Initialize implements CommandInterface
 {
@@ -44,7 +44,7 @@ class Initialize implements CommandInterface
         try {
             /** @var Payment $infoInstance */
             $infoInstance = $commandSubject['payment'];
-            /** @var Order|OrderAdapter|\Magento\Payment\Gateway\Data\Order\OrderAdapter $order */
+            /** @var Order|OrderAdapterInterface $order */
             $order = $infoInstance->getOrder();
             if ($order && ($order->getId() || $order->getOrderIncrementId())) {
                 if (!$order instanceof Order) {
