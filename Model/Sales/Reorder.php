@@ -217,7 +217,7 @@ class Reorder
             }
             $product = $this->productFactory->create()->load($item->getProductId());
             if (!$product->getId()) {
-                $this->addError(__('Product %1 doen\'t exists anymore', $item->getSku()));
+                $this->addError(__('Product %1 doesn\'t exists anymore', $item->getSku()));
                 continue;
             }
             if (!$product->isSalable()) {
@@ -276,11 +276,10 @@ class Reorder
         array      $frequency
     ): void {
         $infoBuyRequest = $this->orderInfoBuyRequestGetter->getInfoBuyRequest($orderItem);
+        /** @comment Set initialCost 0 to avoid wrong total calculation */
+        $frequency['initialCost'] = 0;
         $infoBuyRequest->setData('frequency', $frequency);
         $addProductResult = $cart->addProduct($product, $infoBuyRequest);
-        if (!is_string($addProductResult) && $addProductResult instanceof Quote\Item) {
-            $cart->addItem($addProductResult);
-        }
         // error happens in case the result is string
         if (is_string($addProductResult)) {
             $errors = array_unique(explode("\n", $addProductResult));
