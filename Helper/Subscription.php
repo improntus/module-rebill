@@ -220,21 +220,17 @@ class Subscription extends Data
                     );
                 }
             } else {
-                /*$recurringPaymentPeriod = $this->getRecurringPaymentPeriod(
-                    $recurringPayments * $frequency,
-                    $frequencyType
-                );*/
                 if ($initialCost == 0) {
                     return __(
                         '%1 with a maximum of %2 payments',
                         $description,
-                        $recurringPayments - 1
+                        $recurringPayments
                     );
                 } else {
                     return __(
                         '%1 with a maximum of %2 payments with a sign-up fee of %3',
                         $description,
-                        ($recurringPayments * $frequency) - 1,
+                        $recurringPayments,
                         $this->currencyHelper->currencyByStore($initialCost, null, true, false)
                     );
                 }
