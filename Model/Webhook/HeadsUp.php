@@ -170,7 +170,7 @@ class HeadsUp extends WebhookAbstract
                     $this->rebillSubscription->updateSubscription(
                         $shipment->getRebillId(),
                         [
-                            'amount'         => $shippingPrice,
+                            'amount'         => (string)$shippingPrice,
                             'card'           => $rebillSubscription['card'],
                             'nextChargeDate' => $nextChargeDate,
                             'status'         => $rebillSubscription['status'],
@@ -225,7 +225,7 @@ class HeadsUp extends WebhookAbstract
                     $this->rebillSubscription->updateSubscription(
                         $sub->getRebillId(),
                         [
-                            'amount'         => $price,
+                            'amount'         => (string)$price,
                             'card'           => $rebillSubscription['card'],
                             'nextChargeDate' => $rebillSubscription['nextChargeDate'],
                             'status'         => $rebillSubscription['status'],
@@ -247,7 +247,7 @@ class HeadsUp extends WebhookAbstract
                     $this->rebillSubscription->updateSubscription(
                         $_subscription->getRebillId(),
                         [
-                            'amount'         => $_subscription->getDetails()['price']['amount'],
+                            'amount'         => (string)$_subscription->getDetails()['price']['amount'],
                             'card'           => $rebillSubscription['card'],
                             'nextChargeDate' => date('Y-m-d H:i:s', strtotime("+$retryDays days")),
                             'status'         => $rebillSubscription['status'],
