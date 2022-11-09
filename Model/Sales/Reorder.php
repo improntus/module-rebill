@@ -226,10 +226,16 @@ class Reorder
                 'frequency'  => $frequencyOption,
             ];
         }
+        $shippingAddress = clone $oldQuote->getShippingAddress();
+        $billingAddress = clone $oldQuote->getBillingAddress();
+        $shippingAddress->setData('address_id', null);
+        $billingAddress->setData('address_id', null);
+        $payment = clone $oldQuote->getPayment();
+        $payment->setData('payment_id', null);
         return [
             'items'            => $items,
-            'shipping_address' => $oldQuote->getShippingAddress(),
-            'billing_address'  => $oldQuote->getBillingAddress(),
+            'shipping_address' => $shippingAddress,
+            'billing_address'  => $billingAddress,
             'shipping_method'  => $order->getShippingMethod(),
             'shipping_costs'   => [
                 'shipping_amount'                           => $order->getShippingAmount(),
@@ -237,7 +243,7 @@ class Reorder
                 'shipping_discount_amount'                  => $order->getShippingDiscountAmount(),
                 'shipping_discount_tax_compensation_amount' => $order->getShippingDiscountTaxCompensationAmount(),
             ],
-            'payment'          => $oldQuote->getPayment(),
+            'payment'          => $payment,
             'payment_method'   => $order->getPayment()->getMethod(),
         ];
     }
