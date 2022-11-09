@@ -9,6 +9,7 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Payment;
 use Magento\Sales\Model\OrderFactory;
 use Magento\Sales\Model\OrderRepository;
+use PayPal\Braintree\Gateway\Data\Order\OrderAdapter;
 
 class Initialize implements CommandInterface
 {
@@ -43,12 +44,13 @@ class Initialize implements CommandInterface
         try {
             /** @var Payment $infoInstance */
             $infoInstance = $commandSubject['payment'];
+            /** @var Order|OrderAdapter|\Magento\Payment\Gateway\Data\Order\OrderAdapter $order */
             $order = $infoInstance->getOrder();
-            if ($order && ($order->getId() || $order->getIncrementId())) {
+            if ($order && ($order->getId() || $order->getOrderIncrementId())) {
                 if (!$order instanceof Order) {
                     if ($order->getId()) {
                         $order = $this->orderRepository->get($order->getId());
-                    } else if ($incrementId = $order->getIncrementId()) {
+                    } else if ($incrementId = $order->getOrderIncrementId()) {
                         $order = $this->orderFactory->create();
                         $order->loadByIncrementId($incrementId);
                     }
