@@ -116,6 +116,7 @@ class Reorder
             return null;
         }
         $newCart = $this->customerCartProvider->resolve($_order->getCustomerId());
+        $newCart->removeAllItems();
         foreach ($newCartData['items'] as $item) {
             $this->addItemToCart($item['order_item'], $newCart, $item['product'], $item['frequency']);
         }
@@ -158,6 +159,9 @@ class Reorder
             $this->addError($exception->getMessage());
         }
         if ($this->errors) {
+            if (!isset($order) || !$order) {
+                $this->quoteRepository->delete($newCart);
+            }
             try {
                 $this->addError(__('Order #%1', $_order->getIncrementId()));
                 $this->addError(__('Subscription: %1', $subscription));
