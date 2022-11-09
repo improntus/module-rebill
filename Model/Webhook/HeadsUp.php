@@ -19,7 +19,9 @@ use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Model\AbstractExtensibleModel;
 use Magento\Quote\Model\QuoteRepository;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderRepository;
 use Zend_Db_Expr;
@@ -113,13 +115,16 @@ class HeadsUp extends WebhookAbstract
         if (!$result) {
             throw new LocalizedException(__('Order cant be created.'));
         }
+        if (is_array($result)) {
+            throw new Exception(json_encode($result));
+        }
     }
 
     /**
      * @param string $rebillSubscriptionId
      * @param bool $force
      * @param bool $fromPayment
-     * @return bool
+     * @return array|false|AbstractExtensibleModel|OrderInterface|Order|object|null
      * @throws CouldNotSaveException
      * @throws InputException
      * @throws LocalizedException
@@ -154,7 +159,7 @@ class HeadsUp extends WebhookAbstract
         /** @var \Improntus\Rebill\Model\Entity\SubscriptionShipment\Model $shipment */
         if ($shipment = $package['shipment']) {
             if ($shipment->getId()) {
-                if ($order) {
+                if ($order instanceof Order) {
                     $shippingPrice = array_sum([
                         $order->getShippingAmount(),
                         $order->getShippingTaxAmount(),
@@ -178,7 +183,7 @@ class HeadsUp extends WebhookAbstract
                     );
                     $shipment->setNextSchedule($nextChargeDate);
                 }
-                if ($order) {
+                if ($order instanceof Order) {
                     $shipment->setPayed(0);
                     $shipment->setOrderId($order->getId());
                 }
@@ -188,7 +193,7 @@ class HeadsUp extends WebhookAbstract
                 $this->shipmentRepository->save($shipment);
             }
         }
-        if ($order) {
+        if ($order instanceof Order) {
             $quote = $this->quoteRepository->get($order->getQuoteId());
             /** @var Order\Item $orderItem */
             foreach ($order->getAllVisibleItems() as $orderItem) {
@@ -259,6 +264,6 @@ class HeadsUp extends WebhookAbstract
                 $this->subscriptionRepository->save($_subscription);
             }
         }
-        return (bool)$order;
+        return is_array($order) ? $order : null;
     }
 }

@@ -140,7 +140,7 @@ class Payment extends WebhookAbstract
             }
             if ($subscription->getPayed() == 1 && !$reordered) {
                 $orderGenerated = $this->webhookHeadsUp->executeHeadsUp($subscription->getRebillId(), true);
-                $throwError = !$orderGenerated;
+                $throwError = !$orderGenerated || is_array($orderGenerated);
                 $minimumRemainingPayments = 0;
                 $reordered = true;
                 if ($subscription instanceof Model) {
@@ -196,8 +196,12 @@ class Payment extends WebhookAbstract
                 }
             }
         }
-        if ($throwError && (isset($orderGenerated) && !$orderGenerated)) {
-            throw new LocalizedException(__('New order cannot be created. Failing to try again later.'));
+        if ($throwError && (isset($orderGenerated) && (!$orderGenerated || is_array($orderGenerated)))) {
+            if (is_array($orderGenerated)) {
+                throw new Exception(json_encode($orderGenerated));
+            } else {
+                throw new LocalizedException(__('New order cannot be created. Failing to try again later.'));
+            }
         }
     }
 

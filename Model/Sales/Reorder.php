@@ -104,7 +104,7 @@ class Reorder
      * @param array $frequencies
      * @param string $subscription
      * @param int|null $queueId
-     * @return AbstractExtensibleModel|OrderInterface|object|null
+     * @return array|AbstractExtensibleModel|OrderInterface|object|null
      * @throws CouldNotSaveException
      * @throws LocalizedException
      * @throws NoSuchEntityException
@@ -176,7 +176,7 @@ class Reorder
                 $this->helperConfig->logError($exception->getMessage());
             }
         }
-        return $order ?? null;
+        return $order ?? $this->errors;
     }
 
     /**
