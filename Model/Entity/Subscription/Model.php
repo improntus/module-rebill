@@ -17,6 +17,7 @@ class Model extends AbstractModel implements DataInterface
     public const STATUS_ACTIVE = 'ACTIVE';
     public const STATUS_PAUSED = 'PAUSED';
     public const STATUS_DEFAULT = 'DEFAULT';
+    public const STATUS_RETRY = 'RETRYING';
     public const STATUS_CANCELLED = 'CANCELLED';
     public const STATUS_FINISHED = 'FINISHED';
 
@@ -215,6 +216,8 @@ class Model extends AbstractModel implements DataInterface
         return in_array($this->getStatus(), [
             static::STATUS_ACTIVE,
             static::STATUS_PAUSED,
+            static::STATUS_DEFAULT,
+            static::STATUS_RETRY,
         ]);
     }
 
