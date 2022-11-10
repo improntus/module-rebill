@@ -204,7 +204,7 @@ class Payment extends WebhookAbstract
             if (is_array($orderGenerated)) {
                 throw new Exception(json_encode($orderGenerated));
             } else {
-                throw new LocalizedException(__('New order cannot be created. Failing to try again later.'));
+                throw new LocalizedException(__('New order cannot be created. Check the order products and try again.'));
             }
         }
     }
