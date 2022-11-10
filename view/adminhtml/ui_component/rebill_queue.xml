@@ -70,7 +70,7 @@
             <settings>
                 <filter>false</filter>
                 <sortable>false</sortable>
-                <label translate="true">Data</label>
+                <label translate="true">Error</label>
             </settings>
         </column>
         <actionsColumn name="actions" class="Improntus\Rebill\Ui\Component\Listing\Column\QueueActions">

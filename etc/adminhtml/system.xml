@@ -42,6 +42,11 @@
                     <field id="reorder_retry_days" translate="label comment" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Qty of days to retry a reorder in case of failure</label>
                     </field>
+                    <field id="use_old_prices_on_new_payment" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Use old prices on New Payment Webhook</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>When a new payment is received without a previous heads up, then you can use the prices from the last order to create the new one or use the new prices to update the subscriptions on rebill.</comment>
+                    </field>
                     <field id="allow_mixed_cart" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Allow mixed cart</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

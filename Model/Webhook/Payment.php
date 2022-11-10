@@ -139,7 +139,11 @@ class Payment extends WebhookAbstract
                 continue;
             }
             if ($subscription->getPayed() == 1 && !$reordered) {
-                $orderGenerated = $this->webhookHeadsUp->executeHeadsUp($subscription->getRebillId(), true);
+                $orderGenerated = $this->webhookHeadsUp->executeHeadsUp(
+                    $subscription->getRebillId(),
+                    true,
+                    true
+                );
                 $throwError = !$orderGenerated || is_array($orderGenerated);
                 $minimumRemainingPayments = 0;
                 $reordered = true;

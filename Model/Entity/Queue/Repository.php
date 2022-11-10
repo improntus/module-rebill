@@ -72,11 +72,15 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
     /**
      * @param int $id
      * @param string $status
+     * @param string|null $date
      * @return bool
      */
-    public function validateStatus(int $id, string $status)
+    public function validateStatus(int $id, string $status, ?string $date = null)
     {
         $result = $this->getById($id);
+        if ($status == 'failed') {
+            return $result->getStatus() == $status && strtotime($result->getUpdatedAt()) <= strtotime($date ?: '-7 days');
+        }
         return $result->getStatus() == $status;
     }
 

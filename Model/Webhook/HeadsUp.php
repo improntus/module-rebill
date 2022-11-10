@@ -154,6 +154,9 @@ class HeadsUp extends WebhookAbstract
             $hashes[$details['sku']] = $price->getFrequencyHash();
         }
         $retryDays = ((int)$this->configHelper->getReorderRetryDays()) ?: 7;
+        if ($fromPayment) {
+            $this->reorder->setUseOldPrices($this->configHelper->getUseOldPricesOnNewPayment());
+        }
         /** @var Order $_order */
         $order = $this->reorder->execute($_order, $hashes, $subscription->getRebillId(), $this->queueId);
         /** @var \Improntus\Rebill\Model\Entity\SubscriptionShipment\Model $shipment */

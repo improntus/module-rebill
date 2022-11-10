@@ -73,6 +73,11 @@ class Reorder
     private $errors = [];
 
     /**
+     * @var bool
+     */
+    private $useOldPrices = false;
+
+    /**
      * @param QuoteRepository $quoteRepository
      * @param CartManagementInterface $cartManagement
      * @param ProductFactory $productFactory
@@ -82,13 +87,13 @@ class Reorder
      * @param Config $helperConfig
      */
     public function __construct(
-        QuoteRepository              $quoteRepository,
-        CartManagementInterface      $cartManagement,
-        ProductFactory               $productFactory,
-        CustomerCartResolver         $customerCartProvider,
-        OrderInfoBuyRequestGetter    $orderInfoBuyRequestGetter,
-        TransportInterfaceFactory    $mailTransportFactory,
-        Config                       $helperConfig
+        QuoteRepository           $quoteRepository,
+        CartManagementInterface   $cartManagement,
+        ProductFactory            $productFactory,
+        CustomerCartResolver      $customerCartProvider,
+        OrderInfoBuyRequestGetter $orderInfoBuyRequestGetter,
+        TransportInterfaceFactory $mailTransportFactory,
+        Config                    $helperConfig
     ) {
         $this->mailTransportFactory = $mailTransportFactory;
         $this->helperConfig = $helperConfig;
@@ -137,14 +142,15 @@ class Reorder
             $shippingMethodError = $exception->getMessage();
         }
         $newCart->setPayment($newCartData['payment']);
-        $newCart->collectTotals();
-        if (!$shippingAddress->getShippingMethod()) {
+        if (!$shippingAddress->getShippingMethod() || $this->useOldPrices) {
             $this->addError(__(
                 'The selected shipping method cannot be selected. Reason: %',
                 $shippingMethodError
                 ?? "The shipping method '{$newCartData['shipping_method']}' doesn\'t apply to the current cart"
             ));
-            $shippingAddress->setShippingMethod(self::SUBSTITUTE_SHIPPING_METHOD);
+            if (!$shippingAddress->getShippingMethod()) {
+                $shippingAddress->setShippingMethod(self::SUBSTITUTE_SHIPPING_METHOD);
+            }
             $shippingAddress->setShippingAmount($newCartData['shipping_costs']['shipping_amount']);
             $shippingAddress->setShippingTaxAmount($newCartData['shipping_costs']['shipping_tax_amount']);
             $shippingAddress->setShippingDiscountAmount($newCartData['shipping_costs']['shipping_discount_amount']);
@@ -156,6 +162,8 @@ class Reorder
             $shippingAddress->setBaseShippingDiscountAmount($newCartData['shipping_costs']['shipping_discount_amount']);
         }
         $newCart->getPayment()->setMethod($newCartData['payment_method']);
+        $newCart->setTotalsCollectedFlag(false);
+        $newCart->collectTotals();
         $this->quoteRepository->save($newCart);
         try {
             $order = $this->cartManagement->submit($newCart);
@@ -286,10 +294,16 @@ class Reorder
         /** @comment Set initialCost 0 to avoid wrong total calculation */
         $frequency['initialCost'] = 0;
         $infoBuyRequest->setData('frequency', $frequency);
-        $addProductResult = $cart->addProduct($product, $infoBuyRequest);
+        $newCartItem = $cart->addProduct($product, $infoBuyRequest);
+        if ($newCartItem instanceof Quote\Item) {
+            if ($this->useOldPrices) {
+                $newCartItem->setCustomPrice($orderItem->getPrice());
+            }
+            $newCartItem->calcRowTotal();
+        }
         // error happens in case the result is string
-        if (is_string($addProductResult)) {
-            $errors = array_unique(explode("\n", $addProductResult));
+        if (is_string($newCartItem)) {
+            $errors = array_unique(explode("\n", $newCartItem));
             foreach ($errors as $error) {
                 $this->addCartItemErrorMessage($orderItem, $product, $error);
             }
@@ -310,5 +324,15 @@ class Reorder
         $this->addError($message
             ? __('Could not add the product with SKU "%1" to the shopping cart: %2', $sku, $message)
             : __('Could not add the product with SKU "%1" to the shopping cart', $sku));
+    }
+
+    /**
+     * @param $useOldPrices
+     * @return $this
+     */
+    public function setUseOldPrices($useOldPrices = false)
+    {
+        $this->useOldPrices = $useOldPrices;
+        return $this;
     }
 }
