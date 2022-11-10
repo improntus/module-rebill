@@ -117,6 +117,10 @@ class Reorder
         }
         $newCart = $this->customerCartProvider->resolve($_order->getCustomerId());
         $newCart->removeAllItems();
+        foreach ($newCart->getAllAddresses() as $address) {
+            $address->delete();
+        }
+        $newCart->removeAllAddresses();
         foreach ($newCartData['items'] as $item) {
             $this->addItemToCart($item['order_item'], $newCart, $item['product'], $item['frequency']);
         }
@@ -233,9 +237,12 @@ class Reorder
         $shippingAddress = clone $oldQuote->getShippingAddress();
         $billingAddress = clone $oldQuote->getBillingAddress();
         $shippingAddress->setData('address_id', null);
+        $shippingAddress->setData('quote_id', null);
         $billingAddress->setData('address_id', null);
+        $billingAddress->setData('quote_id', null);
         $payment = clone $oldQuote->getPayment();
         $payment->setData('payment_id', null);
+        $payment->setData('quote_id', null);
         return [
             'items'            => $items,
             'shipping_address' => $shippingAddress,
