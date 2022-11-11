@@ -174,7 +174,7 @@ class HeadsUp extends WebhookAbstract
                     $shippingPrice = $shipment->getDetails()['price']['amount'];
                     $nextChargeDate = date('Y-m-d H:i:s', strtotime("+$retryDays days"));
                 }
-                if (!$fromPayment) {
+                if (!$fromPayment || !$this->configHelper->getUseOldPricesOnNewPayment()) {
                     $this->rebillSubscription->updateSubscription(
                         $shipment->getRebillId(),
                         [
