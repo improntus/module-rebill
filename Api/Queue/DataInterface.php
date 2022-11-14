@@ -63,4 +63,9 @@ interface DataInterface
      * @return DataInterface
      */
     public function setError(string $error): DataInterface;
+
+    /**
+     * @return string|null
+     */
+    public function getUpdatedAt(): ?string;
 }

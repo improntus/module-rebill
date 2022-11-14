@@ -87,6 +87,14 @@ class Config extends Subscription
     /**
      * @return bool
      */
+    public function getUseOldPricesOnNewPayment()
+    {
+        return (bool)$this->getPaymentConfig('general/use_old_prices_on_new_payment');
+    }
+
+    /**
+     * @return bool
+     */
     public function isEnqueueWebhooksEnabled()
     {
         return true;

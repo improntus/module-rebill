@@ -33,6 +33,8 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
                 self.initFrequencyForm(attribute);
             }
             self.addTooltip(attribute);
+
+
         },
         initFrequencyForm: function (attribute) {
             let self = this;
@@ -89,9 +91,10 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
             });
 
             const disabledTypes = [''];
-            self.disableFrequencyButton('.admin__control-select',
+            self.disableFrequencyButton(
                 disabledTypes,
                 buttonElement);
+            $('[name="product[rebill_subscription_type]"]').change(() => self.disableFrequencyButton(disabledTypes, buttonElement));
 
             document.addEventListener("click", e => {
                 if (e.target.matches(".action-close")) {
@@ -228,15 +231,10 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
                 initialCost: $(trElem).find('[data-type="initial-cost"]'),
             }
         },
-        disableFrequencyButton: function (elementId, typesDisabled, buttonElement) {
-            $(elementId).change(function () {
-                let select = this;
-                if (typesDisabled.includes(select.options[select.selectedIndex].value)) {
-                    buttonElement.prop('disabled', true);
-                } else {
-                    buttonElement.prop('disabled', false);
-                }
-            })
+        disableFrequencyButton: function (typesDisabled, buttonElement) {
+            let subsType = $('[name="product[rebill_subscription_type]"]');
+            let disabled = typesDisabled.includes(subsType.val());
+            buttonElement.prop('disabled', disabled);
         }
     });
 

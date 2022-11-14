@@ -100,4 +100,12 @@ class Model extends AbstractModel implements DataInterface
         $this->setData('error', $error);
         return $this;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getUpdatedAt(): ?string
+    {
+        return $this->getData('updated_at');
+    }
 }

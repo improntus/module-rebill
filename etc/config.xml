@@ -51,5 +51,16 @@
                 </api_options>
             </improntus_rebill>
         </payment>
+        <carriers>
+            <rebill>
+                <model>Improntus\Rebill\Model\Carrier\Rebill</model>
+                <active>1</active>
+                <title>Rebill</title>
+                <name>Rebill</name>
+                <price>0.00</price>
+                <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
+                <sallowspecific>0</sallowspecific>
+            </rebill>
+        </carriers>
     </default>
 </config>

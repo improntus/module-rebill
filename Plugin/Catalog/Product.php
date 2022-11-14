@@ -8,6 +8,7 @@
 namespace Improntus\Rebill\Plugin\Catalog;
 
 use Improntus\Rebill\Helper\Config;
+use Magento\Framework\Registry;
 
 class Product
 {
@@ -17,11 +18,19 @@ class Product
     protected $configHelper;
 
     /**
+     * @var Registry
+     */
+    protected $registry;
+
+    /**
      * @param Config $configHelper
+     * @param Registry $registry
      */
     public function __construct(
-        Config $configHelper
+        Config   $configHelper,
+        Registry $registry
     ) {
+        $this->registry = $registry;
         $this->configHelper = $configHelper;
     }
 
@@ -32,9 +41,11 @@ class Product
      */
     public function afterIsSalable(\Magento\Catalog\Model\Product $subject, $result)
     {
-        $subscriptionType = $subject->getData('rebill_subscription_type');
-        if ($subscriptionType == 'subscription' && !$this->configHelper->isLoggedIn()) {
-            $result = false;
+        if (!$this->registry->registry('rebill_reorder_data')) {
+            $subscriptionType = $subject->getData('rebill_subscription_type');
+            if ($subscriptionType == 'subscription' && !$this->configHelper->isLoggedIn()) {
+                $result = false;
+            }
         }
         return $result;
     }
