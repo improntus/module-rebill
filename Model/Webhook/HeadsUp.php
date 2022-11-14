@@ -267,6 +267,6 @@ class HeadsUp extends WebhookAbstract
                 $this->subscriptionRepository->save($_subscription);
             }
         }
-        return is_array($order) ? $order : null;
+        return $order;
     }
 }
