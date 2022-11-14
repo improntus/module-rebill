@@ -1,12 +1,9 @@
 <?php
-
-use Improntus\Rebill\Block\Payment\Transaction;
-use Magento\Framework\Escaper;
-
 /**
  * @var $block Transaction
- * @var $escaper Escaper
  */
+
+use Improntus\Rebill\Block\Payment\Transaction;
 
 $rebillTransaction = $block->getRebillTransaction();
 ?>
@@ -45,7 +42,7 @@ $rebillTransaction = $block->getRebillTransaction();
         "#rebill-transaction-wrapper": {
             "Magento_Ui/js/core/app": {
                 "components": {
-                    "rebill": <?= $escaper->escapeJs(json_encode($rebillTransaction)) ?>
+                    "rebill": <?= /** @noEscape */ json_encode($rebillTransaction) ?>
                 }
             }
         }
