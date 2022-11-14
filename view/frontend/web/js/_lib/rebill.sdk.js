@@ -7583,7 +7583,7 @@ var Rebill;
             const t = document.getElementById(e);
             if (!t) throw new Error("HTMLElement invalid.");
             this.token && this.getRequest(), window.setReady = () => dispatchEvent(this.isIframeReadyEvent);
-            const r = `\n    <iframe\n      id="rebill_elements"\n      title="rebill_elements"\n      name="rebill_elements"\n      src="${g}"\n      onLoad="setReady()"\n      style="padding: 2px; height: ${this.token?250:140}px; border: unset;"\n    />\n  `;
+            const r = `\n    <iframe\n      id="rebill_elements"\n      title="rebill_elements"\n      name="rebill_elements"\n      src="${g}"\n      onLoad="setReady()"\n      style="padding: 2px; height: ${this.token?250:140}px; border: unset;"\n    ></iframe>\n  `;
             t.innerHTML = r
         }, y.prototype.setMetadata = function(e = {}) {
             const t = {
