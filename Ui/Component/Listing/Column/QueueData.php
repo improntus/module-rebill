@@ -60,7 +60,8 @@ class QueueData extends Column
                         break;
                     case 'heads_up':
                         $item[$name] = "Rebill Subscription: {$parameters['id']}<br>";
-                        $item[$name] .= "Date: {$parameters['_nextChargeDate']}";
+                        $_nextChargeDate = $parameters['_nextChargeDate'] ?? "";
+                        $item[$name] .= "Date: {$_nextChargeDate}";
                         break;
                     case 'confirmation':
                         $item[$name] = "Rebill Invoice: {$parameters['invoice_id']}<br>";
