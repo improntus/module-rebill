@@ -18,6 +18,7 @@ use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Pricing\Helper\Data as CurrencyHelper;
 use Magento\Framework\Registry;
 use Magento\Quote\Model\QuoteRepository;
+use Magento\Customer\Model\SessionFactory;
 
 class Data extends AbstractHelper
 {
@@ -57,6 +58,11 @@ class Data extends AbstractHelper
     protected $quoteRepository;
 
     /**
+     * @var SessionFactory
+     */
+    protected  $sessionFactory;
+
+    /**
      * @param Context $context
      * @param Logger $logger
      * @param Session $customerSession
@@ -74,7 +80,8 @@ class Data extends AbstractHelper
         Registry        $registry,
         CurrencyHelper  $currencyHelper,
         Configurable    $configurableType,
-        QuoteRepository $quoteRepository
+        QuoteRepository $quoteRepository,
+        SessionFactory  $sessionFactory
     ) {
         $this->quoteRepository = $quoteRepository;
         $this->configurableType = $configurableType;
@@ -83,6 +90,7 @@ class Data extends AbstractHelper
         $this->productFactory = $productFactory;
         $this->customerSession = $customerSession;
         $this->logger = $logger;
+        $this->sessionFactory = $sessionFactory;
         parent::__construct($context);
     }
 
@@ -91,7 +99,8 @@ class Data extends AbstractHelper
      */
     public function isLoggedIn()
     {
-        return $this->customerSession->isLoggedIn();
+        $customer = $this->sessionFactory->create();
+        return $customer->getCustomer()->getId() > 0;
     }
 
     /**
