@@ -104,10 +104,6 @@
                         <label>UUID</label>
                         <comment>Unique identifier provided by Rebill</comment>
                     </field>
-                    <field id="integration_mode" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
-                        <label>Integration mode</label>
-                        <source_model>Improntus\Rebill\Model\Config\Source\IntegrationMode</source_model>
-                    </field>
                     <field id="default_gateway" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Default Gateway</label>
                         <source_model>Improntus\Rebill\Model\Config\Source\Gateway</source_model>

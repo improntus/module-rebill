@@ -45,7 +45,6 @@
                     <product_label_text>Subscription</product_label_text>
                 </general>
                 <api_options>
-                    <integration_mode>sandbox</integration_mode>
                     <debug_logs>0</debug_logs>
                     <use_api_key>0</use_api_key>
                 </api_options>

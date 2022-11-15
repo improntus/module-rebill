@@ -191,14 +191,6 @@ class Config extends Subscription
     /**
      * @return string
      */
-    public function getIntegrationMode()
-    {
-        return (string)$this->getPaymentConfig('api_options/integration_mode');
-    }
-
-    /**
-     * @return string
-     */
     public function getCountry()
     {
         $result = (string)$this->getConfig('general/country/default');

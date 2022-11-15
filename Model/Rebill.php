@@ -39,30 +39,30 @@ class Rebill
      * @var string[]
      */
     private $endpoints = [
-        'auth'                      => '/v2/auth/login/%s',
-        'customer_auth'             => '/v2/organization/customer-token',
-        'create_item'               => '/v2/item',
-        'update_item'               => '/v2/item/%s',
-        'create_price'              => '/v2/item/%s/price',
-        'update_price'              => '/v2/item/price/%s',
-        'checkout'                  => '/v2/checkout',
-        'customer_subscriptions'    => '/v2/subscriptions/customer/%s',
-        'identification'            => '/v2/data/identification/%s/%s',
-        'organization_info'         => '/v2/organization',
-        'payment'                   => '/v2/payments/%s',
-        'payment_list'              => '/v2/payments',
-        'payment_subscriptions'     => '/v2/payments/%s/billingSchedules',
-        'card'                      => '/v2/clients/cards/%s',
-        'cards'                     => '/v2/clients/cards',
-        'subscription'              => '/v2/subscriptions/customer/%s',
-        'client_subscription_list'  => '/v2/clients/subscriptions',
-        'client_subscription'       => '/v2/clients/subscriptions/%s',
-        'update_subscription'       => '/v2/subscriptions/%s',
-        'subscription_cards'        => '/v2/subscriptions/%s/customer_cards',
-        'subscription_list'         => '/v2/subscriptions/%s/all',
+        'auth' => '/v2/auth/login/%s',
+        'customer_auth' => '/v2/organization/customer-token',
+        'create_item' => '/v2/item',
+        'update_item' => '/v2/item/%s',
+        'create_price' => '/v2/item/%s/price',
+        'update_price' => '/v2/item/price/%s',
+        'checkout' => '/v2/checkout',
+        'customer_subscriptions' => '/v2/subscriptions/customer/%s',
+        'identification' => '/v2/data/identification/%s/%s',
+        'organization_info' => '/v2/organization',
+        'payment' => '/v2/payments/%s',
+        'payment_list' => '/v2/payments',
+        'payment_subscriptions' => '/v2/payments/%s/billingSchedules',
+        'card' => '/v2/clients/cards/%s',
+        'cards' => '/v2/clients/cards',
+        'subscription' => '/v2/subscriptions/customer/%s',
+        'client_subscription_list' => '/v2/clients/subscriptions',
+        'client_subscription' => '/v2/clients/subscriptions/%s',
+        'update_subscription' => '/v2/subscriptions/%s',
+        'subscription_cards' => '/v2/subscriptions/%s/customer_cards',
+        'subscription_list' => '/v2/subscriptions/%s/all',
         'subscription_change_price' => '/v2/subscriptions/%s/change-plan',
-        'invoice'                   => '/v2/receipts/%s',
-        'refund'                    => '/v2/refund',
+        'invoice' => '/v2/receipts/%s',
+        'refund' => '/v2/refund',
     ];
     /**
      * @var string[]
@@ -92,12 +92,7 @@ class Rebill
         $this->curl = $curl;
         $this->configHelper = $configHelper;
         $this->cacheManager = $cacheManager;
-
-        if ($configHelper->getIntegrationMode() == 'sandbox') {
-            $this->baseUrl = 'https://api.rebill.dev';
-        } else {
-            $this->baseUrl = 'https://api.rebill.to';
-        }
+        $this->baseUrl = 'https://api.rebill.to';
     }
 
     /**
@@ -112,7 +107,7 @@ class Rebill
             $token = $this->cacheManager->load('rebill_token');
             if (!$token) {
                 $authParams = [
-                    'email'    => $this->configHelper->getApiUser(),
+                    'email' => $this->configHelper->getApiUser(),
                     'password' => $this->configHelper->getApiPassword(),
                 ];
                 $result = $this->request('auth', 'POST', [$this->configHelper->getApiAlias()], $authParams);
@@ -150,11 +145,11 @@ class Rebill
         bool   $repeat = true
     ) {
         $origParams = [
-            'endpoint'  => $endpoint,
-            'method'    => $method,
-            'urlData'   => $urlData,
-            'data'      => $data,
-            'options'   => $options,
+            'endpoint' => $endpoint,
+            'method' => $method,
+            'urlData' => $urlData,
+            'data' => $data,
+            'options' => $options,
             'needToken' => $needToken,
         ];
         $token = '';

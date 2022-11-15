@@ -73,38 +73,38 @@ class Transaction extends Template
         if ($documentTypes) {
             $identification['type'] = $documentTypes[0];
         }
-        $integratorMode = $this->configHelper->getIntegrationMode();
-        $apiUrl = $integratorMode == 'sandbox' ? 'https://api.rebill.dev/v2' : 'https://api.rebill.to/v2';
+
+        $apiUrl = 'https://api.rebill.to/v2';
         return [
-            'component'       => 'rebill',
+            'component' => 'rebill',
             'urlConfirmation' => $this->getUrl('rebill/payment/success', ['order_id' => $order->getId()]),
-            'initOptions'     => [
+            'initOptions' => [
                 'organization_id' => $this->configHelper->getApiUuid(),
-                'api_url'         => $apiUrl,
+                'api_url' => $apiUrl,
             ],
-            'rebillOptions'   => [
-                'cardHolder'  => [
-                    'name'           => $billingAddress->getFirstname() . ' ' . $billingAddress->getLastname(),
+            'rebillOptions' => [
+                'cardHolder' => [
+                    'name' => $billingAddress->getFirstname() . ' ' . $billingAddress->getLastname(),
                     'identification' => $identification,
                 ],
-                'customer'    => [
+                'customer' => [
                     'firstName' => $order->getCustomerFirstname(),
-                    'lastName'  => $order->getCustomerLastname(),
-                    'email'     => $order->getCustomerEmail(),
-                    'phone'     => [
+                    'lastName' => $order->getCustomerLastname(),
+                    'email' => $order->getCustomerEmail(),
+                    'phone' => [
                         'countryCode' => '00',
-                        'areaCode'    => '00',
+                        'areaCode' => '00',
                         'phoneNumber' => $billingAddress->getTelephone(),
                     ],
-                    'address'   => [
-                        'street'      => $billingAddress->getStreet()[0],
-                        'number'      => $billingAddress->getStreet()[1] ?? 'none',
-                        'floor'       => $billingAddress->getStreet()[2] ?? 'none',
-                        'apt'         => $billingAddress->getStreet()[3] ?? 'none',
-                        'city'        => $billingAddress->getCity(),
-                        'state'       => $billingAddress->getRegion(),
-                        'zipCode'     => $billingAddress->getPostcode() ?? '',
-                        'country'     => $billingAddress->getCountryId(),
+                    'address' => [
+                        'street' => $billingAddress->getStreet()[0],
+                        'number' => $billingAddress->getStreet()[1] ?? 'none',
+                        'floor' => $billingAddress->getStreet()[2] ?? 'none',
+                        'apt' => $billingAddress->getStreet()[3] ?? 'none',
+                        'city' => $billingAddress->getCity(),
+                        'state' => $billingAddress->getRegion(),
+                        'zipCode' => $billingAddress->getPostcode() ?? '',
+                        'country' => $billingAddress->getCountryId(),
                         'description' => "Billing Address",
                     ],
                 ],
@@ -112,7 +112,7 @@ class Transaction extends Template
                     'prices' => $transaction,
                 ],
             ],
-            'documentTypes'   => $documentTypes,
+            'documentTypes' => $documentTypes,
         ];
     }
 
