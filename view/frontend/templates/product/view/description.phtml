@@ -16,17 +16,21 @@ use Magento\Catalog\Block\Product\View;
 
 /** @var Config $configHelper */
 $configHelper = $this->helper(Config::class);
-$frequencies = $configHelper->getProductRebillSubscriptionDetails($block->getProduct())['frequency'];
+$productRebill = $configHelper->getProductRebillSubscriptionDetails($block->getProduct());
+$frequencies = $productRebill['frequency'];
+$isOnlySubscription = $productRebill['subscription_type'] === "subscription";
 ?>
 <?php if (($count = count($frequencies)) && $configHelper->isLoggedIn()) : ?>
     <div class="rebill-subscription">
-        <div class="check-subscription">
-            <input type="radio" name="use_subscription" value="0" id="one-time-purchase" checked="checked">
-            <label for="one-time-purchase">
-                <?= /** @noEscape */
-                __('One time purchase') ?>
-            </label>
-        </div>
+        <?php if (!$isOnlySubscription) : ?>
+            <div class="check-subscription">
+                <input type="radio" name="use_subscription" value="0" id="one-time-purchase" checked="checked">
+                <label for="one-time-purchase">
+                    <?= /** @noEscape */
+                    __('One time purchase') ?>
+                </label>
+            </div>
+        <?php endif ?>
         <div class="check-subscription">
             <input type="radio" name="use_subscription" value="1" id="use-subscription">
             <label for="use-subscription">
@@ -67,6 +71,11 @@ $frequencies = $configHelper->getProductRebillSubscriptionDetails($block->getPro
                     $(".rebill-subscription .description").show();
                     cartButton.text("<?= $escaper->escapeJs($configHelper->getSubscriptionProductText()) ?>");
                 });
+                if(<?= $isOnlySubscription ?>){
+                    $(".rebill-subscription .description").show();
+                    $("#use-subscription")[0].checked= true;
+                    cartButton.text("<?= $escaper->escapeJs($configHelper->getSubscriptionProductText()) ?>");
+                }
                 $("#one-time-purchase").click(function () {
                     // Restore original Price
                     $("span.price").html(productOriginalPrice);
