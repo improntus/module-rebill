@@ -19,8 +19,9 @@ $configHelper = $this->helper(Config::class);
 $productRebill = $configHelper->getProductRebillSubscriptionDetails($block->getProduct());
 $frequencies = $productRebill['frequency'];
 $isOnlySubscription = $productRebill['subscription_type'] === "subscription";
+
 ?>
-<?php if (($count = count($frequencies)) && $configHelper->isLoggedIn()) : ?>
+<?php if (($count = count($frequencies)) && $configHelper->isLoggedIn() && $productRebill['enable_subscription']) : ?>
     <div class="rebill-subscription">
         <?php if (!$isOnlySubscription) : ?>
             <div class="check-subscription">
@@ -71,11 +72,6 @@ $isOnlySubscription = $productRebill['subscription_type'] === "subscription";
                     $(".rebill-subscription .description").show();
                     cartButton.text("<?= $escaper->escapeJs($configHelper->getSubscriptionProductText()) ?>");
                 });
-                if(<?= $isOnlySubscription ?>){
-                    $(".rebill-subscription .description").show();
-                    $("#use-subscription")[0].checked= true;
-                    cartButton.text("<?= $escaper->escapeJs($configHelper->getSubscriptionProductText()) ?>");
-                }
                 $("#one-time-purchase").click(function () {
                     // Restore original Price
                     $("span.price").html(productOriginalPrice);
@@ -105,4 +101,15 @@ $isOnlySubscription = $productRebill['subscription_type'] === "subscription";
             });
         });
     </script>
+    <?php if ($isOnlySubscription) : ?>
+        <script>
+            require(['jquery'], function ($) {
+                $(document).ready(function () {
+                    $(".rebill-subscription .description").show();
+                    $("#use-subscription")[0].checked = true;
+                    cartButton.text("<?= $escaper->escapeJs($configHelper->getSubscriptionProductText()) ?>");
+                });
+            });
+        </script>
+    <?php endif ?>
 <?php endif ?>
