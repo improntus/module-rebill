@@ -215,7 +215,6 @@ class Model extends AbstractModel implements DataInterface
     {
         return in_array($this->getStatus(), [
             static::STATUS_ACTIVE,
-            static::STATUS_PAUSED,
             static::STATUS_DEFAULT,
             static::STATUS_RETRY,
         ]);
