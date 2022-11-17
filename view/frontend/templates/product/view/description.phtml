@@ -106,8 +106,8 @@ $isOnlySubscription = $productRebill['subscription_type'] === "subscription";
             require(['jquery'], function ($) {
                 $(document).ready(function () {
                     $(".rebill-subscription .description").show();
-                    $("#use-subscription")[0].checked = true;
-                    cartButton.text("<?= $escaper->escapeJs($configHelper->getSubscriptionProductText()) ?>");
+                    $("#use-subscription").hide();
+                    $("#product-addtocart-button").text("<?= $escaper->escapeJs($configHelper->getSubscriptionProductText()) ?>");
                 });
             });
         </script>
