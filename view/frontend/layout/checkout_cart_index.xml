@@ -8,6 +8,12 @@
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
+        <referenceContainer name="cart.summary">
+            <block class="Improntus\Rebill\Block\Message"
+                   name="checkout.cart.summary.summary_message"
+                   template="Improntus_Rebill::checkout/summary/message.phtml"
+                   after="checkout.cart.totals.container" />
+        </referenceContainer>
         <referenceBlock name="checkout.cart.totals">
             <arguments>
                 <argument name="jsLayout" xsi:type="array">

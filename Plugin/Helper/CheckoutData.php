@@ -60,9 +60,7 @@ class CheckoutData
             && !$this->customerSession->isLoggedIn()) {
             return false;
         }
-        if (!$this->configHelper->isMixedCartAllowed()
-            && $this->configHelper->hasQuoteSubscriptionProducts($quote)
-            && $this->configHelper->hasQuoteNoSubscriptionProducts($quote)) {
+        if ($this->configHelper->checkoutHasMixedCartConflict($quote)) {
             return false;
         }
         return $result;

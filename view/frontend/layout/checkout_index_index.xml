@@ -55,6 +55,17 @@
                                                         </item>
                                                     </item>
                                                 </item>
+                                                <item name="itemsBefore" xsi:type="array">
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="totalMessage" xsi:type="array">
+                                                            <item name="component" xsi:type="string">Improntus_Rebill/js/view/checkout/summary/message</item>
+                                                            <item name="displayArea" xsi:type="string">itemsBefore</item>
+                                                            <item name="config" xsi:type="array">
+                                                                <item name="template" xsi:type="string">Improntus_Rebill/checkout/summary/message</item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                </item>
                                             </item>
                                         </item>
                                     </item>

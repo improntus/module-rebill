@@ -131,9 +131,7 @@ class ConfigProvider implements ConfigProviderInterface
         if ($this->configHelper->hasQuoteSubscriptionProducts($quote) && !$rulesMatched) {
             $methodAvailable = false;
         }
-        if (!$this->configHelper->isMixedCartAllowed()
-            && ($this->configHelper->hasQuoteSubscriptionProducts($quote)
-                && $this->configHelper->hasQuoteNoSubscriptionProducts($quote))) {
+        if ($this->configHelper->checkoutHasMixedCartConflict($quote)) {
             $methodAvailable = false;
         }
         return $methodAvailable;

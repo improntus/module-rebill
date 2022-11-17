@@ -1,0 +1,8 @@
+<?php
+/** @var Improntus\Rebill\Block\Message $block */
+?>
+<?php if ($block->getMessage()): ?>
+    <div class="summary-message message-error error message">
+        <span><?php echo $block->getMessage() ?></span>
+    </div>
+<?php endif; ?>
