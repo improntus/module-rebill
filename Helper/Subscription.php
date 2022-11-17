@@ -61,6 +61,7 @@ class Subscription extends Data
         foreach ($quote->getAllItems() as $item) {
             if ($item->getOptionByCode('rebill_subscription') && !$item->getParentItemId()) {
                 $hasSubscriptionProducts = true;
+                break;
             }
         }
         return $hasSubscriptionProducts;
@@ -78,6 +79,7 @@ class Subscription extends Data
         foreach ($quote->getAllItems() as $item) {
             if (!$item->getOptionByCode('rebill_subscription') && !$item->getParentItemId()) {
                 $hasNoSubscriptionProducts = true;
+                break;
             }
         }
         return $hasNoSubscriptionProducts;

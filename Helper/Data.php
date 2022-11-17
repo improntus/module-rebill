@@ -11,6 +11,7 @@ use Exception;
 use Improntus\Rebill\Logger\Logger;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductFactory;
+use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Helper\AbstractHelper;
@@ -60,7 +61,12 @@ class Data extends AbstractHelper
     /**
      * @var SessionFactory
      */
-    protected  $sessionFactory;
+    protected $sessionFactory;
+
+    /**
+     * @var CheckoutSession
+     */
+    protected $_checkoutSession;
 
     /**
      * @param Context $context
@@ -71,6 +77,8 @@ class Data extends AbstractHelper
      * @param CurrencyHelper $currencyHelper
      * @param Configurable $configurableType
      * @param QuoteRepository $quoteRepository
+     * @param SessionFactory $sessionFactory
+     * @param CheckoutSession $checkoutSession
      */
     public function __construct(
         Context         $context,
@@ -81,7 +89,8 @@ class Data extends AbstractHelper
         CurrencyHelper  $currencyHelper,
         Configurable    $configurableType,
         QuoteRepository $quoteRepository,
-        SessionFactory  $sessionFactory
+        SessionFactory  $sessionFactory,
+        CheckoutSession $checkoutSession
     ) {
         $this->quoteRepository = $quoteRepository;
         $this->configurableType = $configurableType;
@@ -91,6 +100,7 @@ class Data extends AbstractHelper
         $this->customerSession = $customerSession;
         $this->logger = $logger;
         $this->sessionFactory = $sessionFactory;
+        $this->_checkoutSession = $checkoutSession;
         parent::__construct($context);
     }
 

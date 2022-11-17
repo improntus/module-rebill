@@ -7,6 +7,9 @@
 
 namespace Improntus\Rebill\Helper;
 
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Quote\Model\Quote;
 use Magento\Store\Model\ScopeInterface;
 
 class Config extends Subscription
@@ -74,6 +77,18 @@ class Config extends Subscription
     public function isMixedCartAllowed()
     {
         return (bool)$this->getPaymentConfig('general/allow_mixed_cart');
+    }
+
+    /**
+     * @return string
+     */
+    public function getCheckOutMixedCartConflictMessage()
+    {
+        $message = $this->getPaymentConfig('general/checkout_mixed_cart_conflict_message');
+        if ( ! strlen($message)) {
+            $message = __("Mixed cart is not allowed");
+        }
+        return (string)$message;
     }
 
     /**
@@ -240,5 +255,24 @@ class Config extends Subscription
         if ($this->isDebugLogsEnabled()) {
             parent::logError($message);
         }
+    }
+
+    /**
+     * @param Quote|null $quote
+     * @return bool
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     */
+    public function checkoutHasMixedCartConflict( ?Quote $quote = null): bool
+    {
+        $quote = ($quote != null) ? $quote : $this->_checkoutSession->getQuote();
+
+        if (!$this->isMixedCartAllowed()
+            && ($this->hasQuoteSubscriptionProducts($quote)
+                && $this->hasQuoteNoSubscriptionProducts($quote))) {
+            return true;
+        }
+
+        return false;
     }
 }

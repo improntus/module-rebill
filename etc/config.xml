@@ -38,6 +38,7 @@
                     <approved_status>processing</approved_status>
                     <denied_status>cancelled</denied_status>
                     <allow_mixed_cart>0</allow_mixed_cart>
+                    <checkout_mixed_cart_conflict_message>Mixed cart is not allowed</checkout_mixed_cart_conflict_message>
                     <enqueue_message>1</enqueue_message>
                     <subscription_product_text>Subscribe</subscription_product_text>
                     <guest_customer_text>Log in to subscribe to this product</guest_customer_text>

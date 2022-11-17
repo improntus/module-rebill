@@ -64,6 +64,18 @@
                 type="Improntus\Rebill\Plugin\Helper\CheckoutData" sortOrder="10"/>
     </type>
 
+    <type name="Magento\Checkout\CustomerData\Cart">
+        <plugin name="Improntus_Rebill::cart_message" type="Improntus\Rebill\Plugin\Checkout\CustomerData\Message"/>
+    </type>
+    <type name="Magento\Checkout\Model\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="Improntus_Rebill::summary_message" xsi:type="object">Improntus\Rebill\Model\ConfigProvider</item>
+            </argument>
+        </arguments>
+    </type>
+
+
     <type name="Magento\Catalog\Model\Product">
         <plugin name="Improntus_Rebill::afterIsSalable" type="Improntus\Rebill\Plugin\Catalog\Product" sortOrder="10"/>
     </type>

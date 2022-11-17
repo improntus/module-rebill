@@ -52,20 +52,24 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <comment>This option will allow the customer to pay subscription and not subscription products in the same order</comment>
                     </field>
-                    <field id="subscription_product_text" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="checkout_mixed_cart_conflict_message" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Checkout mixed cart conflict message</label>
+                        <comment>Message to be displayed if there is a mixed cart conflict at checkout</comment>
+                    </field>
+                    <field id="subscription_product_text" translate="label comment" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Text for subscription products</label>
                         <comment>This text will be shown in product page to let customer know that the product is subscription type.</comment>
                     </field>
-                    <field id="guest_customer_text" translate="label comment" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="guest_customer_text" translate="label comment" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Text for guest customer in subscription products</label>
                         <comment>This text will be shown in product page to let guest customer know that they can subscribe to the product only if they have an account.</comment>
                     </field>
-                    <field id="product_label" translate="label comment" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="product_label" translate="label comment" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Label for Subscription Products</label>
                         <comment>Label in form of a text or image to more easily identify subscription products</comment>
                         <source_model>Improntus\Rebill\Model\Config\Source\ProductLabel</source_model>
                     </field>
-                    <field id="product_label_text" translate="label comment" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="product_label_text" translate="label comment" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Text for Label</label>
                         <depends>
                             <field id="product_label">text</field>
