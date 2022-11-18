@@ -21,6 +21,7 @@ use Magento\Framework\EntityManager\HydratorInterface;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Improntus\Rebill\Model\Entity\Item\Repository as ItemRepository;
+use Improntus\Rebill\Model\Config\Source\CustomerDocumentType;
 
 class Repository extends RepositoryAbstract implements RepositoryInterface
 {
@@ -40,6 +41,11 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
     protected $configHelper;
 
     /**
+     * @var CustomerDocumentType
+     */
+    protected $customerDocumentType;
+
+    /**
      * @param Config $configHelper
      * @param RebillItem $rebillItem
      * @param ItemRepository $itemRepository
@@ -52,12 +58,14 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
         RebillItem                   $rebillItem,
         ItemRepository               $itemRepository,
         SearchCriteriaBuilder        $searchCriteriaBuilder,
+        CustomerDocumentType         $customerDocumentType,
         CollectionProcessorInterface $collectionProcessor = null,
         ?HydratorInterface           $hydrator = null
     ) {
         $this->configHelper = $configHelper;
         $this->rebillItem = $rebillItem;
         $this->itemRepository = $itemRepository;
+        $this->customerDocumentType = $customerDocumentType;
         parent::__construct(
             Model::class,
             Price::class,
@@ -184,6 +192,15 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
                 );
                 if ($rebillPrice) {
                     $item->setRebillPriceId($rebillPrice);
+                    $documentTypes = $this->customerDocumentType->toOptionArray();
+                    $idPriceSetting = $this->rebillItem->createPriceSetting($rebillPrice,
+                        [
+                            'documentRequired' => count($documentTypes) > 0,
+                            'phoneRequired' => true,
+                            'billingAddressRequired' => true,
+                            'showImage' => true,
+                            'redirectUrl' => null,
+                        ]);
                 } else {
                     return $item;
                 }
@@ -191,11 +208,11 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
                 $this->rebillItem->updatePrice(
                     $item->getRebillPriceId(),
                     [
-                        'amount'      => (string)$item->getDetails()['price'],
-                        'type'        => 'fixed',
+                        'amount' => (string)$item->getDetails()['price'],
+                        'type' => 'fixed',
                         'repetitions' => $item->getDetails()['frequency']['recurring_payments'],
-                        'currency'    => (string)$item->getDetails()['currency'],
-                        'gatewayId'   => (string)$item->getDetails()['gateway'],
+                        'currency' => (string)$item->getDetails()['currency'],
+                        'gatewayId' => (string)$item->getDetails()['gateway'],
                     ]
                 );
             }

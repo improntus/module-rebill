@@ -45,6 +45,7 @@ class Rebill
         'update_item' => '/v2/item/%s',
         'create_price' => '/v2/item/%s/price',
         'update_price' => '/v2/item/price/%s',
+        'create_price_settings' => '/v2/item/price/%s/settings',
         'checkout' => '/v2/checkout',
         'customer_subscriptions' => '/v2/subscriptions/customer/%s',
         'identification' => '/v2/data/identification/%s/%s',

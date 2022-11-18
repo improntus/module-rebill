@@ -81,4 +81,14 @@ class Item extends Rebill
         }
         return null;
     }
+
+    public function createPriceSetting(string $priceId, array $data = [])
+    {
+        try {
+            return $this->request('create_price_settings', 'POST', [$priceId], $data);
+        } catch (Exception $exception) {
+            $this->configHelper->logError($exception->getMessage());
+        }
+        return null;
+    }
 }
