@@ -181,3 +181,5 @@ Subscriptions,Suscripciones
 "Rebill Payment","Pago Rebill"
 "Pay with rebill","Pagar con Rebill"
 "New order cannot be created. Check the order products and try again.","No se pudo crear el pedido. Revise los productos e intente nuevamente"
+"Checkout mixed cart conflict message","Mensaje de conflicto de carrito mixto en el Checkout"
+"Message to be displayed if there is a mixed cart conflict at checkout","Mensaje a mostrar si hay conflicto de carrito mixto en el checkout"

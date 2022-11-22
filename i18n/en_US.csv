@@ -178,3 +178,5 @@ Subscriptions,Subscriptions
 "Rebill Payment","Rebill Payment"
 "Pay with rebill","Pay with rebill"
 "New order cannot be created. Check the order products and try again.","New order cannot be created. Check the order products and try again."
+"Checkout mixed cart conflict message","Checkout mixed cart conflict message"
+"Message to be displayed if there is a mixed cart conflict at checkout","Message to be displayed if there is a mixed cart conflict at checkout"
