@@ -44,24 +44,24 @@ class Frequency extends Column
      */
     public function prepareDataSource(array $dataSource)
     {
-        if (isset($dataSource['data']['items'])) {
-            foreach ($dataSource['data']['items'] as &$item) {
-                $name = $this->getData('name');
-                if (isset($item['frequency'])) {
-//                    $item[$name] = $this->subscription->getFrequencyDescription(
-//                        null,
-//                        [
-//                            'frequency'         => $item["frequency"],
-//                            'frequencyType'     => $item["frequency_type"],
-//                            'recurringPayments' => $item["repetitions"] ?? null,
-//                            'initialCost'       => 0,
-//                            'price'             => (float)$item["amount"],
-//                        ],
-//                        (float)$item["amount"]
-//                    );
-                }
-            }
+        if (!isset($dataSource['data']['items'])) {
+            return $dataSource;
         }
+
+        foreach ($dataSource['data']['items'] as &$item) {
+            $name = $this->getData('name');
+            if (!isset($item['frequency'])) {
+                continue;
+            }
+
+            if ($item['frequency'] == 1) {
+                $item[$name] = $item['frequency_type'] == 'months' ? __('monthly') : __('yearly');
+            } else {
+                $item[$name] = __("%1 %2", $item['frequency'], $item['frequency_type']);
+            }
+
+        }
+
         return $dataSource;
     }
 }

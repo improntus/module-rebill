@@ -21,10 +21,11 @@ $product = $block->getProduct();
 $details = $configHelper->getProductRebillSubscriptionDetails($product);
 /** @var Data $currencyHelper */
 $currencyHelper = $this->helper(Data::class);
-$onclick = $configHelper->isLoggedIn() ? '' : "onclick=\"window.location.href='{$block->getUrl('customer/account/login')}'\" style=\"cursor:pointer;\"";
+$isLoggedIn = $configHelper->isLoggedIn();
+$onclick = $isLoggedIn ? '' : "onclick=\"window.location.href='{$block->getUrl('customer/account/login')}'\" style=\"cursor:pointer;\"";
 ?>
 <?php if ($details['enable_subscription']) : ?>
-    <?php if (!$configHelper->isLoggedIn()) : ?>
+    <?php if (!$isLoggedIn) : ?>
         <div class="subscription-text" <?= /** @noEscape */$onclick ?>>
             <span class="text guest-text"><?= $escaper->escapeHtml($configHelper->getGuestCustomerText()) ?></span>
         </div>
