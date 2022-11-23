@@ -85,7 +85,7 @@ class Config extends Subscription
     public function getCheckOutMixedCartConflictMessage()
     {
         $message = $this->getPaymentConfig('general/checkout_mixed_cart_conflict_message');
-        if ( ! strlen($message)) {
+        if (empty($message)) {
             $message = __("Mixed cart is not allowed");
         }
         return (string)$message;
@@ -263,7 +263,7 @@ class Config extends Subscription
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    public function checkoutHasMixedCartConflict( ?Quote $quote = null): bool
+    public function checkoutHasMixedCartConflict(?Quote $quote = null): bool
     {
         $quote = ($quote != null) ? $quote : $this->_checkoutSession->getQuote();
 
