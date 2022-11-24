@@ -114,8 +114,8 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
                     frequency: parseInt(elemt.frequency.val()),
                     frequencyType: elemt.frequencyType.val(),
                     recurringPayments: parseInt(elemt.recurringPayments.val()),
-                    price: parseInt(elemt.price.val()),
-                    initialCost: parseInt(elemt.initialCost.val()),
+                    price: parseFloat(elemt.price.val()),
+                    initialCost: parseFloat(elemt.initialCost.val()),
                 }
 
                 self.getErrorMsg(elemt, frequencyObj, errorMsgArray);
@@ -153,7 +153,7 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
                 .val(frequency.frequencyType ?? 'months').change();
             let maxRecurringPaymentsTooltip = $t('If it is 0 the subscription will be recurrent');
             let recurringPaymentsField = $(`<input min="0" type="number" class="input-text" data-id="${id}" data-type="max-recurring-payments" value="${frequency.recurringPayments}" >&nbsp;<span tooltip="${maxRecurringPaymentsTooltip}" flow="right">?</span>`);
-            let priceField = $(`<input type="number" class="input-text" data-id="${id}" data-type="price" value="${price}" >`);
+            let priceField = $(`<input type="number" class="input-text" data-id="${id}" data-type="price" value="${price}">`);
             let initialCostField = $(`<input min="0" type="number" class="input-text" data-id="${id}" data-type="initial-cost" value="${frequency.initialCost}" >`);
             let actions = $(`<button type="button" class="action button"></button>`).text($t('Delete'));
             $('#rebill-frequency-modal table tbody')
@@ -198,7 +198,7 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
                 frequencyElemt.removeClass("rebill-invalid");
                 let recurringPaymentsElemt = $(this).find('[data-type="max-recurring-payments"]');
                 recurringPaymentsElemt.removeClass("rebill-invalid");
-                $(this).removeClass("rebill-invalid");
+                $(this).removeClass("rebill-row-invalid");
             });
         },
         getErrorMsg: function (elemt, frequencyObj, lstErrorMsg) {

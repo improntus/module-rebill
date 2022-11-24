@@ -88,10 +88,11 @@ $isOnlySubscription = $productRebill['subscription_type'] === "subscription";
                     if ($('#one-time-purchase').is(':checked')) {
                         frequencyPrice = "0";
                     }
+                    let priceElemt = $(".product-info-main span.price");
                     if (containsZeroPrice(frequencyPrice)) {
-                        $("span.price").html(productOriginalPrice);
+                        priceElemt.html(productOriginalPrice);
                     } else {
-                        $("span.price").html(productOriginalPrice + frequencyOperator + frequencyPrice);
+                        priceElemt.html(productOriginalPrice + frequencyOperator + frequencyPrice);
                     }
                 }
 
