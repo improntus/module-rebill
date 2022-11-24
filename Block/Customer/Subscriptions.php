@@ -98,6 +98,7 @@ class Subscriptions extends Template
             ]);
             //phpcs:enable
             $subscriptions->addFieldToFilter('so.customer_id', $this->session->getCustomerId());
+            $subscriptions->getSelect()->order('main_table.created_at DESC');
             $subscriptions->getSelect()->group('package_hash');
             return $subscriptions;
         } catch (Exception $exception) {
