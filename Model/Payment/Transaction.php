@@ -50,8 +50,8 @@ class Transaction
      * @var array
      */
     private array $defaultFrequency = [
-        'frequency'          => 0,
-        'frequency_type'     => 'months',
+        'frequency' => 0,
+        'frequency_type' => 'months',
         'recurring_payments' => 1,
     ];
 
@@ -82,14 +82,14 @@ class Transaction
     }
 
     /**
-         * @return string
-         * phpcs:disable
-         */
+     * @return string
+     * phpcs:disable
+     */
     public static function getDefaultFrequencyHash()
     {
         return self::createHashFromArray([
-            'frequency'          => 0,
-            'frequency_type'     => 'months',
+            'frequency' => 0,
+            'frequency_type' => 'months',
             'recurring_payments' => 1,
         ]);
     }
@@ -111,7 +111,7 @@ class Transaction
             $this->prepareAdditionalItems($order, $quote, $items);
             $rebillDetails = $this->sendItems($order, $items);
             return [
-                'order'          => $order,
+                'order' => $order,
                 'rebill_details' => $rebillDetails,
             ];
         } catch (Exception $exception) {
@@ -156,7 +156,7 @@ class Transaction
                 $frequencyOption = json_decode($frequencyOption->getValue(), true);
                 $_frequencyQty = $frequencyOption['frequency'] ?? 0;
                 $frequency = [
-                    'frequency'      => $_frequencyQty ?? 0,
+                    'frequency' => $_frequencyQty ?? 0,
                     'frequency_type' => $frequencyOption['frequencyType'] ?? 'months',
                 ];
                 if (isset($frequencyOption['recurringPayments']) && $frequencyOption['recurringPayments'] > 0) {
@@ -166,25 +166,25 @@ class Transaction
             $frequencyHash = self::createHashFromArray($frequency);
             $this->frequencyHashes[$frequencyHash] = $frequency;
             $preparedItems[$frequencyHash][] = [
-                'type'           => 'product',
+                'type' => 'product',
                 'frequency_hash' => $frequencyHash,
-                'frequency'      => $frequency,
-                'sku'            => $item->getSku(),
-                'product_name'   => $item->getName(),
-                'price'          => $price,
-                'quantity'       => $itemQty,
-                'gateway'        => $gateway,
-                'currency'       => $this->configHelper->getCurrency(),
+                'frequency' => $frequency,
+                'sku' => $item->getSku(),
+                'product_name' => $item->getName(),
+                'price' => $price,
+                'quantity' => $itemQty,
+                'gateway' => $gateway,
+                'currency' => $this->configHelper->getCurrency(),
             ];
         }
         return $preparedItems;
     }
 
     /**
-         * @param array $array
-         * @return string
-         * phpcs:disable
-         */
+     * @param array $array
+     * @return string
+     * phpcs:disable
+     */
     public static function createHashFromArray(array $array)
     {
         return hash('md5', implode('-', array_map(function ($item) {
@@ -222,15 +222,15 @@ class Transaction
             array_sum($itemsTotals),
         ]);
         $additionalItem = [
-            'type'           => 'additional',
+            'type' => 'additional',
             'frequency_hash' => $defaultFrequencyHash,
-            'frequency'      => $this->defaultFrequency,
-            'sku'            => "order-{$order->getIncrementId()}-additional-costs",
-            'product_name'   => "Order #{$order->getIncrementId()} Additional Costs",
-            'price'          => $total,
-            'quantity'       => 1,
-            'gateway'        => $gateway,
-            'currency'       => $this->configHelper->getCurrency(),
+            'frequency' => $this->defaultFrequency,
+            'sku' => "order-{$order->getIncrementId()}-additional-costs",
+            'product_name' => "Order #{$order->getIncrementId()} Additional Costs",
+            'price' => $total,
+            'quantity' => 1,
+            'gateway' => $gateway,
+            'currency' => $this->configHelper->getCurrency(),
         ];
         if (isset($items[$defaultFrequencyHash]) && count($items) == 1) {
             $additionalItem['price'] += $order->getShippingAmount() + $order->getShippingTaxAmount();
@@ -261,16 +261,16 @@ class Transaction
                 $sku = "shipment-$orderId";
                 $name = "Order #{$orderId} Shipment " . implode(' ', $itemsNames);
                 $items[$hash][] = [
-                    'type'           => 'shipment',
+                    'type' => 'shipment',
                     'frequency_hash' => $hash,
-                    'frequency'      => $frequency,
-                    'sku'            => $sku,
-                    'product_name'   => $sku,
-                    'price_name'     => $name,
-                    'price'          => $shipmentPrice,
-                    'quantity'       => 1,
-                    'gateway'        => $gateway,
-                    'currency'       => $this->configHelper->getCurrency(),
+                    'frequency' => $frequency,
+                    'sku' => $sku,
+                    'product_name' => $sku,
+                    'price_name' => $name,
+                    'price' => $shipmentPrice,
+                    'quantity' => 1,
+                    'gateway' => $gateway,
+                    'currency' => $this->configHelper->getCurrency(),
                 ];
             }
         }
@@ -292,15 +292,15 @@ class Transaction
             if ($hash == $defaultFrequencyHash) {
                 foreach ($_items as $item) {
                     $compiledItems[] = [
-                        'type'           => $item['type'],
+                        'type' => $item['type'],
                         'frequency_hash' => $defaultFrequencyHash,
-                        'frequency'      => $this->defaultFrequency,
-                        'sku'            => $item['sku'],
-                        'product_name'   => $item['price_name'] ?? $item['product_name'],
-                        'price'          => $item['price'],
-                        'quantity'       => $item['quantity'],
-                        'gateway'        => $gateway,
-                        'currency'       => $this->configHelper->getCurrency(),
+                        'frequency' => $this->defaultFrequency,
+                        'sku' => $item['sku'],
+                        'product_name' => $item['price_name'] ?? $item['product_name'],
+                        'price' => $item['price'],
+                        'quantity' => $item['quantity'],
+                        'gateway' => $gateway,
+                        'currency' => $this->configHelper->getCurrency(),
                     ];
                 }
             } else {
@@ -316,7 +316,7 @@ class Transaction
             }
             $rebillPrice = $this->getRebillPrice($item);
             $result[] = [
-                'id'       => $rebillPrice->getRebillPriceId(),
+                'id' => $rebillPrice->getRebillPriceId(),
                 'quantity' => (int)$item['quantity'],
             ];
         }
@@ -330,21 +330,21 @@ class Transaction
      */
     private function getRebillPrice(array $item)
     {
-        $hash = self::createHashFromArray($item);
+        $hash = self::createHashFromArray(self::filterByKeys($item));
         $rebillPrice = $this->priceRepository->getByHash($hash);
         if (!$rebillPrice->getId()) {
             $details = [
-                'amount'      => (string)$item['price'],
-                'type'        => 'fixed',
+                'amount' => (string)$item['price'],
+                'type' => 'fixed',
                 'repetitions' => 1,
-                'currency'    => $item['currency'],
-                'gatewayId'   => $item['gateway'],
+                'currency' => $item['currency'],
+                'gatewayId' => $item['gateway'],
                 'description' => $item['price_name'] ?? $item['product_name'],
-                'enabled'     => true,
+                'enabled' => true,
             ];
             if ($item['frequency']['frequency'] > 0) {
                 $details['frequency'] = [
-                    'type'     => $item['frequency']['frequency_type'],
+                    'type' => $item['frequency']['frequency_type'],
                     'quantity' => (int)$item['frequency']['frequency'],
                 ];
                 $details['repetitions'] = $item['frequency']['recurring_payments'] ?? null;
@@ -361,4 +361,17 @@ class Transaction
         }
         return $rebillPrice;
     }//phpcs:enable
+
+    /**
+     * @param $item
+     * @return array
+     */
+    private function filterByKeys($item)
+    {
+        return array_filter(
+            $item,
+            fn($key) => $key != 'quantity',
+            ARRAY_FILTER_USE_KEY
+        );
+    }
 }
