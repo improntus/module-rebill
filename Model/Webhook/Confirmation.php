@@ -178,7 +178,7 @@ class Confirmation extends WebhookAbstract
                         $model->setRebillId($subscription['id']);
                         $model->setRebillPriceId($price->getRebillPriceId());
                         $model->setOrderId($orderId);
-                        $model->setQuantity(1);
+                        $model->setQuantity($subscription['quantity']);
                         $model->setDetails($subscription);
                         $packageHash = hash('md5', "$orderId-{$price->getFrequencyHash()}");
                         $model->setPackageHash($packageHash);
