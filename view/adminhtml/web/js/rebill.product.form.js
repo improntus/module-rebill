@@ -114,8 +114,8 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
                     frequency: parseInt(elemt.frequency.val()),
                     frequencyType: elemt.frequencyType.val(),
                     recurringPayments: parseInt(elemt.recurringPayments.val()),
-                    price: parseFloat(elemt.price.val()),
-                    initialCost: parseFloat(elemt.initialCost.val()),
+                    price: self.getPriceFormat(elemt.price.val()),
+                    initialCost: self.getPriceFormat(elemt.initialCost.val()),
                 }
 
                 self.getErrorMsg(elemt, frequencyObj, errorMsgArray);
@@ -235,6 +235,19 @@ define(['jquery', 'mage/translate', 'Magento_Ui/js/modal/modal'], function ($, $
             let subsType = $('[name="product[rebill_subscription_type]"]');
             let disabled = typesDisabled.includes(subsType.val());
             buttonElement.prop('disabled', disabled);
+        },
+        getPriceFormat: function (price) {
+            if (!price.includes('.')) {
+                return parseFloat(price);
+            }
+            let decimalNumber = price.split('.').pop();
+            let maxDigitDecimal = 5;
+            decimalNumber = decimalNumber.substring(0, maxDigitDecimal);
+            while (decimalNumber && decimalNumber.slice(-1) === '0') {
+                decimalNumber = decimalNumber.slice(0, -1);
+            }
+
+            return parseFloat(price).toFixed(decimalNumber.length);
         }
     });
 
