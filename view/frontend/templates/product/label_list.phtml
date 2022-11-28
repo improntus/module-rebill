@@ -38,6 +38,7 @@ $configHelper = $this->helper(Config::class);
                     success: function (data) {
                         $.each(data.products, function (id, value) {
                             $(`#product-item-info_${id} .product-image-photo`).parent().append(labelEl);
+                            $(`#product-item-info_${id} button.action.tocart.primary`).hide();
                         });
                     }
                 });
