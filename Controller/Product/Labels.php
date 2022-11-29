@@ -69,7 +69,9 @@ class Labels extends Action implements HttpPostActionInterface
         foreach ($productCollection as $product) {
             $rebillDetails = $this->configHelper->getProductRebillSubscriptionDetails($product);
             if (isset($rebillDetails['enable_subscription']) && $rebillDetails['enable_subscription']) {
-                $rebillItems[$product->getId()] = true;
+                $rebillItem['id'] = $product->getId();
+                $rebillItem['details'] = $rebillDetails;
+                $rebillItems[$product->getId()] = $rebillItem;
             }
         }
         $response = $this->jsonFactory->create();

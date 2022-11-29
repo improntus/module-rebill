@@ -22,23 +22,24 @@ $configHelper = $this->helper(Config::class);
         require(['jquery'], function ($) {
             $(document).ready(function () {
                 let labelType = '<?= $escaper->escapeHtml($labelType) ?>';
-                let labelRebillLogo = '<?= /** @noEscape  */ $block->getViewFileUrl('Improntus_Rebill::images/rebill_logo.png'); ?>';
+                let labelRebillLogo = '<?= /** @noEscape */ $block->getViewFileUrl('Improntus_Rebill::images/rebill_logo.png'); ?>';
                 let labelEl = $('<div class="rebill-product-label"></div>');
                 if (labelType === 'text') {
                     labelEl.append($('<span class="rebill-label-text"></span>').text('<?= $escaper->escapeHtml($configHelper->getProductLabelCustomText()) ?>'));
                 } else {
                     labelEl.append($('<div class="rebill-label-rebill-logo"></div>')
-                        .append($(`<img src='${labelRebillLogo}' alt='<?= /** @noEscape  */ __('Product Subscription with Rebill') ?>'/>`)));
+                        .append($(`<img src='${labelRebillLogo}' alt='<?= /** @noEscape */ __('Product Subscription with Rebill') ?>'/>`)));
                 }
                 $.ajax({
-                    url: "<?= /** @noEscape  */ $block->getUrl('rebill/product/labels') ?>",
+                    url: "<?= /** @noEscape */ $block->getUrl('rebill/product/labels') ?>",
                     type: 'POST',
-                    data: {ids: <?= /** @noEscape  */ json_encode($block->getLoadedProductCollection()->getAllIds()) ?>},
+                    data: {ids: <?= /** @noEscape */ json_encode($block->getLoadedProductCollection()->getAllIds()) ?>},
                     dataType: 'json',
                     success: function (data) {
                         $.each(data.products, function (id, value) {
                             $(`#product-item-info_${id} .product-image-photo`).parent().append(labelEl);
-                            $(`#product-item-info_${id} button.action.tocart.primary`).hide();
+                            if(value.details.subscription_type === "subscription")
+                                $(`#product-item-info_${id} button.action.tocart.primary`).hide();
                         });
                     }
                 });
