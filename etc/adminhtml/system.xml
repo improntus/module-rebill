@@ -23,6 +23,7 @@
                 </field>
                 <field id="sort_order" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Sort Order</label>
+                    <validate>validate-number validate-digits</validate>
                 </field>
                 <group id="general" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>General</label>
@@ -38,6 +39,7 @@
                     <field id="failed_reorder_email" translate="label comment" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Email for failed reorder</label>
                         <comment>Reorders happens when a new payment is placed from rebill or a subscription is about to be payed.</comment>
+                        <validate>validate-email</validate>
                     </field>
                     <field id="reorder_retry_days" translate="label comment" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Qty of days to retry a reorder in case of failure</label>
@@ -97,6 +99,7 @@
                         <depends>
                             <field id="use_api_key">0</field>
                         </depends>
+                        <validate>validate-email</validate>
                     </field>
                     <field id="password" translate="label" type="password" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
                         <label>Api Password</label>
