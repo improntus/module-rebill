@@ -23,13 +23,7 @@ $configHelper = $this->helper(Config::class);
             $(document).ready(function () {
                 let labelType = '<?= $escaper->escapeHtml($labelType) ?>';
                 let labelRebillLogo = '<?= /** @noEscape */ $block->getViewFileUrl('Improntus_Rebill::images/rebill_logo.png'); ?>';
-                let labelEl = $('<div class="rebill-product-label"></div>');
-                if (labelType === 'text') {
-                    labelEl.append($('<span class="rebill-label-text"></span>').text('<?= $escaper->escapeHtml($configHelper->getProductLabelCustomText()) ?>'));
-                } else {
-                    labelEl.append($('<div class="rebill-label-rebill-logo"></div>')
-                        .append($(`<img src='${labelRebillLogo}' alt='<?= /** @noEscape */ __('Product Subscription with Rebill') ?>'/>`)));
-                }
+                let customLabelText = '<?= $escaper->escapeHtml($configHelper->getProductLabelCustomText()) ?>';
                 $.ajax({
                     url: "<?= /** @noEscape */ $block->getUrl('rebill/product/labels') ?>",
                     type: 'POST',
@@ -37,7 +31,15 @@ $configHelper = $this->helper(Config::class);
                     dataType: 'json',
                     success: function (data) {
                         $.each(data.products, function (id, value) {
+                            let labelEl = $('<div class="rebill-product-label"></div>');
+                            if (labelType === 'text') {
+                                labelEl.append($('<span class="rebill-label-text"></span>').text(customLabelText));
+                            } else {
+                                labelEl.append($('<div class="rebill-label-rebill-logo"></div>')
+                                    .append($(`<img src='${labelRebillLogo}' alt='<?= /** @noEscape */ __('Product Subscription with Rebill') ?>'/>`)));
+                            }
                             $(`#product-item-info_${id} .product-image-photo`).parent().append(labelEl);
+
                             if(value.details.subscription_type === "subscription")
                                 $(`#product-item-info_${id} button.action.tocart.primary`).hide();
                         });
