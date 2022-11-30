@@ -221,6 +221,7 @@ class Transaction
             $order->getShippingDiscountTaxCompensationAmount(),
             array_sum($itemsTotals),
         ]);
+        $total = number_format($total, 5);
         $additionalItem = [
             'type' => 'additional',
             'frequency_hash' => $defaultFrequencyHash,
