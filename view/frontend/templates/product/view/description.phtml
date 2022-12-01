@@ -52,9 +52,12 @@ $isOnlySubscription = $productRebill['subscription_type'] === "subscription";
                 <span class="option">
                     <select name="frequency" id="frequency">
                         <?php foreach ($frequencies as $frequency) : ?>
-                            <option value="<?= /** @noEscape */ $frequency['id'] ?>"
-                                    data-price="<?= /** @noEscape */ $configHelper->getFrequencyPriceFormat((float)$frequency['price']); ?>">
-                                <?= /** @noEscape */ $configHelper->getFrequencyDescription($block->getProduct(), $frequency) ?>
+                            <option value="<?= /** @noEscape */
+                            $frequency['id'] ?>"
+                                    data-price="<?= /** @noEscape */
+                                    $configHelper->getFrequencyPriceFormat((float)$frequency['price']); ?>">
+                                <?= /** @noEscape */
+                                $configHelper->getFrequencyDescription($block->getProduct(), $frequency) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -82,7 +85,7 @@ $isOnlySubscription = $productRebill['subscription_type'] === "subscription";
                     addFrequencyPrice();
                 }, 100);
 
-                function addFrequencyPrice(){
+                function addFrequencyPrice() {
                     let frequencyPrice = $("#frequency").find('option:selected').data('price');
                     let frequencyOperator = frequencyPrice.indexOf("-") === -1 ? " +" : " ";
                     if ($('#one-time-purchase').is(':checked')) {
@@ -104,6 +107,7 @@ $isOnlySubscription = $productRebill['subscription_type'] === "subscription";
     </script>
     <?php if ($isOnlySubscription) : ?>
         <script>
+
             require(['jquery'], function ($) {
                 $(document).ready(function () {
                     $(".rebill-subscription .description").show();
@@ -114,4 +118,16 @@ $isOnlySubscription = $productRebill['subscription_type'] === "subscription";
             });
         </script>
     <?php endif ?>
+<?php endif ?>
+
+<?php if ($isOnlySubscription && count($frequencies) == 0) : ?>
+    <script>
+
+        require(['jquery'], function ($) {
+            $(document).ready(function () {
+                let cartButton = $("#product-addtocart-button");
+                cartButton.hide();
+            });
+        });
+    </script>
 <?php endif ?>

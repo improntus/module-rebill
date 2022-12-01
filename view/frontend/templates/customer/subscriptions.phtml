@@ -31,6 +31,7 @@ $subscriptions = $block->getSubscriptions();
                 <th><?= $escaper->escapeHtml(__('Quantity')) ?></th>
                 <th><?= $escaper->escapeHtml(__('Status')) ?></th>
                 <th><?= $escaper->escapeHtml(__('Total')) ?></th>
+                <th><?= $escaper->escapeHtml(__('Iterations Remaining')) ?></th>
                 <th><?= $escaper->escapeHtml(__('Payment Method')) ?></th>
                 <th><?= $escaper->escapeHtml(__('Next Scheduled Payment')) ?></th>
                 <th></th>
@@ -45,6 +46,7 @@ $subscriptions = $block->getSubscriptions();
                     <td><?= $escaper->escapeHtml($details['quantity']) ?></td>
                     <td><?= $escaper->escapeHtml($subscription->getStatus()) ?></td>
                     <td><?= /** @noEscape */ $currencyHelper->currencyByStore((float)$subscription->getData('price')) ?></td>
+                    <td><?= $escaper->escapeHtml($details['remainingIterations']) ?></td>
                     <td><?= $escaper->escapeHtml($block->getPaymentMethod($details, $cards)) ?></td>
                     <td>
                         <?php if ($subscription->hasNextScheduledPayment()): ?>

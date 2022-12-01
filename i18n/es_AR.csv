@@ -97,6 +97,7 @@ Quantity,Cantidad
 Status,Estado
 Total,Total
 "Payment Method","Método de pago"
+"Iterations Remaining", "Iteraciones restantes"
 "Next Scheduled Payment","Próximo pago programado"
 Update,Actualizar
 Pause,Pausar
