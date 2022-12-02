@@ -156,4 +156,13 @@ class Subscriptions extends Template
     {
         return empty($details['remainingIterations']) ? "0" : $details['remainingIterations'];
     }
+
+    public function getTotal($details, $subscription)
+    {
+        $price = $subscription->getData('price');
+        if(empty($details['quantity']) || !$price){
+            return 0;
+        }
+        return (float)$details['quantity'] * (float)$price;
+    }
 }

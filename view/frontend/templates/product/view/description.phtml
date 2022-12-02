@@ -19,9 +19,10 @@ $configHelper = $this->helper(Config::class);
 $productRebill = $configHelper->getProductRebillSubscriptionDetails($block->getProduct());
 $frequencies = $productRebill['frequency'];
 $isOnlySubscription = $productRebill['subscription_type'] === "subscription";
+$isRebillEnabled = $configHelper->isEnabled();
 
 ?>
-<?php if (($count = count($frequencies)) && $configHelper->isLoggedIn() && $productRebill['enable_subscription']) : ?>
+<?php if (($count = count($frequencies)) && $configHelper->isLoggedIn() && $productRebill['enable_subscription'] && $isRebillEnabled) : ?>
     <div class="rebill-subscription">
         <?php if (!$isOnlySubscription) : ?>
             <div class="check-subscription">
@@ -87,7 +88,7 @@ $isOnlySubscription = $productRebill['subscription_type'] === "subscription";
 
                 function addFrequencyPrice() {
                     let frequencyPrice = $("#frequency").find('option:selected').data('price');
-                    let frequencyOperator = frequencyPrice.indexOf("-") === -1 ? " +" : " ";
+                    let frequencyOperator = frequencyPrice.indexOf("-") === -1 ? " + " : " ";
                     if ($('#one-time-purchase').is(':checked')) {
                         frequencyPrice = "0";
                     }
@@ -120,7 +121,7 @@ $isOnlySubscription = $productRebill['subscription_type'] === "subscription";
     <?php endif ?>
 <?php endif ?>
 
-<?php if ($isOnlySubscription && count($frequencies) == 0) : ?>
+<?php if ($isOnlySubscription && (count($frequencies) == 0 || !$isRebillEnabled)) : ?>
     <script>
 
         require(['jquery'], function ($) {
