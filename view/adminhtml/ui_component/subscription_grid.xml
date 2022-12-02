@@ -102,7 +102,7 @@
         <column name="remainingIterations" class="Improntus\Rebill\Ui\Component\Listing\Column\RemainingIterations" sortOrder="10">
             <settings>
                 <filter>false</filter>
-                <label translate="true">Iterations Remaining</label>
+                <label translate="true">Remaining Iterations</label>
             </settings>
         </column>
         <column name="last_charge_date" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">

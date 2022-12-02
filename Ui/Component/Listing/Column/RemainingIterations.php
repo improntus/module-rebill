@@ -42,7 +42,7 @@ class RemainingIterations extends Column
         foreach ($dataSource['data']['items'] as &$item) {
             $name = $this->getData('name');
             if ($item[$name] == "null") {
-                $item[$name] = "";
+                $item[$name] = "0";
             }
         }
 
