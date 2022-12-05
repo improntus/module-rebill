@@ -154,7 +154,7 @@ class Subscriptions extends Template
      */
     public function getRemainingIterationsByDetails($details)
     {
-        return empty($details['remainingIterations']) ? "0" : $details['remainingIterations'];
+        return empty($details['remainingIterations']) ? "-" : $details['remainingIterations'];
     }
 
     public function getTotal($details, $subscription)
