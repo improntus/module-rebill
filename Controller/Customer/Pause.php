@@ -28,14 +28,19 @@ class Pause extends ChangeStatus
             return;
         }
 
+        if($subscription->getStatus() === EntitySubscription::STATUS_PAUSED){
+            return;
+        }
+
         $_details = $subscription->getDetails();
         $this->rebillSubscription->updateSubscription(
             $subscription->getRebillId(),
             [
                 'amount'      => $_details['price']['amount'],
-                'repetitions' => $_details['remainingIterations'],
-                'status'      => EntitySubscription::STATUS_PAUSED,
                 'card'        => $_details['card'],
+                'nextChargeDate' => $_details['nextChargeDate'],
+                'status'      => EntitySubscription::STATUS_PAUSED,
+
             ]
         );
         $subscription->setStatus(EntitySubscription::STATUS_PAUSED);

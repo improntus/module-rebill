@@ -27,14 +27,19 @@ class Reactivate extends ChangeStatus
         if (!$subscription) {
             return;
         }
+
+        if($subscription->getStatus() === EntitySubscription::STATUS_ACTIVE){
+            return;
+        }
+
         $_details = $subscription->getDetails();
         $this->rebillSubscription->updateSubscription(
             $subscription->getRebillId(),
             [
                 'amount'      => $_details['price']['amount'],
-                'repetitions' => $_details['remainingIterations'],
-                'status'      => EntitySubscription::STATUS_ACTIVE,
                 'card'        => $_details['card'],
+                'nextChargeDate' => $_details['nextChargeDate'],
+                'status'      => EntitySubscription::STATUS_ACTIVE,
             ]
         );
         $subscription->setStatus(EntitySubscription::STATUS_ACTIVE);

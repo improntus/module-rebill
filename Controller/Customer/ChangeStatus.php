@@ -114,7 +114,6 @@ abstract class ChangeStatus extends Action
         }
 
         try {
-            $this->changeStatus($this->subscriptionRepository, $subscription);
             $this->changeStatus($this->shipmentRepository, $subscriptionPackage['shipment']);
             foreach ($subscriptionPackage['subscription_list'] as $_subscription) {
                 $this->changeStatus($this->subscriptionRepository, $_subscription);
