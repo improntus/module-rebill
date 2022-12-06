@@ -76,6 +76,9 @@ class SubscriptionChangeStatus extends WebhookAbstract
      */
     private function updateStatus($item, string $newStatus)
     {
+        if ($newStatus === $item->getStatus()) {
+            return;
+        }
         $item->setStatus($newStatus);
         if ($item instanceof SubscriptionModel) {
             $this->subscriptionRepository->save($item);
@@ -86,10 +89,10 @@ class SubscriptionChangeStatus extends WebhookAbstract
         $this->rebillSubscription->updateSubscription(
             $item->getRebillId(),
             [
-                'amount'         => $details["price"]["amount"],
-                'card'           => $details['card'],
+                'amount' => $details["price"]["amount"],
+                'card' => $details['card'],
                 'nextChargeDate' => $details['nextChargeDate'],
-                'status'         => $newStatus,
+                'status' => $newStatus,
             ]
         );
     }
