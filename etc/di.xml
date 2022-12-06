@@ -80,7 +80,7 @@
     </type>
 
     <type name="Magento\Catalog\Block\Product\ListProduct">
-        <plugin name="Improntus_Rebill::afterGetProductCollection" type="Improntus\Rebill\Plugin\Catalog\ListProduct" sortOrder="10"/>
+        <plugin name="Improntus_Rebill::afterGetProductCollection" type="Improntus\Rebill\Plugin\Catalog\ListProduct" sortOrder="10" disabled="true"/>
     </type>
 
     <preference for="Improntus\Rebill\Api\Item\DataInterface" type="Improntus\Rebill\Model\Entity\Item\Model"/>
