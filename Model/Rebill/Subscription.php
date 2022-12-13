@@ -49,7 +49,7 @@ class Subscription extends Rebill
     public function cancelSubscription(string $id, string $customerEmail)
     {
         try {
-            return $this->request('client_subscription', 'DELETE', [$id], ['customerEmail' => $customerEmail]);
+            return $this->request('client_subscription', 'DELETE', [$id], ['customerEmail' => $customerEmail], ['headers'=> ['origin' => 'magento']]);
         } catch (Exception $exception) {
             $this->configHelper->logError($exception->getMessage());
             throw $exception;
@@ -81,7 +81,7 @@ class Subscription extends Rebill
     public function updateSubscription(string $id, array $data)
     {
         try {
-            return $this->request('update_subscription', 'PUT', [$id], $data);
+            return $this->request('update_subscription', 'PUT', [$id], $data, ['headers'=> ['origin' => 'magento']]);
         } catch (Exception $exception) {
             $this->configHelper->logError($exception->getMessage());
             throw $exception;

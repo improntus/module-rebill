@@ -89,9 +89,6 @@ class SubscriptionChangeStatus extends WebhookAbstract
         $this->rebillSubscription->updateSubscription(
             $item->getRebillId(),
             [
-                'amount' => $details["price"]["amount"],
-                'card' => $details['card'],
-                'nextChargeDate' => $details['nextChargeDate'],
                 'status' => $newStatus,
             ]
         );

@@ -32,13 +32,9 @@ class Reactivate extends ChangeStatus
             return;
         }
 
-        $_details = $subscription->getDetails();
         $this->rebillSubscription->updateSubscription(
             $subscription->getRebillId(),
             [
-                'amount'      => $_details['price']['amount'],
-                'card'        => $_details['card'],
-                'nextChargeDate' => $_details['nextChargeDate'],
                 'status'      => EntitySubscription::STATUS_ACTIVE,
             ]
         );

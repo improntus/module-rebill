@@ -85,10 +85,7 @@ class Save extends Action
                     $this->rebillSubscription->updateSubscription(
                         $shipment->getRebillId(),
                         [
-                            'amount'      => $shipmentDetails['price']['amount'],
-                            'repetitions' => $shipmentDetails['remainingIterations'],
                             'status'      => $rebillSubscription['status'],
-                            'card'        => $rebillSubscription['card'],
                         ]
                     );
                     $shipmentDetails['card'] = $rebillSubscription['card'];
@@ -107,10 +104,7 @@ class Save extends Action
                 $this->rebillSubscription->updateSubscription(
                     $_subscription->getRebillId(),
                     [
-                        'amount'      => $_subscriptionDetails['price']['amount'],
-                        'repetitions' => $_subscriptionDetails['remainingIterations'],
                         'status'      => $rebillSubscription['status'],
-                        'card'        => $rebillSubscription['card'],
                     ]
                 );
                 $_subscriptionDetails['card'] = $rebillSubscription['card'];

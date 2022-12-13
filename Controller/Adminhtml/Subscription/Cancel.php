@@ -131,7 +131,10 @@ class Cancel extends Action
         if (is_null($subscription)) {
             return;
         }
-        $this->rebillSubscription->cancelSubscription($subscription->getRebillId(), $this->customerEmail);
+        $this->rebillSubscription->updateSubscription($subscription->getRebillId(),
+            [
+                'status' => EntitySubscription::STATUS_CANCELLED,
+            ]);
         $subscription->setStatus(EntitySubscription::STATUS_CANCELLED);
         $repository->save($subscription);
     }

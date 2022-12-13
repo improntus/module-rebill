@@ -29,7 +29,11 @@ class Cancel extends ChangeStatus
         if (!$subscription) {
             return;
         }
-        $this->rebillSubscription->cancelSubscription($subscription->getRebillId(), $this->customerEmail);
+
+        $this->rebillSubscription->updateSubscription($subscription->getRebillId(),
+            [
+                'status' => EntitySubscription::STATUS_CANCELLED,
+            ]);
         $subscription->setStatus(EntitySubscription::STATUS_CANCELLED);
         $repository->save($subscription);
     }
