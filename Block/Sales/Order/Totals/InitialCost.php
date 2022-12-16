@@ -11,7 +11,9 @@ use Improntus\Rebill\Helper\Config;
 use Magento\Framework\DataObject;
 use Magento\Framework\View\Element\Template;
 use Magento\Sales\Model\Order\Payment;
+use Magento\Sales\Model\Order\Invoice;
 use Magento\Framework\Exception\NoSuchEntityException;
+
 
 class InitialCost extends Template
 {
@@ -42,19 +44,13 @@ class InitialCost extends Template
     public function initTotals()
     {
         $order = $this->getSource();
+        if ($order instanceof Invoice) {
+            $order = $order->getOrder();
+        }
         $orderPayment = $order->getPayment();
 
-        if ($orderPayment instanceof Payment && $this->configHelper->hasOrderSubscriptionProducts($order)) {
-            if ($order->getData('rebill_initial_cost_amount') > 0) {
-                $total = new DataObject([
-                    'code'  => 'rebill_initial_cost',
-                    'field' => 'rebill_initial_cost_amount',
-                    'value' => $order->getData('rebill_initial_cost_amount'),
-                    'label' => __('Subscription Initial Cost'),
-                ]);
-                $parent = $this->getParentBlock();
-                $parent->addTotalBefore($total, 'shipping');
-            } else {
+        if (($orderPayment instanceof Payment) && $this->configHelper->hasOrderSubscriptionProducts($order)) {
+            if ($order->getData('rebill_initial_cost_amount') <= 0) {
                 $rebillInfo = $this->configHelper->getOrderSubscriptionInformation($order);
                 $cost = 0;
                 foreach ($rebillInfo as $info) {
@@ -63,17 +59,16 @@ class InitialCost extends Template
                 $order->setData('rebill_initial_cost_amount', $cost);
                 $order->setData('base_rebill_initial_cost_amount', $cost);
                 $order->save();
-                $total = new DataObject([
-                    'code'  => 'rebill_initial_cost',
-                    'field' => 'rebill_initial_cost_amount',
-                    'value' => $cost,
-                    'label' => __('Subscription Initial Cost'),
-                ]);
-                $parent = $this->getParentBlock();
-                $parent->addTotalBefore($total, 'shipping');
             }
+            $total = new DataObject([
+                'code' => 'rebill_initial_cost',
+                'field' => 'rebill_initial_cost_amount',
+                'value' => $order->getData('rebill_initial_cost_amount'),
+                'label' => __('Subscription Initial Cost'),
+            ]);
+            $parent = $this->getParentBlock();
+            $parent->addTotalBefore($total, 'shipping');
         }
-
         return $this;
     }
 
