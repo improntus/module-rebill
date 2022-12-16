@@ -364,14 +364,16 @@ class Transaction
     }//phpcs:enable
 
     /**
-     * @param $item
+     * @param array $item
      * @return array
      */
-    private function filterByKeys($item)
+    private function filterByKeys(array $item): array
     {
         return array_filter(
             $item,
-            fn($key) => $key != 'quantity',
+            function ($key) {
+                return $key != 'quantity';
+            },
             ARRAY_FILTER_USE_KEY
         );
     }
