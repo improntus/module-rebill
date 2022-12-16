@@ -63,34 +63,38 @@ class SubscriptionChangeStatus extends WebhookAbstract
         $newStatus = strtoupper($newStatus);
         $shipmentPackage = $this->subscriptionRepository->getSubscriptionPackage($billingScheduleId);
         foreach ($shipmentPackage["subscription_list"] as $subscription) {
-            $this->updateStatus($subscription, $newStatus);
+            $this->updateStatus($subscription, $newStatus, $billingScheduleId);
         }
-        $this->updateStatus($shipmentPackage["shipment"], $newStatus);
+        $this->updateStatus($shipmentPackage["shipment"], $newStatus, $billingScheduleId);
     }
 
     /**
-     * @param SubscriptionModel|ShipmentModel $item
+     * @param $item
      * @param string $newStatus
+     * @param string $billingScheduleId
      * @return void
      * @throws CouldNotSaveException
      */
-    private function updateStatus($item, string $newStatus)
+    private function updateStatus($item, string $newStatus, string $billingScheduleId)
     {
         if ($newStatus === $item->getStatus()) {
             return;
         }
+
         $item->setStatus($newStatus);
         if ($item instanceof SubscriptionModel) {
             $this->subscriptionRepository->save($item);
         } else {
             $this->subscriptionRepository->getSubscriptionShipmentRepository()->save($item);
         }
-        $details = $item->getDetails();
-        $this->rebillSubscription->updateSubscription(
-            $item->getRebillId(),
-            [
-                'status' => $newStatus,
-            ]
-        );
+
+        if ($billingScheduleId != $item->getRebillId()) {
+            $this->rebillSubscription->updateSubscription(
+                $item->getRebillId(),
+                [
+                    'status' => $newStatus,
+                ]
+            );
+        }
     }
 }
