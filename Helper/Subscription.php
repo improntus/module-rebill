@@ -114,8 +114,8 @@ class Subscription extends Data
     {
         return [
             'enable_subscription' => (bool)$product->getData('rebill_subscription_type'),
-            'subscription_type'   => $product->getData('rebill_subscription_type'),
-            'frequency'           => json_decode($product->getData('rebill_frequency') ?? '[]', true),
+            'subscription_type' => $product->getData('rebill_subscription_type'),
+            'frequency' => json_decode($product->getData('rebill_frequency') ?? '[]', true),
         ];
     }
 
@@ -318,5 +318,15 @@ class Subscription extends Data
         } catch (Exception $exception) {
             return '';
         }
+    }
+
+    /**
+     * @param string $description
+     * @param int $limit
+     * @return false|string
+     */
+    public function getShortDescription(string $description, int $limit = 0)
+    {
+        return strlen($description) > $limit ? substr($description, 0, $limit) : $description;
     }
 }

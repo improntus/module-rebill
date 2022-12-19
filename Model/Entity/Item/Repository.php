@@ -134,7 +134,7 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
             if (!$item->getRebillId()) {
                 $rebillItem = $this->rebillItem->createItem([
                     'name'        => $item->getSku(),
-                    'description' => $item->getDescription(),
+                    'description' => $this->configHelper->getShortDescription($item->getDescription(), 150),
                 ]);
                 if ($rebillItem) {
                     $item->setRebillId($rebillItem);

@@ -39,7 +39,6 @@ class Item extends Rebill
             return $result['id'];
         } catch (Exception $exception) {
             $this->configHelper->logError($exception->getMessage());
-            $this->configHelper->logError('id:' . $itemId . ' amount:' . $data['amount']);
         }
         return null;
     }

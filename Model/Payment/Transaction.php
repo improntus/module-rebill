@@ -260,7 +260,7 @@ class Transaction
                 }, $item);
                 $orderId = $order->getIncrementId();
                 $sku = "shipment-$orderId";
-                $name = "Order #{$orderId} Shipment " . implode(' ', $itemsNames);
+                $name = $this->configHelper->getShortDescription("Order #{$orderId} Shipment " . implode(' ', $itemsNames), 250);
                 $items[$hash][] = [
                     'type' => 'shipment',
                     'frequency_hash' => $hash,
