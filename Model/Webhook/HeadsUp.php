@@ -25,6 +25,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderRepository;
 use Zend_Db_Expr;
+use DateTime;
 
 class HeadsUp extends WebhookAbstract
 {
@@ -175,11 +176,15 @@ class HeadsUp extends WebhookAbstract
                     $nextChargeDate = date('Y-m-d H:i:s', strtotime("+$retryDays days"));
                 }
                 if (!$fromPayment || !$this->configHelper->getUseOldPricesOnNewPayment()) {
+                    $rebillShipment = $this->subscriptionRepository->getRebillSubscription(
+                        $shipment->getRebillId(),
+                        $_order->getCustomerEmail()
+                    );
+
+                    $subscriptionData = $this->prepareDataSubscription($rebillShipment, $nextChargeDate, $shippingPrice);
                     $this->rebillSubscription->updateSubscription(
                         $shipment->getRebillId(),
-                        [
-                            'status'         => $rebillSubscription['status'],
-                        ]
+                        $subscriptionData
                     );
                     $shipment->setNextSchedule($nextChargeDate);
                 }
@@ -202,7 +207,7 @@ class HeadsUp extends WebhookAbstract
                 $frequencyOption = json_decode($frequencyOption->getValue(), true);
                 $_frequencyQty = $frequencyOption['frequency'] ?? 0;
                 $frequency = [
-                    'frequency'      => $_frequencyQty ?? 0,
+                    'frequency' => $_frequencyQty ?? 0,
                     'frequency_type' => $frequencyOption['frequencyType'] ?? 'months',
                 ];
                 if (isset($frequencyOption['recurringPayments']) && $frequencyOption['recurringPayments']) {
@@ -227,11 +232,10 @@ class HeadsUp extends WebhookAbstract
                     ]);
                     $itemQty = $orderItem->getQtyOrdered();
                     $price = $rowTotal / $itemQty;
+                    $subscriptionData = $this->prepareDataSubscription($rebillSubscription, $rebillSubscription['nextChargeDate'], $price);
                     $this->rebillSubscription->updateSubscription(
                         $sub->getRebillId(),
-                        [
-                            'status'         => $rebillSubscription['status'],
-                        ]
+                        $subscriptionData
                     );
                     $sub->setNextSchedule($rebillSubscription['nextChargeDate']);
                     $sub->setOrderId($order->getId());
@@ -246,18 +250,41 @@ class HeadsUp extends WebhookAbstract
             /** @var \Improntus\Rebill\Model\Entity\Subscription\Model $_subscription */
             foreach ($package['subscription_list'] as $_subscription) {
                 if (!$fromPayment) {
+                    $nextSchedule = date('Y-m-d H:i:s', strtotime("+$retryDays days"));
                     $this->rebillSubscription->updateSubscription(
                         $_subscription->getRebillId(),
                         [
-                            'status'         => $rebillSubscription['status'],
+                            'amount' => (string)$_subscription->getDetails()['price']['amount'],
+                            'status' => $rebillSubscription['status'],
+                            'nextChargeDate' => $nextSchedule,
                         ]
                     );
-                    $_subscription->setNextSchedule(date('Y-m-d H:i:s', strtotime("+$retryDays days")));
+                    $_subscription->setNextSchedule($nextSchedule);
                 }
                 $_subscription->setDetails($rebillSubscription);
                 $this->subscriptionRepository->save($_subscription);
             }
         }
         return $order;
+    }
+
+    private function prepareDataSubscription($rebillSubscription, $nextChargeDate, $price)
+    {
+        $subscriptionData = [
+            'status' => $rebillSubscription['status'],
+        ];
+
+        $rebillSubscriptionDate = new DateTime($rebillSubscription['nextChargeDate']);
+        $subscriptionDate = new DateTime($nextChargeDate);
+        $diff = $rebillSubscriptionDate->diff($subscriptionDate);
+        if ($diff->days > 0) {
+            $subscriptionData = array_merge($subscriptionData, ['nextChargeDate' => $nextChargeDate]);
+        }
+
+        if ((string)$price != $rebillSubscription['price']['amount']) {
+            $subscriptionData = array_merge($subscriptionData, ['amount' => (string)$price]);
+        }
+
+        return $subscriptionData;
     }
 }
