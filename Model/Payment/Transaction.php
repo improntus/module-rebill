@@ -259,14 +259,14 @@ class Transaction
                     return "({$item['product_name']})";
                 }, $item);
                 $orderId = $order->getIncrementId();
-                $sku = "shipment-$orderId";
+                $sku = "shipment-{$orderId}";
                 $name = $this->configHelper->getShortDescription("Order #{$orderId} Shipment " . implode(' ', $itemsNames), 250);
                 $items[$hash][] = [
                     'type' => 'shipment',
                     'frequency_hash' => $hash,
                     'frequency' => $frequency,
                     'sku' => $sku,
-                    'product_name' => $sku,
+                    'product_name' => $this->configHelper->getShortDescription($sku, 50),
                     'price_name' => $name,
                     'price' => $shipmentPrice,
                     'quantity' => 1,
