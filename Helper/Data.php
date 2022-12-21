@@ -148,4 +148,10 @@ class Data extends AbstractHelper
         }
         return false;
     }
+
+    public function arraySumDecimalRight(array $array)
+    {
+        $result = array_sum($array);
+        return number_format($result, 5);
+    }
 }

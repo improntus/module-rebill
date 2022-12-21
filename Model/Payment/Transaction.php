@@ -142,7 +142,7 @@ class Transaction
                 $_item = $item->getParentItem();
             }
             $discount = $_item->getDiscountAmount();
-            $rowTotal = array_sum([
+            $rowTotal = $this->configHelper->arraySumDecimalRight([
                 $_item->getRowTotal(),
                 $discount > 0 ? $discount * -1 : $discount,
                 $_item->getTaxAmount(),
@@ -206,7 +206,7 @@ class Transaction
         $itemsTotals = [];
         foreach ($order->getAllVisibleItems() as $item) {
             $discount = $item->getDiscountAmount();
-            $rowTotal = array_sum([
+            $rowTotal = $this->configHelper->arraySumDecimalRight([
                 $item->getRowTotal(),
                 $discount > 0 ? $discount * -1 : $discount,
                 $item->getTaxAmount(),
@@ -214,7 +214,7 @@ class Transaction
             ]);
             $itemsTotals[] = $rowTotal * -1;
         }
-        $total = array_sum([
+        $total = $this->configHelper->arraySumDecimalRight([
             $order->getGrandTotal(),
             $order->getShippingAmount() * -1,
             $order->getShippingTaxAmount() * -1,
@@ -222,7 +222,6 @@ class Transaction
             $order->getShippingDiscountTaxCompensationAmount(),
             array_sum($itemsTotals),
         ]);
-        $total = number_format($total, 5);
         $additionalItem = [
             'type' => 'additional',
             'frequency_hash' => $defaultFrequencyHash,
@@ -241,7 +240,7 @@ class Transaction
             if (isset($items[$defaultFrequencyHash])) {
                 $itemsQty--;
             }
-            $shipmentPrice = array_sum([
+            $shipmentPrice = $this->configHelper->arraySumDecimalRight([
                     $order->getShippingAmount(),
                     $order->getShippingTaxAmount(),
                     -$order->getShippingDiscountAmount(),
