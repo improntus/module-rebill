@@ -165,7 +165,7 @@ class Transaction
             }
             $frequencyHash = self::createHashFromArray($frequency);
             $this->frequencyHashes[$frequencyHash] = $frequency;
-            $preparedItems[$frequencyHash][] = [
+            $rebillItem = [
                 'type' => 'product',
                 'frequency_hash' => $frequencyHash,
                 'frequency' => $frequency,
@@ -176,6 +176,7 @@ class Transaction
                 'gateway' => $gateway,
                 'currency' => $this->configHelper->getCurrency(),
             ];
+            $preparedItems = $this->filterDuplicates($preparedItems, $frequencyHash, $rebillItem);
         }
         return $preparedItems;
     }
@@ -376,5 +377,32 @@ class Transaction
             },
             ARRAY_FILTER_USE_KEY
         );
+    }
+
+    /**
+     * @param $preparedItems
+     * @param $frequencyHash
+     * @param $rebillItem
+     * @return mixed
+     */
+    private function filterDuplicates($preparedItems, $frequencyHash, $rebillItem)
+    {
+        if (array_key_exists($frequencyHash, $preparedItems)) {
+            $existsItem = false;
+            foreach ($preparedItems[$frequencyHash] as &$item) {
+                if ($item['sku'] == $rebillItem['sku'] && $item["price"] == $rebillItem['price']) {
+                    $item["quantity"] += $rebillItem["quantity"];
+                    $existsItem = true;
+                    break;
+                }
+            }
+
+            if (!$existsItem) {
+                $preparedItems[$frequencyHash][] = $rebillItem;
+            }
+        } else {
+            $preparedItems[$frequencyHash][] = $rebillItem;
+        }
+        return $preparedItems;
     }
 }

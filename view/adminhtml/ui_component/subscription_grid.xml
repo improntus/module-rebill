@@ -117,6 +117,7 @@
             <settings>
                 <filter>dateRange</filter>
                 <dataType>date</dataType>
+                <timezone>false</timezone>
                 <dateFormat>yyyy-MM-dd</dateFormat>
                 <label translate="true">Next Charge Date</label>
             </settings>
