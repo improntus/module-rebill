@@ -133,8 +133,8 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
         if ($item instanceof DataInterface) {
             if (!$item->getRebillId()) {
                 $rebillItem = $this->rebillItem->createItem([
-                    'name'        => $this->configHelper->getShortDescription($item->getSku(), 50),
-                    'description' => $this->configHelper->getShortDescription($item->getDescription(), 150),
+                    'name'        => $this->configHelper->getShortDescription($item->getSku(), 255),
+                    'description' => $this->configHelper->getShortDescription($item->getDescription(), 500),
                 ]);
                 if ($rebillItem) {
                     $item->setRebillId($rebillItem);
