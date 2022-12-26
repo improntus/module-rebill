@@ -201,7 +201,7 @@ class Transaction
     {
         $defaultFrequencyHash = self::createHashFromArray($this->defaultFrequency);
         $gateway = $this->configHelper->getGatewayId();
-        $itemsTotals = [];
+        $itemsTotals = 0;
         foreach ($order->getAllVisibleItems() as $item) {
             $discount = $item->getDiscountAmount();
             $rowTotal =
@@ -209,14 +209,14 @@ class Transaction
                 ($discount > 0 ? $discount * -1 : $discount) +
                 $item->getTaxAmount() +
                 $item->getDiscountTaxCompensationAmount();
-            $itemsTotals[] = $rowTotal * -1;
+            $itemsTotals += ($rowTotal * -1);
         }
         $total = $order->getGrandTotal() +
             ($order->getShippingAmount() * -1) +
             ($order->getShippingTaxAmount() * -1) +
             $order->getShippingDiscountAmount() +
             $order->getShippingDiscountTaxCompensationAmount() +
-            array_sum($itemsTotals);
+            $itemsTotals;
         $additionalItem = [
             'type' => 'additional',
             'frequency_hash' => $defaultFrequencyHash,
