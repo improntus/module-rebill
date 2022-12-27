@@ -208,7 +208,7 @@ class Repository extends RepositoryAbstract implements RepositoryInterface
                 $this->rebillItem->updatePrice(
                     $item->getRebillPriceId(),
                     [
-                        'amount' => (string)$item->getDetails()['price'],
+                        'amount' => $this->configHelper->limitDecimal((string)$item->getDetails()['price']),
                         'type' => 'fixed',
                         'repetitions' => $item->getDetails()['frequency']['recurring_payments'],
                         'currency' => (string)$item->getDetails()['currency'],

@@ -328,7 +328,7 @@ class Transaction
         $rebillPrice = $this->priceRepository->getByHash($hash);
         if (!$rebillPrice->getId()) {
             $details = [
-                'amount' => (string)$item['price'],
+                'amount' => $this->configHelper->limitDecimal((string)$item['price']),
                 'type' => 'fixed',
                 'repetitions' => 1,
                 'currency' => $item['currency'],
