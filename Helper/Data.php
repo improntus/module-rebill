@@ -148,4 +148,24 @@ class Data extends AbstractHelper
         }
         return false;
     }
+    /**
+     * @param string $price
+     * @return string
+     */
+    public function limitDecimal(string $price): string
+    {
+        $separator = preg_replace('/\d+/u', '', $price);
+        if (strlen($separator) != 1) {
+            return $price;
+        }
+
+        $decimalSeparatorPos = strpos($price, $separator);
+        $decimalPart = substr($price, $decimalSeparatorPos + 1);
+        $limitMax = 5;
+        if (strlen($decimalPart) > $limitMax) {
+            $decimalPart = substr($decimalPart, 0, $limitMax);
+        }
+        $wholeNumber = substr($price, 0, $decimalSeparatorPos);
+        return $wholeNumber . $separator . $decimalPart;
+    }
 }
