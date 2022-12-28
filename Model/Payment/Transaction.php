@@ -268,7 +268,10 @@ class Transaction
                 ];
             }
         }
-        $items[$defaultFrequencyHash][] = $additionalItem;
+        if ($additionalItem['price'] != 0) {
+            $items[$defaultFrequencyHash][] = $additionalItem;
+        }
+
     }
 
     /**
@@ -328,7 +331,7 @@ class Transaction
         $rebillPrice = $this->priceRepository->getByHash($hash);
         if (!$rebillPrice->getId()) {
             $details = [
-                'amount' => $this->configHelper->limitDecimal((string)$item['price']),
+                'amount' => $this->configHelper->limitDecimal($item['price']),
                 'type' => 'fixed',
                 'repetitions' => 1,
                 'currency' => $item['currency'],

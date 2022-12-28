@@ -149,23 +149,30 @@ class Data extends AbstractHelper
         return false;
     }
     /**
-     * @param string $price
+     * @param float $price
      * @return string
      */
-    public function limitDecimal(string $price): string
+    public function limitDecimal(float $price): string
     {
-        $separator = preg_replace('/\d+/u', '', $price);
-        if (strlen($separator) != 1) {
-            return $price;
-        }
+        $limitDecimalMax = 5;
+        $price = round($this->returnNumberString($price), $limitDecimalMax);
+        return (string) $price;
+    }
 
-        $decimalSeparatorPos = strpos($price, $separator);
-        $decimalPart = substr($price, $decimalSeparatorPos + 1);
-        $limitMax = 5;
-        if (strlen($decimalPart) > $limitMax) {
-            $decimalPart = substr($decimalPart, 0, $limitMax);
+    /**
+     * @param $n
+     * @param $min
+     * @param $max
+     * @return string
+     */
+    public function returnNumberString($n, $min = 20, $max = 20)
+    {
+        $abs = abs($n);
+        if ($abs < 1) {
+            $n = rtrim(sprintf("%.{$min}F", $n), "0");
+        } else {
+            $n = rtrim(rtrim(sprintf("%.{$max}F", $n), "0"), '.');
         }
-        $wholeNumber = substr($price, 0, $decimalSeparatorPos);
-        return $wholeNumber . $separator . $decimalPart;
+        return $n;
     }
 }
