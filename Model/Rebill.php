@@ -50,6 +50,7 @@ class Rebill
         'customer_subscriptions' => '/v2/subscriptions/customer/%s',
         'identification' => '/v2/data/identification/%s/%s',
         'organization_info' => '/v2/organization',
+        'getcurrencies' => '/v2/data/currencies/%s/%s',
         'payment' => '/v2/payments/%s',
         'payment_list' => '/v2/payments',
         'payment_subscriptions' => '/v2/payments/%s/billingSchedules',

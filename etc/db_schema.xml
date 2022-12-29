@@ -111,6 +111,20 @@
             <column name="entity_id"/>
         </constraint>
     </table>
+    <table name="rebill_currency" resource="default" engine="innodb" comment="Rebill Currency">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="currency_id" length="255" nullable="false" comment="Currency ID"/>
+        <column xsi:type="varchar" name="symbol" length="255" nullable="false" comment="Currency ID"/>
+        <column xsi:type="varchar" name="description" length="255" nullable="false" comment="Currency ID"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="false"/>
+        <column xsi:type="datetime" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="REBILL_CURRENCY_ID">
+            <column name="currency_id"/>
+        </constraint>
+    </table>
     <table name="salesrule">
         <column xsi:type="int" name="rebill_apply_to_subscriptions" unsigned="true" nullable="true" comment="Rebill Apply To Subscriptions"/>
         <column xsi:type="int" name="rebill_no_apply_expired_coupon" unsigned="true" nullable="true" comment="Rebill No Apply Expired Coupon"/>

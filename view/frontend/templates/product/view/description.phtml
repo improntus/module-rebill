@@ -20,9 +20,11 @@ $productRebill = $configHelper->getProductRebillSubscriptionDetails($block->getP
 $frequencies = $productRebill['frequency'];
 $isOnlySubscription = $productRebill['subscription_type'] === "subscription";
 $isRebillEnabled = $configHelper->isEnabled();
+$currenciesAvailable = $configHelper->currencyAvailable();
+
 
 ?>
-<?php if (($count = count($frequencies)) && $configHelper->isLoggedIn() && $productRebill['enable_subscription'] && $isRebillEnabled) : ?>
+<?php if (($count = count($frequencies)) && $configHelper->isLoggedIn() && $productRebill['enable_subscription'] && $isRebillEnabled && $currenciesAvailable) : ?>
     <div class="rebill-subscription">
         <?php if (!$isOnlySubscription) : ?>
             <div class="check-subscription">
@@ -121,13 +123,22 @@ $isRebillEnabled = $configHelper->isEnabled();
     <?php endif ?>
 <?php endif ?>
 
-<?php if ($isOnlySubscription && (count($frequencies) == 0 || !$isRebillEnabled)) : ?>
+<?php if ($isOnlySubscription && (count($frequencies) == 0 || !$isRebillEnabled || !$currenciesAvailable) ) : ?>
     <script>
 
         require(['jquery'], function ($) {
             $(document).ready(function () {
                 let cartButton = $("#product-addtocart-button");
                 cartButton.hide();
+
+                <?php if (!$currenciesAvailable) : ?>
+                    let formProduct = $('form#product_addtocart_form');
+                    let message = document.createElement('div');
+                    message.classList.add('rebill-error-message');
+                    let msg = "<?= $escaper->escapeJs($configHelper->getProductCurrencyRebillInvalidMessage()) ?>";
+                    message.innerHTML = `${msg}`;
+                    formProduct.append(message);
+                <?php endif ?>
             });
         });
     </script>

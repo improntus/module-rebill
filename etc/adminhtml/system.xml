@@ -25,6 +25,10 @@
                     <label>Sort Order</label>
                     <validate>validate-number validate-digits</validate>
                 </field>
+                <field id="enabled_currencies" translate="label" type="multiselect" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled Currencies</label>
+                    <source_model>Improntus\Rebill\Model\Config\Source\Currency</source_model>
+                </field>
                 <group id="general" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>General</label>
                     <attribute type="expanded">1</attribute>

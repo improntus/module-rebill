@@ -92,6 +92,22 @@ class Config extends Subscription
     }
 
     /**
+     * @return \Magento\Framework\Phrase
+     */
+    public function getCurrencyRebillInvalidMessage()
+    {
+        return __("The currency is not supported by Rebill. Please remove subscriptions from cart or change currency");
+    }
+
+    /**
+     * @return \Magento\Framework\Phrase
+     */
+    public function getProductCurrencyRebillInvalidMessage()
+    {
+        return __("The currency is not supported by Rebill.");
+    }
+
+    /**
      * @return bool
      */
     public function getReorderRetryDays()

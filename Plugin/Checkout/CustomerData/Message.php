@@ -48,11 +48,22 @@ class Message
      */
     public function afterGetSectionData(Cart $subject, array $result): array
     {
+        $msgArray = [];
         if ($this->configHelper->checkoutHasMixedCartConflict()) {
             $message = $this->configHelper->getCheckOutMixedCartConflictMessage();
-            $result['message'] = $message;
-            $this->messageManager->addErrorMessage($message);
+            $msgArray[] = $message;
         }
+        if(!$this->configHelper->currencyAvailable()){
+            $currencyMsg = $this->configHelper->getCurrencyRebillInvalidMessage();
+            $msgArray[] = $currencyMsg;
+        }
+
+        if(count($msgArray) > 0){
+            $msg = implode('. ', $msgArray);
+            $result['message'] = $msg;
+            $this->messageManager->addErrorMessage($msg);
+        }
+
         return $result;
     }
 }

@@ -83,6 +83,7 @@
         <plugin name="Improntus_Rebill::afterGetProductCollection" type="Improntus\Rebill\Plugin\Catalog\ListProduct" sortOrder="10" disabled="true"/>
     </type>
 
+    <preference for="Improntus\Rebill\Api\Currency\DataInterface" type="Improntus\Rebill\Model\Entity\Currency\Model"/>
     <preference for="Improntus\Rebill\Api\Item\DataInterface" type="Improntus\Rebill\Model\Entity\Item\Model"/>
     <preference for="Improntus\Rebill\Api\Price\DataInterface" type="Improntus\Rebill\Model\Entity\Price\Model"/>
     <preference for="Improntus\Rebill\Api\Payment\DataInterface" type="Improntus\Rebill\Model\Entity\Payment\Model"/>
@@ -92,6 +93,8 @@
     <preference for="Improntus\Rebill\Api\SubscriptionShipment\DataInterface"
                 type="Improntus\Rebill\Model\Entity\SubscriptionShipment\Model"/>
 
+    <preference for="Improntus\Rebill\Api\Currency\RepositoryInterface"
+                type="Improntus\Rebill\Model\Entity\Currency\Repository"/>
     <preference for="Improntus\Rebill\Api\Item\RepositoryInterface"
                 type="Improntus\Rebill\Model\Entity\Item\Repository"/>
     <preference for="Improntus\Rebill\Api\Price\RepositoryInterface"
@@ -105,6 +108,8 @@
     <preference for="Improntus\Rebill\Api\SubscriptionShipment\RepositoryInterface"
                 type="Improntus\Rebill\Model\Entity\SubscriptionShipment\Repository"/>
 
+    <preference for="Improntus\Rebill\Api\Currency\SearchResultInterface"
+                type="Improntus\Rebill\Model\Entity\Currency\SearchResults"/>
     <preference for="Improntus\Rebill\Api\Item\SearchResultInterface"
                 type="Improntus\Rebill\Model\Entity\Item\SearchResults"/>
     <preference for="Improntus\Rebill\Api\Price\SearchResultInterface"

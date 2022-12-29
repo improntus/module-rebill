@@ -20,6 +20,8 @@ use Magento\Framework\Pricing\Helper\Data as CurrencyHelper;
 use Magento\Framework\Registry;
 use Magento\Quote\Model\QuoteRepository;
 use Magento\Customer\Model\SessionFactory;
+use Improntus\Rebill\Model\Entity\Currency\Repository as CurrencyRepository;
+use Magento\Store\Model\StoreManagerInterface;
 
 class Data extends AbstractHelper
 {
@@ -67,6 +69,14 @@ class Data extends AbstractHelper
      * @var CheckoutSession
      */
     protected $_checkoutSession;
+    /**
+     * @var CurrencyRepository
+     */
+    protected $currencyRepository;
+    /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
 
     /**
      * @param Context $context
@@ -79,18 +89,22 @@ class Data extends AbstractHelper
      * @param QuoteRepository $quoteRepository
      * @param SessionFactory $sessionFactory
      * @param CheckoutSession $checkoutSession
+     * @param CurrencyRepository $currencyRepository
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
-        Context         $context,
-        Logger          $logger,
-        Session         $customerSession,
-        ProductFactory  $productFactory,
-        Registry        $registry,
-        CurrencyHelper  $currencyHelper,
-        Configurable    $configurableType,
-        QuoteRepository $quoteRepository,
-        SessionFactory  $sessionFactory,
-        CheckoutSession $checkoutSession
+        Context               $context,
+        Logger                $logger,
+        Session               $customerSession,
+        ProductFactory        $productFactory,
+        Registry              $registry,
+        CurrencyHelper        $currencyHelper,
+        Configurable          $configurableType,
+        QuoteRepository       $quoteRepository,
+        SessionFactory        $sessionFactory,
+        CheckoutSession       $checkoutSession,
+        CurrencyRepository    $currencyRepository,
+        StoreManagerInterface $storeManager
     ) {
         $this->quoteRepository = $quoteRepository;
         $this->configurableType = $configurableType;
@@ -101,6 +115,9 @@ class Data extends AbstractHelper
         $this->logger = $logger;
         $this->sessionFactory = $sessionFactory;
         $this->_checkoutSession = $checkoutSession;
+        $this->currencyRepository = $currencyRepository;
+        $this->storeManager = $storeManager;
+
         parent::__construct($context);
     }
 
@@ -148,6 +165,27 @@ class Data extends AbstractHelper
         }
         return false;
     }
+
+    /**
+     * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function currencyAvailable($quote = null): bool
+    {
+        $quote = ($quote != null) ? $quote : $this->_checkoutSession->getQuote();
+        if (!$this->hasQuoteSubscriptionProducts($quote)) {
+            return true;
+        }
+
+        $currencies = $this->currencyRepository->getCollection();
+        $baseCurrency = $this->storeManager->getStore()->getCurrentCurrencyCode();
+
+        $result = $currencies->addFieldToSelect('*')
+            ->addFieldToFilter('currency_id', ['eq' => $baseCurrency]);
+
+        return $result->count() > 0;
+    }
+
     /**
      * @param float $price
      * @return string
@@ -156,7 +194,7 @@ class Data extends AbstractHelper
     {
         $limitDecimalMax = 5;
         $price = round($this->returnNumberString($price), $limitDecimalMax);
-        return (string) $price;
+        return (string)$price;
     }
 
     /**

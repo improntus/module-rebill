@@ -63,6 +63,10 @@ class CheckoutData
         if ($this->configHelper->checkoutHasMixedCartConflict($quote)) {
             return false;
         }
+
+        if(!$this->configHelper->currencyAvailable($quote)){
+            return false;
+        }
         return $result;
     }
 }

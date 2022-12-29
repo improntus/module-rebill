@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Improntus Dev Team
+ * @copyright Copyright (c) 2022 Improntus (http://www.improntus.com/)
+ * @package Improntus_Rebill
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="admin_system_config_save">
+        <observer name="Improntus_Rebill_config_save_after" instance="Improntus\Rebill\Observer\UpdateRebillCurrencies" />
+    </event>
+</config>
