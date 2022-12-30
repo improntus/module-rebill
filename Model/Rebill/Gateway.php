@@ -21,7 +21,7 @@ class Gateway extends Rebill
             $result = $this->request('organization_info');
             return $result['gateways'];
         } catch (Exception $exception) {
-            return [];
+            $this->configHelper->logError($exception->getMessage());
         }
     }
 }
