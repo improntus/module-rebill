@@ -21,7 +21,7 @@ class Currency extends Rebill
             $result = $this->request('getcurrencies', 'GET', [$gateway, $isoCountry]);
             return $result;
         } catch (Exception $exception) {
-            return [];
+            $this->configHelper->logError($exception->getMessage());
         }
     }
 }
