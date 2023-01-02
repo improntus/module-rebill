@@ -53,7 +53,7 @@ class Message
             $message = $this->configHelper->getCheckOutMixedCartConflictMessage();
             $msgArray[] = $message;
         }
-        if(!$this->configHelper->currencyAvailable()){
+        if(!$this->configHelper->currencyAvailableCheckOut()){
             $currencyMsg = $this->configHelper->getCurrencyRebillInvalidMessage();
             $msgArray[] = $currencyMsg;
         }

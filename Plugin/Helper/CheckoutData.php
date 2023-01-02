@@ -64,7 +64,7 @@ class CheckoutData
             return false;
         }
 
-        if(!$this->configHelper->currencyAvailable($quote)){
+        if(!$this->configHelper->currencyAvailableCheckOut($quote)){
             return false;
         }
         return $result;

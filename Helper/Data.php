@@ -170,13 +170,8 @@ class Data extends AbstractHelper
      * @return bool
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function currencyAvailable($quote = null): bool
+    public function currencyAvailable(): bool
     {
-        $quote = ($quote != null) ? $quote : $this->_checkoutSession->getQuote();
-        if (!$this->hasQuoteSubscriptionProducts($quote)) {
-            return true;
-        }
-
         $currencies = $this->currencyRepository->getCollection();
         $baseCurrency = $this->storeManager->getStore()->getCurrentCurrencyCode();
 
@@ -184,6 +179,21 @@ class Data extends AbstractHelper
             ->addFieldToFilter('currency_id', ['eq' => $baseCurrency]);
 
         return $result->count() > 0;
+    }
+
+    /**
+     * @param $quote
+     * @return true
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function currencyAvailableCheckOut($quote = null)
+    {
+        $quote = ($quote != null) ? $quote : $this->_checkoutSession->getQuote();
+        if (!$this->hasQuoteSubscriptionProducts($quote)) {
+            return true;
+        }
+        return $this->currencyAvailable();
     }
 
     /**

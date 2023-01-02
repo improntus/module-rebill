@@ -27,11 +27,6 @@ class ConfigProvider implements ConfigProviderInterface
     protected $methodCode = 'improntus_rebill';
 
     /**
-     * @var Rebill
-     */
-    protected $method;
-
-    /**
      * @var CheckoutSession
      */
     protected $_checkoutSession;
@@ -132,6 +127,9 @@ class ConfigProvider implements ConfigProviderInterface
             $methodAvailable = false;
         }
         if ($this->configHelper->checkoutHasMixedCartConflict($quote)) {
+            $methodAvailable = false;
+        }
+        if(!$this->configHelper->currencyAvailable()){
             $methodAvailable = false;
         }
         return $methodAvailable;
