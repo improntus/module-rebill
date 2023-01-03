@@ -280,9 +280,10 @@ class HeadsUp extends WebhookAbstract
         if ($diff->days > 0) {
             $subscriptionData = array_merge($subscriptionData, ['nextChargeDate' => $nextChargeDate]);
         }
-
-        if ((string)$price != $rebillSubscription['price']['amount']) {
-            $subscriptionData = array_merge($subscriptionData, ['amount' => (string)$price]);
+        $rebillPrice = $this->configHelper->limitDecimal($rebillSubscription['price']['amount']);
+        $amount = $this->configHelper->limitDecimal($price);
+        if ($amount != $rebillPrice) {
+            $subscriptionData = array_merge($subscriptionData, ['amount' => $amount]);
         }
 
         return $subscriptionData;
