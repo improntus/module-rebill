@@ -24,7 +24,7 @@
 "Unable to refund payment on Rebill.","No se puede reembolsar el pago en Rebill."
 "%1 with a sign-up fee of %2","%1 con un costo inicial de %2"
 "%1 with a maximum of %2 payments","%1 con un máximo de %2 pagos"
-"%1 with a maximum of %2 payments with a sign-up fee of %3", "%1 con un maximo de %2 pagos con un costo inicial de %3"
+"%1 with a maximum of %2 payments with a sign-up fee of %3", "%1 con un máximo de %2 pagos con un costo inicial de %3"
 "%1 for %2 %3 with a sign-up fee of %4","%1 por %2 %3 con un costo inicial de %4"
 monthly, mensualmente
 yearly, anualmente

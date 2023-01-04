@@ -258,7 +258,7 @@ class Reorder
             }
             $frequencyOption = json_decode($rebillCustomOption->getValue(), true);
             $frequency = [
-                'frequency'      => $frequencyOption['frequency'] ?? 0,
+                'frequency' => $frequencyOption['frequency'] ?? 0,
                 'frequency_type' => $frequencyOption['frequencyType'] ?? 'months',
             ];
             if (isset($frequencyOption['recurringPayments']) && $frequencyOption['recurringPayments'] > 0) {
@@ -279,8 +279,8 @@ class Reorder
             }
             $items[] = [
                 'order_item' => $item,
-                'product'    => $product,
-                'frequency'  => $frequencyOption,
+                'product' => $product,
+                'frequency' => $frequencyOption,
             ];
         }
         $shippingAddress = clone $oldQuote->getShippingAddress();
@@ -293,19 +293,19 @@ class Reorder
         $payment->setData('payment_id', null);
         $payment->setData('quote_id', null);
         return [
-            'items'                => $items,
-            'shipping_address'     => $shippingAddress,
-            'billing_address'      => $billingAddress,
-            'shipping_method'      => $order->getShippingMethod(),
+            'items' => $items,
+            'shipping_address' => $shippingAddress,
+            'billing_address' => $billingAddress,
+            'shipping_method' => $order->getShippingMethod(),
             'shipping_description' => $order->getShippingDescription(),
-            'shipping_costs'       => [
-                'shipping_amount'                           => $order->getShippingAmount(),
-                'shipping_tax_amount'                       => $order->getShippingTaxAmount(),
-                'shipping_discount_amount'                  => $order->getShippingDiscountAmount(),
+            'shipping_costs' => [
+                'shipping_amount' => $order->getShippingAmount(),
+                'shipping_tax_amount' => $order->getShippingTaxAmount(),
+                'shipping_discount_amount' => $order->getShippingDiscountAmount(),
                 'shipping_discount_tax_compensation_amount' => $order->getShippingDiscountTaxCompensationAmount(),
             ],
-            'payment'              => $payment,
-            'payment_method'       => $order->getPayment()->getMethod(),
+            'payment' => $payment,
+            'payment_method' => $order->getPayment()->getMethod(),
         ];
     }
 
