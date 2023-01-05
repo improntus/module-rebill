@@ -124,10 +124,6 @@ class ConfigProvider implements ConfigProviderInterface
             }
         }
 
-        if(!$this->configHelper->hasQuoteSubscriptionProducts($quote)){
-            $methodAvailable = false;
-        }
-
         if ($this->configHelper->hasQuoteSubscriptionProducts($quote) && !$rulesMatched) {
             $methodAvailable = false;
         }
