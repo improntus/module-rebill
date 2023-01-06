@@ -58,8 +58,8 @@ class Subscription extends SearchResult
     public function setOrder($field, $direction = self::SORT_ORDER_DESC)
     {
         $jsonFields = [
-            "last_charge_date"    => "DATE_FORMAT(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.lastChargeDate')),'%Y-%m-%d')",
-            "next_charge_date"    => "DATE_FORMAT(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.nextChargeDate')),'%Y-%m-%d')",
+            "last_charge_date"    => "DATE_FORMAT(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.lastChargeDate')),'%Y-%m-%d %H:%i')",
+            "next_charge_date"    => "DATE_FORMAT(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.nextChargeDate')),'%Y-%m-%d %H:%i')",
             "user_email"          => "JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.userEmail'))",
             "title"               => "JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.title'))",
             "amount"              => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.amount')),'')",
@@ -157,8 +157,8 @@ class Subscription extends SearchResult
             "status"              => "main_table.status",
             "quantity"            => "main_table.quantity",
             "order_id"            => "main_table.order_id",
-            "last_charge_date"    => "DATE_FORMAT(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.lastChargeDate')),'%Y-%m-%d')",
-            "next_charge_date"    => "DATE_FORMAT(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.nextChargeDate')),'%Y-%m-%d')",
+            "last_charge_date"    => "DATE_FORMAT(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.lastChargeDate')),'%Y-%m-%d %H:%i')",
+            "next_charge_date"    => "DATE_FORMAT(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.nextChargeDate')),'%Y-%m-%d %H:%i')",
             "user_email"          => "JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.userEmail'))",
             "title"               => "JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.title'))",
             "amount"              => "IFNULL(JSON_UNQUOTE(JSON_EXTRACT(main_table.details, '$.price.amount')),'')",
