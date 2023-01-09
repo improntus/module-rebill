@@ -241,6 +241,7 @@ class HeadsUp extends WebhookAbstract
                     $sub->setOrderId($order->getId());
                     $sub->setPayed(0);
                     if ($sub->getId() == $subscription->getId()) {
+                        $rebillSubscription['price']['amount'] = $this->configHelper->limitDecimal($price);
                         $sub->setDetails($rebillSubscription);
                     }
                     $this->subscriptionRepository->save($sub);

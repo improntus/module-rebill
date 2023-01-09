@@ -256,13 +256,14 @@ class Reorder
             if (!$rebillCustomOption) {
                 continue;
             }
-            $frequencyOption = json_decode($rebillCustomOption->getValue(), true);
+            $updatedFrequency = $this->getFrequencyUpdated($item, $rebillCustomOption);
+
             $frequency = [
-                'frequency' => $frequencyOption['frequency'] ?? 0,
-                'frequency_type' => $frequencyOption['frequencyType'] ?? 'months',
+                'frequency' => $updatedFrequency['frequency'] ?? 0,
+                'frequency_type' => $updatedFrequency['frequencyType'] ?? 'months',
             ];
-            if (isset($frequencyOption['recurringPayments']) && $frequencyOption['recurringPayments'] > 0) {
-                $frequency['recurring_payments'] = (int)$frequencyOption['recurringPayments'];
+            if (isset($updatedFrequency['recurringPayments']) && $updatedFrequency['recurringPayments'] > 0) {
+                $frequency['recurring_payments'] = (int)$updatedFrequency['recurringPayments'];
             }
             $frequencyHash = Transaction::createHashFromArray($frequency);
             if (!in_array($frequencyHash, $frequencies)) {
@@ -280,7 +281,7 @@ class Reorder
             $items[] = [
                 'order_item' => $item,
                 'product' => $product,
-                'frequency' => $frequencyOption,
+                'frequency' => $updatedFrequency,
             ];
         }
         $shippingAddress = clone $oldQuote->getShippingAddress();
@@ -376,5 +377,24 @@ class Reorder
     {
         $this->useOldPrices = $useOldPrices;
         return $this;
+    }
+
+    /**
+     * @param Item $item
+     * @param $rebillCustomOption
+     * @return array|mixed
+     */
+    private function getFrequencyUpdated(Order\Item $item, $rebillCustomOption)
+    {
+        $currenciesFrequency = json_decode($item->getProduct()->getRebillFrequency(), true);
+        $frequencyOption = json_decode($rebillCustomOption->getValue(), true);
+        $updatedFrequency = [];
+        foreach ($currenciesFrequency as $currencyFrequency) {
+            if ($frequencyOption['id'] == $currencyFrequency['id']) {
+                $updatedFrequency = $currencyFrequency;
+                break;
+            }
+        }
+        return count($updatedFrequency) > 0 ? $updatedFrequency : $frequencyOption;
     }
 }

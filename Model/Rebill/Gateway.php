@@ -22,6 +22,7 @@ class Gateway extends Rebill
             return $result['gateways'];
         } catch (Exception $exception) {
             $this->configHelper->logError($exception->getMessage());
+            return [];
         }
     }
 }
