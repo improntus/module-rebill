@@ -113,9 +113,7 @@ class HeadsUp extends WebhookAbstract
     {
         $subscriptionId = $this->getParameter('id');
         $result = $this->executeHeadsUp($subscriptionId);
-        if (!$result) {
-            throw new LocalizedException(__('Order cant be created.'));
-        }
+
         if (is_array($result)) {
             throw new Exception(json_encode($result));
         }
