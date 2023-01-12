@@ -184,7 +184,7 @@ class HeadsUp extends WebhookAbstract
                         $shipment->getRebillId(),
                         $subscriptionData
                     );
-                    $shipment->setNextSchedule($nextChargeDate);
+
                 }
                 if ($order instanceof Order) {
                     $shipment->setPayed(0);
@@ -193,6 +193,7 @@ class HeadsUp extends WebhookAbstract
                 if ($shipment->getId() == $subscription->getId()) {
                     $shipment->setDetails($rebillSubscription);
                 }
+                $shipment->setNextSchedule($nextChargeDate);
                 $this->shipmentRepository->save($shipment);
             }
         }
@@ -246,10 +247,10 @@ class HeadsUp extends WebhookAbstract
                 }
             }
         } else {
+            $nextSchedule = date('Y-m-d H:i:s', strtotime("+$retryDays days"));
             /** @var \Improntus\Rebill\Model\Entity\Subscription\Model $_subscription */
             foreach ($package['subscription_list'] as $_subscription) {
                 if (!$fromPayment) {
-                    $nextSchedule = date('Y-m-d H:i:s', strtotime("+$retryDays days"));
                     $this->rebillSubscription->updateSubscription(
                         $_subscription->getRebillId(),
                         [
@@ -258,9 +259,9 @@ class HeadsUp extends WebhookAbstract
                             'nextChargeDate' => $nextSchedule,
                         ]
                     );
-                    $_subscription->setNextSchedule($nextSchedule);
                 }
                 $_subscription->setDetails($rebillSubscription);
+                $_subscription->setNextSchedule($nextSchedule);
                 $this->subscriptionRepository->save($_subscription);
             }
         }
