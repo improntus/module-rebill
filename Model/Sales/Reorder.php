@@ -172,6 +172,9 @@ class Reorder
             foreach ($newCartData['items'] as $item) {
                 $this->addItemToCart($item['order_item'], $newCart, $item['product'], $item['frequency']);
             }
+
+            $newCartData['shipping_address'] = $this->getShippingAddressUpdated($newCartData, $newCart);
+
             $newCart->setShippingAddress($newCartData['shipping_address']);
             $newCart->setBillingAddress($newCartData['billing_address']);
             $newCart->setStore($_order->getStore());
@@ -396,5 +399,29 @@ class Reorder
             }
         }
         return count($updatedFrequency) > 0 ? $updatedFrequency : $frequencyOption;
+    }
+
+    /**
+     * @param $newCartData
+     * @param $newCart
+     * @return mixed
+     */
+    private function getShippingAddressUpdated($newCartData, $newCart)
+    {
+        $subtotal = 0;
+        $grandTotal = 0;
+        $subtotalInclTax = 0;
+        $discount = 0;
+        foreach ($newCart->getItemsCollection() as $item) {
+            $subtotal += $item->getRowTotal();
+            $discount += $item->getDiscountAmount();
+        }
+        $grandTotal += array_sum([$subtotal,
+            $discount > 0 ? $discount * -1 : $discount,
+            $item->getTaxAmount(),
+            $item->getDiscountTaxCompensationAmount()]);
+        $newCartData['shipping_address']['subtotal'] = $subtotal;
+        $newCartData['shipping_address']['grand_total'] = $grandTotal;
+        return $newCartData['shipping_address'];
     }
 }
