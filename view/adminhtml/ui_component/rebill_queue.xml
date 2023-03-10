@@ -76,6 +76,7 @@
         <actionsColumn name="actions" class="Improntus\Rebill\Ui\Component\Listing\Column\QueueActions">
             <settings>
                 <indexField>entity_id</indexField>
+                <label translate="true">Actions</label>
             </settings>
         </actionsColumn>
     </columns>
