@@ -10,18 +10,16 @@
     <acl>
         <resources>
             <resource id="Magento_Backend::admin">
-                <resource id="Magento_Backend::content">
-                    <resource id="Improntus_Rebill::main" title="Rebill" translate="title" sortOrder="0">
+                    <resource id="Improntus_Rebill::main" title="Rebill menu" translate="title" sortOrder="0">
+                        <resource id="Improntus_Rebill::rebill" title="Rebill" translate="title" sortOrder="0">
+                        </resource>
+                        <resource id="Improntus_Rebill::subscriptions" title="Subscriptions" translate="title" sortOrder="10">
+                        </resource>
+                        <resource id="Improntus_Rebill::payments" title="Payments" translate="title" sortOrder="20">
+                        </resource>
+                        <resource id="Improntus_Rebill::queue" title="Queue" translate="title" sortOrder="30">
+                        </resource>
                     </resource>
-                    <resource id="Improntus_Rebill::rebill" title="Rebill" translate="title" sortOrder="0">
-                    </resource>
-                    <resource id="Improntus_Rebill::subscriptions" title="Subscriptions" translate="title" sortOrder="0">
-                    </resource>
-                    <resource id="Improntus_Rebill::payments" title="Payments" translate="title" sortOrder="0">
-                    </resource>
-                    <resource id="Improntus_Rebill::queue" title="Queue" translate="title" sortOrder="0">
-                    </resource>
-                </resource>
             </resource>
         </resources>
     </acl>
