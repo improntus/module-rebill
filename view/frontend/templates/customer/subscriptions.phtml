@@ -44,7 +44,7 @@ $subscriptions = $block->getSubscriptions();
                 <tr>
                     <td><?= $escaper->escapeHtml($subscription->getData('title') . ($subscription->getData('shipment') ? ' + SHIPMENT' : '')) ?></td>
                     <td><?= $escaper->escapeHtml($details['quantity']) ?></td>
-                    <td><?= $escaper->escapeHtml($subscription->getStatus()) ?></td>
+                    <td><?= $escaper->escapeHtml(__($subscription->getStatus())) ?></td>
                     <td><?= /** @noEscape */ $currencyHelper->currencyByStore($block->getTotal($details, $subscription)) ?></td>
                     <td><?= $escaper->escapeHtml($block->getRemainingIterationsByDetails($details)) ?></td>
                     <td><?= $escaper->escapeHtml($block->getPaymentMethod($details, $cards)) ?></td>

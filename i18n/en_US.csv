@@ -180,3 +180,7 @@ Subscriptions,Subscriptions
 "New order cannot be created. Check the order products and try again.","New order cannot be created. Check the order products and try again."
 "Checkout mixed cart conflict message","Checkout mixed cart conflict message"
 "Message to be displayed if there is a mixed cart conflict at checkout","Message to be displayed if there is a mixed cart conflict at checkout"
+"Enabled Currencies","Enabled Currencies"
+"Use old prices on New Payment Webhook","Use old prices on New Payment Webhook"
+"When a new payment is received without a previous heads up, then you can use the prices from the last order to create the new one or use the new prices to update the subscriptions on rebill.", "When a new payment is received without a previous heads up, then you can use the prices from the last order to create the new one or use the new prices to update the subscriptions on rebill."
+"Subscription Type","Subscription Type"
