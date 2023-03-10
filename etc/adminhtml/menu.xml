@@ -11,12 +11,12 @@
     <menu>
         <add id="Improntus_Rebill::main" title="Rebill" module="Improntus_Rebill" sortOrder="40" resource="Improntus_Rebill::main"/>
         <add id="Improntus_Rebill::rebill" title="Rebill" module="Improntus_Rebill" sortOrder="0"
-             parent="Improntus_Rebill::main" resource="Improntus_Rebill::rebill"/>
-        <add id="Improntus_Rebill::subscriptions" title="Subscriptions" module="Improntus_Rebill" sortOrder="0"
+             parent="Improntus_Rebill::main" resource="Improntus_Rebill::main"/>
+        <add id="Improntus_Rebill::subscriptions" title="Subscriptions" module="Improntus_Rebill" sortOrder="10"
              parent="Improntus_Rebill::rebill" action="rebill/subscription/index" resource="Improntus_Rebill::subscriptions"/>
-        <add id="Improntus_Rebill::payments" title="Payments" module="Improntus_Rebill" sortOrder="0"
+        <add id="Improntus_Rebill::payments" title="Payments" module="Improntus_Rebill" sortOrder="20"
              parent="Improntus_Rebill::rebill" action="rebill/payment/index" resource="Improntus_Rebill::payments"/>
-        <add id="Improntus_Rebill::queue" title="Queue" module="Improntus_Rebill" sortOrder="0"
+        <add id="Improntus_Rebill::queue" title="Queue" module="Improntus_Rebill" sortOrder="30"
              parent="Improntus_Rebill::rebill" action="rebill/queue/index" resource="Improntus_Rebill::queue"/>
     </menu>
 </config>
