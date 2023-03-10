@@ -49,28 +49,28 @@ class QueueData extends Column
                 $parameters = json_decode($item['parameters'], true);
                 switch ($item['type']) {
                     case 'payment_change_status':
-                        $item[$name] = "Rebill Payment: {$parameters['payment']['id']}<br>";
-                        $item[$name] .= "New Status: {$parameters['payment']['newStatus']}<br>";
-                        $item[$name] .= "Previous Status: {$parameters['payment']['previousStatus']}";
+                        $item[$name] = __("Rebill Payment: %1",$parameters['payment']['id']) . "<br>";
+                        $item[$name] .= __("New Status: %1",$parameters['payment']['newStatus']) . "<br>";
+                        $item[$name] .= __("Previous Status: %1",__($parameters['payment']['previousStatus']));
                         break;
                     case 'subscription_change_status':
-                        $item[$name] = "Rebill Subscription: {$parameters['billingScheduleId']}<br>";
-                        $item[$name] .= "New Status: {$parameters['newStatus']}<br>";
-                        $item[$name] .= "Previous Status: {$parameters['oldStatus']}";
+                        $item[$name] = __("Rebill Subscription: %1",$parameters['billingScheduleId']) ."<br>";
+                        $item[$name] .= __("New Status: %1",$parameters['newStatus']) . "<br>";
+                        $item[$name] .= __("Previous Status: %1",$parameters['oldStatus']);
                         break;
                     case 'heads_up':
-                        $item[$name] = "Rebill Subscription: {$parameters['id']}<br>";
+                        $item[$name] = __("Rebill Subscription: %1",$parameters['id']) . "<br>";
                         $_nextChargeDate = $parameters['_nextChargeDate'] ?? "";
-                        $item[$name] .= "Date: {$_nextChargeDate}";
+                        $item[$name] .= __("Date: %1",$_nextChargeDate);
                         break;
                     case 'confirmation':
                         $item[$name] = "Rebill Invoice: {$parameters['invoice_id']}<br>";
-                        $item[$name] .= "Magento Order ID: {$parameters['order_id']}";
+                        $item[$name] .= __("Magento Order ID: %1", $parameters['order_id']);
                         break;
                     case 'new_payment':
                     default:
                         $item[$name] = "Rebill Payment: {$parameters['payment']['id']}<br>";
-                        $item[$name] .= "Status: {$parameters['payment']['status']}";
+                        $item[$name] .= __("Status: %1", __($parameters['payment']['status']));
                         break;
                 }
             }
