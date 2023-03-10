@@ -44,11 +44,11 @@
                 <label translate="true">Payment Id Rebill</label>
             </settings>
         </column>
-        <column name="status" sortOrder="3">
+        <column name="status" class="Improntus\Rebill\Ui\Component\Listing\Column\Status" sortOrder="3">
             <settings>
                 <filter>false</filter>
                 <sortable>false</sortable>
-                <label translate="true">status</label>
+                <label translate="true">Status</label>
             </settings>
         </column>
         <column name="amount" class="Magento\Sales\Ui\Component\Listing\Column\Price">

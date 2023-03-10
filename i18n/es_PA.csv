@@ -207,3 +207,6 @@ Subscriptions,Suscripciones
 "Date: %1","Fecha %1"
 "Magento Order ID: %1","Id de pedido Magento: %1"
 "Rebill Invoice: %1","Factura Rebill: %1"
+"Retry","Reintentar"
+"Payment Id Rebill","Id de pago Rebill"
+"Status","Estado"
