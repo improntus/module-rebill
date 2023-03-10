@@ -64,12 +64,12 @@ class QueueData extends Column
                         $item[$name] .= __("Date: %1",$_nextChargeDate);
                         break;
                     case 'confirmation':
-                        $item[$name] = "Rebill Invoice: {$parameters['invoice_id']}<br>";
+                        $item[$name] = __("Rebill Invoice: %1",$parameters['invoice_id'])."<br>";
                         $item[$name] .= __("Magento Order ID: %1", $parameters['order_id']);
                         break;
                     case 'new_payment':
                     default:
-                        $item[$name] = "Rebill Payment: {$parameters['payment']['id']}<br>";
+                        $item[$name] = __("Rebill Payment: %1",$parameters['payment']['id']) . "<br>";
                         $item[$name] .= __("Status: %1", __($parameters['payment']['status']));
                         break;
                 }
