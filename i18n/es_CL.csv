@@ -210,3 +210,6 @@ Subscriptions,Suscripciones
 "Retry","Reintentar"
 "Payment Id Rebill","Id de pago Rebill"
 "Status","Estado"
+"failed","fallido"
+"processing","procesando"
+"success","exitoso"

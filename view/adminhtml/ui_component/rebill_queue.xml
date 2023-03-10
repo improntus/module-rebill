@@ -44,7 +44,7 @@
                 <label translate="true">Id</label>
             </settings>
         </column>
-        <column name="status">
+        <column name="status" class="Improntus\Rebill\Ui\Component\Listing\Column\Status">
             <settings>
                 <filter>false</filter>
                 <sortable>false</sortable>
